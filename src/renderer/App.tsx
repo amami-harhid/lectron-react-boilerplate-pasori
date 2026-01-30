@@ -1,36 +1,67 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import * as MiscAppFxns from './pages/lib/app/misc';
+import React, {useEffect} from 'react';
+import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
-import Home from './pages/home';
-import SqlDemo from './pages/sqlDemoPage';
+import {TopPage} from './pages/topPage';
+import {StopPage} from './pages/stopPage';
+import {HistoriesPage} from './pages/historiesPage';
 
 import './css/app.css';
-import './css/navbars.css';
-import './css/mastheads.css';
 
-const updateMainColWidth = MiscAppFxns.updateMainColWidth;
+export function IPCNavigator() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (window.navigate) {
+            window.navigate.onNavigate(async (_path:string) => {
+                await navigate(_path, {replace:false});
+            });
+        }
+    },
+    // 第二引数は空配列とする。
+    // ページ表示後にページごとにuseEffectが実行されてしまい
+    // 同じパスへのnavigate(path)がページごとに実行されてしまうことを回避する。
+    []);  
+    
+        return (
+            <></>
+        )
 
-export default class App extends React.Component {
+}
+
+export function App() {
+
+        return (
+            <>
+            <Router>
+                <IPCNavigator/>
+                <Routes>
+                        <Route path="/" element={<TopPage />} />
+                        <Route path="/Top" element={<TopPage />} />
+                        <Route path="/Stop" element={<StopPage />} />
+                        <Route path="/Histories" element={<HistoriesPage />} />
+                </Routes>
+            </Router>
+            </>
+        );
+
+}
+
+export default class App2 extends React.Component {
     constructor(props:any) {
         super(props);
         this.state = {}
     }
     async componentDidMount() {
-        window.addEventListener('resize', updateMainColWidth);
+//        window.addEventListener('resize', updateMainColWidth);
     }
     render() {
+ 
         return (
-            <fieldset id="app" >
-                <Router>
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/Home" element={<Home />} />
-                        <Route path="/SqlDemo" element={<SqlDemo />} />
+                        <Route path="/" element={<TopPage />} />
+                        <Route path="/Top" element={<TopPage />} />
+                        <Route path="/Stop" element={<StopPage />} />
+                        <Route path="/Histories" element={<HistoriesPage />} />
                     </Routes>
-                </Router>
-            </fieldset>
         );
     }
 }

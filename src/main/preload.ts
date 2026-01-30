@@ -23,7 +23,32 @@ const electronHandler = {
     },
   },
 };
-
+const electronNavigate = {
+  onNavigate: (callback:CallableFunction) => {
+    ipcRenderer.on("navigate", (_, path) => {
+      callback(path)
+    })
+  },
+};
+const electronPasoriCard = {
+  onTouch: (callback:CallableFunction) => {
+    ipcRenderer.on("card-touch", async(_, idm) => {
+      await callback(idm);
+    })
+  },
+  onRelease: (callback:CallableFunction) => {
+    ipcRenderer.on("card-release", async(_, idm) => {
+      await callback(idm);
+    })
+  }
+};
 contextBridge.exposeInMainWorld('electron', electronHandler);
+contextBridge.exposeInMainWorld('navigate', electronNavigate);
+contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
+
+
+
 
 export type ElectronHandler = typeof electronHandler;
+export type ElectronNavigate = typeof electronNavigate;
+export type ElectronPasoriCard = typeof electronPasoriCard;

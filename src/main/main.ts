@@ -21,7 +21,7 @@ import webpackPaths from '../../.erb/configs/webpack.paths';
 const databaseName = "myCoolDatabase.sqlite3";
 const sqlPath = path.join(webpackPaths.appPath,'sql',databaseName);
 console.log('sqlPath=',sqlPath) 
-const db = new sqlite3.Database(sqlPath, (err) => {
+const db = new sqlite3.Database(sqlPath, (err:Error|null) => {
     // release/app の下に sql フォルダーがないのでエラーになった。
     // release/app/sql を作れば作成できた。
     if (err) console.error('Database opening error: ', err);

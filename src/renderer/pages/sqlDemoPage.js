@@ -3,7 +3,6 @@ import Masthead from './mastheads/mainMasthead';
 import LeftNavbar from './navbars/leftNav';
 import * as MiscAppFxns from "./lib/app/misc";
 import SqlDemoApp from "./sqlDemoApp.js"
-
 const updateMainColWidth = MiscAppFxns.updateMainColWidth;
 
 export default class SqlDemoPage extends React.Component {

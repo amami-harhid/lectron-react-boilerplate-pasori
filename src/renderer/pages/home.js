@@ -4,7 +4,6 @@ import LeftNavbar from './navbars/leftNav';
 import * as MiscAppFxns from "./lib/app/misc";
 
 const updateMainColWidth = MiscAppFxns.updateMainColWidth;
-
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
