@@ -23,9 +23,11 @@ const getMainBrowser = ():BrowserWindow => {
 
 export class CardReader {
     private enableRead:boolean = false;
+    private _ready:boolean = false;
     private _logger:Logger;
     constructor(logger:Logger) {
         this.enableRead = true;
+        this._ready = false;
         this._logger = {
             info: logger.info,
             warn: logger.warn,
@@ -69,7 +71,9 @@ export class CardReader {
         nfc.on('reader', (reader:TReader)=>{
             const device_name = reader.reader.name;
             this._logger.debug(`Device ready device=(${device_name})`);
+            this._ready = true;
             // TODO デバイスを認識したときに Renderer側へ伝えたい。準備完了を表示させたい。
+            browser.webContents.send(CardReaderID.CARD_READY, device_name);
             reader.on('card', cardTouch);
             reader.on('card.off', cardRelease);
             reader.on('end', () => {

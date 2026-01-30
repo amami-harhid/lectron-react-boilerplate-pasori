@@ -4,7 +4,6 @@ export function TopPage() {
     const pageTitleSpan = useRef<HTMLSpanElement>(null);
     const pasoriModal = useRef<HTMLDivElement>(null);
     const statusDivP = useRef<HTMLParagraphElement>(null);
-
     // カードタッチしたときの処理
     window?.pasoriCard.onTouch(async (idm:string)=>{
         if(idm.length==0){

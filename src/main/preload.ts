@@ -41,7 +41,19 @@ const electronPasoriCard = {
     ipcRenderer.on( CardReaderID.CARD_RELEASE, async(_, idm) => {
       await callback(idm);
     })
-  }
+  },
+  onCardReady: (callback:CallableFunction) => {
+    ipcRenderer.on( CardReaderID.CARD_READY, async(_, device_name) => {
+      await callback(device_name);
+    })
+  },
+  onCardStart: async () => {
+    await ipcRenderer.invoke( CardReaderID.CARD_START);
+  },
+  onCardStop: async () => {
+    await ipcRenderer.invoke( CardReaderID.CARD_STOP);
+  },
+  
 };
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
