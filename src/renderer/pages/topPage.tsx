@@ -1,38 +1,54 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 export function TopPage() {
-    const mainPanel = useRef(null);
+    const [count, setCount] = useState(false); // trueのとき入室中！実験用
+    const pageTitleSpan = useRef<HTMLSpanElement>(null);
     const pasoriModal = useRef<HTMLDivElement>(null);
-    const statusDiv = useRef(null);
+    const statusDivP = useRef<HTMLParagraphElement>(null);
+
+    // カードタッチしたときの処理
     window?.pasoriCard.onTouch(async (idm:string)=>{
-        // CARDタッチしたときの処理
         if(idm.length==0){
             // 安全のために空チェック
             return;
         }
         // idmが登録されている利用者を取得する
-        // 登録されていないとき、モーダルを表示（登録がありません）、ブザーを鳴らす
-        if(pasoriModal.current){
-            pasoriModal.current.style.display = 'block';
+        const cards = [];
+        if(idm != '0000'){
+            cards.push(idm);
         }
-
+        // 登録されていないとき、モーダルを表示（登録がありません）、ブザーを鳴らす
+        if(statusDivP.current && pasoriModal.current){
+            if(cards.length==0){
+                // 実験用
+                statusDivP.current.textContent = "登録がありません";
+            }else{
+                // 実験用
+                if(count){
+                    statusDivP.current.textContent = "退室しました";
+                }else{
+                    statusDivP.current.textContent = "入室しました";
+                }
+                setCount(!count);
+            }
+            pasoriModal.current.style.display = 'block';
+ 
+        }
+ 
     });
-    window?.pasoriCard.onRelease(async (idm:string)=>{
-        // CARDが離れたときの処理
+    // カードが離れたときの処理
+    window?.pasoriCard.onRelease(async (/*idm:string*/)=>{
         // モーダルが表示されているときは モーダルを非表示にする
-        if(pasoriModal.current){
+        if(pasoriModal.current && statusDivP.current){
             pasoriModal.current.style.display = 'none';
+            statusDivP.current.textContent = '';
         }
     });
     return (
         <>
-        <div className ="mainPanel" ref={mainPanel}>
-            <div className="PasoriTop">
-                <h1>カードをタッチしてね</h1>
-            </div>
-        </div>
+        <h1 className="pageTitle"><span ref={pageTitleSpan}>Now Stating up!</span></h1>
         <div className="modal" ref={pasoriModal}>
             <div className="modal-content">
-                <div id="statusDiv" className="card" ref={statusDiv}></div>
+                <div className="card"><p ref={statusDivP}></p></div>
             </div>
         </div>
         </>

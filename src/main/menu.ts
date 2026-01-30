@@ -253,28 +253,52 @@ export default class MenuBuilder {
       { 
         label: 'HELP', 
         submenu: [
-            {
+          {
                 label: '開発者ツール',
                 id: DEV_TOOL,
                 enabled: true,
                 click: () => {
                     openDevTool();
                 }
-            },
-        {
-          label: 'Reload',
-          click: () => {
-            this.mainWindow.webContents.reload();
           },
-        },
-            {
-                label: 'VERSION',
-                id: APP_VERSION,
-                enabled: true,
-                click: () => {
-                    viewAppVersion();
-                }
-            },
+          {
+              label: 'Reload',
+              click: () => {
+                  this.mainWindow.webContents.reload();
+              },
+          },
+          {
+              label: 'VERSION',
+              id: APP_VERSION,
+              enabled: true,
+              click: () => {
+                  viewAppVersion();
+              }
+          },
+          {
+              label: '登録なしカード',
+              enabled: true,
+              click: () => {
+                  const browserWindows = BrowserWindow.getFocusedWindow();
+                  browserWindows?.webContents.send('card-touch', '0000');
+              }
+          },
+          {
+              label: 'カードタッチ',
+              enabled: true,
+              click: () => {
+                  const browserWindows = BrowserWindow.getFocusedWindow();
+                  browserWindows?.webContents.send('card-touch', '123456');
+              }
+          },
+          {
+              label: 'カード離す',
+              enabled: true,
+              click: () => {
+                  const browserWindows = BrowserWindow.getFocusedWindow();
+                  browserWindows?.webContents.send('card-release', '');
+              }
+          },
 
         ] 
       },

@@ -1,6 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { CardReaderID } from "../card/cardEventID";
 
 export type Channels = 'ipc-example' | 'asynchronous-sql-reply' | 'asynchronous-sql-command';
 
@@ -32,12 +33,12 @@ const electronNavigate = {
 };
 const electronPasoriCard = {
   onTouch: (callback:CallableFunction) => {
-    ipcRenderer.on("card-touch", async(_, idm) => {
+    ipcRenderer.on( CardReaderID.CARD_TOUCH, async(_, idm) => {
       await callback(idm);
     })
   },
   onRelease: (callback:CallableFunction) => {
-    ipcRenderer.on("card-release", async(_, idm) => {
+    ipcRenderer.on( CardReaderID.CARD_RELEASE, async(_, idm) => {
       await callback(idm);
     })
   }
