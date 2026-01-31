@@ -2,20 +2,17 @@ import { ipcRenderer } from "electron";
 import * as Cards from "./cards";
 import { CardRow } from "./cardRow";
 
-export function ipcRendererBridge() {
-    ipcRenderer.on(Cards.deleteByFcno.name, async(event:Electron.IpcRendererEvent, change:number)=>{
-        console.log(`change=${change}`);
-    });
-    ipcRenderer.on(Cards.selectRowByFcno.name, async(event:Electron.IpcRendererEvent, row:CardRow)=>{
-        console.log(row);
-    });
-};
+const NameSelectRowByFcno = Cards.selectRowByFcno.name;
 
-// TODO 
-type ChannelRender = "selectRowByFcno"
-const aaa = {
+type CSelectRowByFcno = "selectRowByFcno"
+
+const DbCardsHandler = {
     ipcRenderer:{
-        on: (Cards.selectRowByFcno.name, func : async(event:Electron.IpcRendererEvent, row:CardRow)=>void),
-
-    }
+        sendSelectRowByFcno(channel:CSelectRowByFcno, fcno:String){
+            ipcRenderer.send(channel, fcno);
+        },
+        onSelectRowByFcno(channel:CSelectRowByFcno, func:(row:CardRow)=>void){
+            ipcRenderer.once(channel, (_event, row) => func(row));
+        },
+      }
 }
