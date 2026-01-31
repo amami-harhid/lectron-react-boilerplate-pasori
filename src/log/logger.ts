@@ -1,5 +1,4 @@
 import logger from 'electron-log';
-import { ApConfig } from '../conf/conf.js';
 
 export interface ILogger {
     info: CallableFunction;
@@ -7,14 +6,13 @@ export interface ILogger {
     warn: CallableFunction;
     error: CallableFunction;
 }
-const DEBUG_LOG = "DEBUG_LOG";
 
 export class Logger implements ILogger {
     info(...args: any[]) {
         logger.info(args);
     }
     debug(...args: any[]) {
-        if(ApConfig.has(DEBUG_LOG) && ApConfig.get(DEBUG_LOG)===true){
+        if(process.env.DEBUG_PROD === 'true'){
             logger.debug(args);
         }
     }

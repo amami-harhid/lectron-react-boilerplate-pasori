@@ -2,9 +2,9 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { CardReaderID } from "../card/cardEventID";
+import { CardRow } from '../db/cards/cardRow';
 
 export type Channels = 'ipc-example' | 'asynchronous-sql-reply' | 'asynchronous-sql-command';
-
 const electronHandler = {
   ipcRenderer: {
     sendMessage(channel: Channels, ...args: unknown[]) {
@@ -59,9 +59,23 @@ contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 
+export type DbChannels = 'cards' | 'histories';
+const electronPasoriDb = {
+    cardRequest(channel: DbChannels, ...args: unknown[]) {
+      ipcRenderer.send(channel, ...args);
+    },
+    cardAllOnce(channel: DbChannels, func: (rows: CardRow[]) => void) {
+      ipcRenderer.once(channel, (_event:IpcRendererEvent, rows:CardRow[]) => func(rows));
+    },
+    cardGetOnce(channel: DbChannels, func: (row:CardRow) => void) {
+      ipcRenderer.once(channel, (_event:IpcRendererEvent, row) => func(row));
+    },
+}
+contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
 
 
 
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
+export type ElectronPasoriDb = typeof electronPasoriDb;
