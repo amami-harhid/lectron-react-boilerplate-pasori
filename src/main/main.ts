@@ -14,23 +14,10 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { ipcMainSqliteBridge } from '../db/ipcMain';
 
-import sqlite from 'sqlite3';
-const sqlite3 = sqlite.verbose();
-import webpackPaths from '../../.erb/configs/webpack.paths';
-const databaseName = "myCoolDatabase.sqlite3";
-const sqlPath = path.join(webpackPaths.appPath,'sql',databaseName);
-console.log('sqlPath=',sqlPath) 
-const db = new sqlite3.Database(sqlPath, (err:Error|null) => {
-    // release/app の下に sql フォルダーがないのでエラーになった。
-    // release/app/sql を作れば作成できた。
-    if (err) console.error('Database opening error: ', err);
-});
-
-db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS myCoolTable (info TEXT NULL)');
-});
-
+import { db } from '../db/db';
+import { createTables } from '../db/createTables';
 
 class AppUpdater {
   constructor() {
@@ -50,11 +37,14 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 // MAIN<-->RENDERERのDB通信
+ipcMainSqliteBridge();
+/*
 ipcMain.on('asynchronous-sql-command', async (event, sql, ...args) => {
     db.run(sql, args, (err:Error, result:any) => {
         event.reply('asynchronous-sql-reply', result);
     });
 });
+*/
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -118,6 +108,9 @@ const createWindow = async () => {
       mainWindow.show();
     }
   });
+  
+  //---- DB TABLE CREATE IF NOT EXITST
+  await createTables(db);
 
   mainWindow.on('closed', () => {
     mainWindow = null;

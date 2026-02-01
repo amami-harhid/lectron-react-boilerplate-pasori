@@ -1,0 +1,48 @@
+import * as DotEnv from 'dotenv';
+DotEnv.config();
+
+import Sqlite from 'sqlite3';
+import * as Cards from '../db/cards/cards';
+import * as Histories from '../db/histories/histories';
+import { CardRow } from '../db/cards/cardRow';
+import { HistoriesRow } from '../db/histories/historiesRow';
+
+//---- DB TABLE INSERT DUMMY DATA
+const cardsDatas:CardRow[] = [
+    {
+      fcno: '0001',
+      idm: '0000000000000025',
+      name: 'ひながた みなみ',
+      kana: 'ヒナガタ ミナミ',
+      in_room: false,
+      mail: 'minami-xxx@test.com',
+    },
+    {
+      fcno: '0002',
+      idm: '0000000000000035',
+      name: 'ジェームス 鴇田',
+      kana: 'トキタ ジェームス',
+      in_room: false,
+      mail: 'jms-xxxx@test.com',
+    }
+] as const;
+
+
+export const createTables = async(db:Sqlite.Database) => {
+    if(process.env.DEBUG_PROD === 'true'){
+        await Cards.cards_dropTable(db);
+        await Histories.hist_dropTable(db);
+    }
+    await Cards.cards_createTable(db);
+    await Histories.hist_createTable(db);
+
+    if(process.env.DEBUG_PROD === 'true'){
+        console.log('DEBUG DATA SHIKOMI!')
+        for(const data of cardsDatas) {
+            await Cards.cards_insert(db,data);
+            await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
+            await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
+        }
+    }
+
+}
