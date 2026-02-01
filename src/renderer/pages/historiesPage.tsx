@@ -18,20 +18,20 @@ type PAGEINFO = {
 const CHANNEL_SQL_REQUEST = 'asynchronous-sql-command';
 const CHANNEL_SQL_REPLY = 'asynchronous-sql-reply';
 export function HistoriesPage() {
-    const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
-    const histories_dateResult = useRef<HTMLSpanElement>(null);
 
-    const select = async (date:Date): Promise<HistoriesCardRow[]> => {
-        console.log('select executed');
+    const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
+    const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
+        // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_SQL_REQUEST,
             Histories.hist_selectByDate.name, date);
+        // 応答を待つ
         const rows: HistoriesCardRow[]
             = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_SQL_REPLY);
         return rows;
-    }
+    };
     const historiesToTableData = async (date:Date):Promise<TABLE_ROW[]> => {
-        const rows:HistoriesCardRow[] = await select(date);
+        const rows:HistoriesCardRow[] = await histSelectByDate(date);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].id + 1 : 1;
@@ -47,7 +47,7 @@ export function HistoriesPage() {
         }
         return _data;
     }
-
+    // 日付選択値が変更されたときに呼び出される。
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>)=>{
         const date = event.target.valueAsDate;
         if(date){
