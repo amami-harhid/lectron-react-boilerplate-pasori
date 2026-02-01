@@ -13,27 +13,14 @@ type ROW = {
     in:string,
     out:string,
 }
+type PAGEINFO = {
+    date: string,
+    tableData: ROW[],
+}
 export function HistoriesPage() {
-    const [pageCounter, setPageCounter] = useState<number>(0);
+    const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
     const [input_date, setInput_date] = useState<string>('');
     const [data, setData] = useState<ROW[]>([]);
-    const handleAllDelete = () => {
-        // id=-1 の行がないので全行が消える。
-        setData((prev)=> prev.filter((row)=>row.id == -1));
-    };
-    const handlerAdd = (row:HistoriesCardRow) => {
-        const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1;
-        const newRow:ROW = {
-            id: newId,
-            fcno: row.fcno,
-            name: (row.name)?row.name:'',
-            kana: (row.kana)?row.kana:'',
-            in: (row.date_in)?row.date_in:'',
-            out: (row.date_out)?row.date_out:'',
-        }
-        setData([...data, newRow]);
-    }
-    //const histories_inputDate = useRef<HTMLInputElement>(null);
     const histories_reload = useRef<HTMLButtonElement>(null);
     const histories_dateResult = useRef<HTMLSpanElement>(null);
     const historiesTbody = useRef<HTMLTableSectionElement>(null);
@@ -47,18 +34,7 @@ export function HistoriesPage() {
             = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>('asynchronous-sql-reply');    
         return rows;
     }
-    const historiesView = async (date:Date) => {
-        /* 
-        const childNodes = historiesTbody.current?.childNodes
-        if(childNodes){
-            for(const item of childNodes.entries()){
-                const childNode = item[1]; // item: [number, ChildNode]
-                if(childNode)
-                    childNode.remove();
-            }            
-        }
-        */
-        //setData([]);
+    const historiesView = async (date:Date):Promise<ROW[]> => {
         const rows:HistoriesCardRow[] = await select(date);
         const _data:ROW[] = [];
         for(const row of rows){
@@ -73,30 +49,28 @@ export function HistoriesPage() {
             }
             _data.push(newRow);
         }
-        setData(_data);
+        return _data;
     }
     
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
-        setInput_date(event.target.value);
-        tableChange(event);
-    }
-
-    const tableChange = async (event: React.ChangeEvent<HTMLInputElement>)=>{
+    const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>)=>{
         console.log('tableChange executed!');
         const own = event.target
         const date = own.valueAsDate;
+        const rows:ROW[] = []
         if(date){
             if(histories_dateResult && histories_dateResult.current){
                 const date_str = DateUtils.dateToSqlite3Date(date);
                 histories_dateResult.current.textContent = date_str;
-                await historiesView(date);
+                rows.push(...await historiesView(date));
+                setPageInfo( {date:date_str, tableData:rows} )
             }
         }else{
-            if(histories_dateResult && histories_dateResult.current){
-                histories_dateResult.current.textContent = '';
-            }
+            dateInit();
         }
 
+    }
+    const dateInit = () => {
+        setPageInfo( {date:'', tableData:[]} )
     }
     console.log('addEventLister change')
     //setPageCounter(pageCounter+1);
@@ -107,7 +81,7 @@ export function HistoriesPage() {
             <div className="modal_histories">
                 <div className="modal-content">
                     <label htmlFor="histories_inputDate">日付を選択してください:</label>
-                    <input type="date" value={input_date} onChange={handleInputChange}/>&nbsp;<button ref={histories_reload}>ﾘﾛｰﾄﾞ</button>
+                    <input type="date" value={pageInfo.date} onChange={handleInputChange}/>&nbsp;<button onClick={dateInit}>初期化</button>
                     <p>選択された日付: <span ref={histories_dateResult}></span></p>
                 </div>
                 <table id="histories_table" className="appTable">
@@ -122,7 +96,7 @@ export function HistoriesPage() {
                     </tr>
                 </tbody>
                 <tbody ref={historiesTbody}>
-                    {data.map(row=>(
+                    {pageInfo.tableData.map(row=>(
                        <tr key={row.id}>
                             <td>{row.id}</td>
                             <td>{row.fcno}</td>
