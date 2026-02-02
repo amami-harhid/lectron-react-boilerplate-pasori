@@ -237,8 +237,8 @@ export default class MenuBuilder {
           },
         ],
       },
-      { 
-        label: '履歴', 
+      {
+        label: '履歴',
         submenu: [
           {
             label: '入退室履歴',
@@ -248,10 +248,10 @@ export default class MenuBuilder {
                     viewHistories();
             }
           },
-        ] 
+        ]
       },
-      { 
-        label: 'HELP', 
+      {
+        label: 'HELP',
         submenu: [
           {
                 label: '開発者ツール',
@@ -300,7 +300,7 @@ export default class MenuBuilder {
               }
           },
 
-        ] 
+        ]
       },
     ];
 
@@ -335,7 +335,7 @@ const toManager = ()=>{
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/manager");
+    sendMessage("navigate", "/IdmRegister");
     sendMessage(MenuChannel.APP_MANAGER_HANDLING);
 }
 const toGeneral = () => {
@@ -345,7 +345,7 @@ const toGeneral = () => {
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, false);
     sendMessage("navigate", "/top");
-    sendMessage(MenuChannel.APP_GENERAL_HANDLING);
+    //sendMessage(MenuChannel.APP_GENERAL_HANDLING);
 }
 const toGeneralStop = () => {
     setEnableToMenuItem(GENERAL, true);
@@ -354,7 +354,7 @@ const toGeneralStop = () => {
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", "/stop");
-    sendMessage(MenuChannel.APP_GENERAL_STOP_HANDLING);
+    //sendMessage(MenuChannel.APP_GENERAL_STOP_HANDLING);
 }
 const toMember = () => {
     setEnableToMenuItem(GENERAL, true);

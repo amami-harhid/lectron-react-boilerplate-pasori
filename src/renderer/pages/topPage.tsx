@@ -6,6 +6,7 @@ export function TopPage() {
     const statusDivP = useRef<HTMLParagraphElement>(null);
     // カードタッチしたときの処理
     window?.pasoriCard.onTouch(async (idm:string)=>{
+        console.log('idm=', idm);
         if(idm.length==0){
             // 安全のために空チェック
             return;
@@ -30,9 +31,9 @@ export function TopPage() {
                 setCount(!count);
             }
             pasoriModal.current.style.display = 'block';
- 
+
         }
- 
+
     });
     // カードが離れたときの処理
     window?.pasoriCard.onRelease(async (/*idm:string*/)=>{

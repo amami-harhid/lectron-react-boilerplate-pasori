@@ -16,8 +16,21 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { ipcMainSqliteBridge } from '../db/ipcMain';
 
+import { Logger } from "../log/logger";
+const logger = new Logger();
+
 import { db } from '../db/db';
 import { createTables } from '../db/createTables';
+
+import { CardReader } from '../card/icCardReader';
+
+const cardReaderReady = () => {
+    const reader = new CardReader(logger)
+    reader.ready();
+}
+
+cardReaderReady();
+
 
 class AppUpdater {
   constructor() {
@@ -107,8 +120,9 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+
   });
-  
+
   //---- DB TABLE CREATE IF NOT EXITST
   await createTables(db);
 
@@ -127,7 +141,9 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  //new AppUpdater();
+
+
 };
 
 /**
@@ -151,6 +167,10 @@ app
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
+
     });
   })
   .catch(console.log);
+
+
+

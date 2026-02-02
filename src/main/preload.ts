@@ -3,12 +3,12 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { CardReaderID } from "../card/cardEventID";
 import { CardRow } from '../db/cards/cardRow';
-
-export type Channels = 'ipc-example' | 'asynchronous-sql-reply' | 'asynchronous-sql-command';
+import * as IpcServices from '../channel/ipcService';
+export type Channels = IpcServices.IpcChannelValOfService;
 const electronHandler = {
   ipcRenderer: {
-    sendMessage(channel: Channels, ...args: unknown[]) {
-      ipcRenderer.send(channel, ...args);
+    sendMessage(channel: Channels, methodName:string, ...args: unknown[]) {
+      ipcRenderer.send(channel, methodName, ...args);
     },
     on(channel: Channels, func: (...args: unknown[]) => void) {
       const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
@@ -44,11 +44,14 @@ const electronNavigate = {
 };
 const electronPasoriCard = {
   onTouch: (callback:CallableFunction) => {
-    ipcRenderer.on( CardReaderID.CARD_TOUCH, async(_, idm) => {
+    const f = async(event:Electron.IpcRendererEvent, idm:string) => {
       await callback(idm);
-    })
+    }
+    ipcRenderer.removeAllListeners(CardReaderID.CARD_TOUCH);
+    ipcRenderer.on( CardReaderID.CARD_TOUCH, f);
   },
   onRelease: (callback:CallableFunction) => {
+    ipcRenderer.removeAllListeners(CardReaderID.CARD_RELEASE);
     ipcRenderer.on( CardReaderID.CARD_RELEASE, async(_, idm) => {
       await callback(idm);
     })
@@ -64,12 +67,13 @@ const electronPasoriCard = {
   onCardStop: async () => {
     await ipcRenderer.invoke( CardReaderID.CARD_STOP);
   },
-  
+
 };
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 
+/*
 export type DbChannels = 'cards' | 'histories';
 const electronPasoriDb = {
     cardRequest(channel: DbChannels, ...args: unknown[]) {
@@ -83,10 +87,10 @@ const electronPasoriDb = {
     },
 }
 contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
-
+*/
 
 
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
-export type ElectronPasoriDb = typeof electronPasoriDb;
+//export type ElectronPasoriDb = typeof electronPasoriDb;

@@ -8,9 +8,10 @@ interface ICCard {
   uid: string; // とりあえず uid を使えるようにする
 }
 
-const logger = new Logger()
-const nfc = new NFC(logger);
+//const logger = new Logger()
+const nfc = new NFC();
 type TReader = typeof Reader;
+
 
 const getMainBrowser = ():BrowserWindow => {
     const browsers = BrowserWindow.getAllWindows();
@@ -22,7 +23,8 @@ const getMainBrowser = ():BrowserWindow => {
 }
 
 export class CardReader {
-    private enableRead:boolean = false;
+//    private enableRead:boolean = false;
+    private enableRead:boolean = true;
     private _ready:boolean = false;
     private _logger:Logger;
     constructor(logger:Logger) {
@@ -43,16 +45,25 @@ export class CardReader {
     }
 
     ready() {
+        console.log('Gooooo ready()')
+        /*
         ipcMain.on(CardReaderID.CARD_START, ()=>{
+            console.log('CARD_START')
             this.enableRead = true;
         })
         ipcMain.on(CardReaderID.CARD_STOP, ()=>{
+            console.log('CARD_STOP')
             this.enableRead = false;
         })
-        const browser = getMainBrowser();
+        */
         const cardTouch = async (card:ICCard) => {
             const uid = card.uid;
+            console.log(uid);
             if(this.enableRead && uid && uid.length>0){
+                const browser = getMainBrowser();
+                console.log('browser=',browser);
+                const currentURL = browser.webContents.getURL();
+                console.log('currentURL=',currentURL)
                 browser.webContents.send(CardReaderID.CARD_TOUCH, uid);
                 const msg = `CARD TOUCH uid=(${uid})`;
                 this._logger.debug(msg);
@@ -63,17 +74,20 @@ export class CardReader {
         }
         const cardRelease = async (card:ICCard) => {
             const uid = card.uid;
+            const browser = getMainBrowser();
             browser.webContents.send(CardReaderID.CARD_RELEASE, uid);
             const msg = `CARD TOUCH uid=(${uid})`;
             this._logger.debug(msg);
         }
-
+        console.log('before nfc.on ready')
         nfc.on('reader', (reader:TReader)=>{
             const device_name = reader.reader.name;
             this._logger.debug(`Device ready device=(${device_name})`);
+            //console.log(`Device ready device=(${device_name})`);
             this._ready = true;
             // TODO デバイスを認識したときに Renderer側へ伝えたい。準備完了を表示させたい。
-            browser.webContents.send(CardReaderID.CARD_READY, device_name);
+            //const browser = getMainBrowser();
+            //browser.webContents.send(CardReaderID.CARD_READY, device_name);
             reader.on('card', cardTouch);
             reader.on('card.off', cardRelease);
             reader.on('end', () => {

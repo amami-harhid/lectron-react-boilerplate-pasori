@@ -11,7 +11,7 @@ import { HistoriesRow } from '../db/histories/historiesRow';
 const cardsDatas:CardRow[] = [
     {
       fcno: '0001',
-      idm: '0000000000000025',
+      idm: '012e4ce24397797c',
       name: 'ひながた みなみ',
       kana: 'ヒナガタ ミナミ',
       in_room: false,
@@ -24,11 +24,23 @@ const cardsDatas:CardRow[] = [
       kana: 'トキタ ジェームス',
       in_room: false,
       mail: 'jms-xxxx@test.com',
+    },
+    {
+      fcno: '0003',
+      idm: '',
+      name: 'ジェームス 鴇田2',
+      kana: 'トキタ ジェームス2',
+      in_room: false,
+      mail: 'jms-xxxx2@test.com',
     }
+
 ] as const;
 
 
 export const createTables = async(db:Sqlite.Database) => {
+
+    console.log('process.env.DEBUG_PROD=',process.env.DEBUG_PROD);
+
     if(process.env.DEBUG_PROD === 'true'){
         await Cards.cards_dropTable(db);
         await Histories.hist_dropTable(db);

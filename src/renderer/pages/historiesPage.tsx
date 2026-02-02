@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import * as Histories from '../../db/histories/histories';
 import { HistoriesCardRow } from '../../db/histories/historiesRow';
 import * as DateUtils from '../../utils/dateUtils';
-
+import * as IpcServices from '../../channel/ipcService';
 type TABLE_ROW = {
     id:number,
     fcno:string,
@@ -15,19 +15,20 @@ type PAGEINFO = {
     date: string,
     tableData: TABLE_ROW[],
 }
-const CHANNEL_SQL_REQUEST = 'asynchronous-sql-command';
-const CHANNEL_SQL_REPLY = 'asynchronous-sql-reply';
+type CHANNEL = IpcServices.IpcChannelValOfService;
+const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
+const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
 export function HistoriesPage() {
 
     const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
-            CHANNEL_SQL_REQUEST,
+            CHANNEL_REQUEST,
             Histories.hist_selectByDate.name, date);
         // 応答を待つ
         const rows: HistoriesCardRow[]
-            = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_SQL_REPLY);
+            = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_REPLY);
         return rows;
     };
     const historiesToTableData = async (date:Date):Promise<TABLE_ROW[]> => {

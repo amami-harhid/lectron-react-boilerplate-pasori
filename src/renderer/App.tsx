@@ -4,6 +4,7 @@ import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-d
 import {TopPage} from './pages/topPage';
 import {StopPage} from './pages/stopPage';
 import {HistoriesPage} from './pages/historiesPage';
+import {IdmRegisterPage} from './pages/idmRegisterPage';
 
 import './css/app.css';
 
@@ -19,8 +20,8 @@ export function IPCNavigator() {
     // 第二引数は空配列とする。
     // ページ表示後にページごとにuseEffectが実行されてしまい
     // 同じパスへのnavigate(path)がページごとに実行されてしまうことを回避する。
-    []);  
-    
+    []);
+
         return (
             <></>
         )
@@ -38,30 +39,10 @@ export function App() {
                         <Route path="/Top" element={<TopPage />} />
                         <Route path="/Stop" element={<StopPage />} />
                         <Route path="/Histories" element={<HistoriesPage />} />
+                        <Route path="/IdmRegister" element={<IdmRegisterPage />} />
                 </Routes>
             </Router>
             </>
         );
 
-}
-
-export default class App2 extends React.Component {
-    constructor(props:any) {
-        super(props);
-        this.state = {}
-    }
-    async componentDidMount() {
-//        window.addEventListener('resize', updateMainColWidth);
-    }
-    render() {
- 
-        return (
-                    <Routes>
-                        <Route path="/" element={<TopPage />} />
-                        <Route path="/Top" element={<TopPage />} />
-                        <Route path="/Stop" element={<StopPage />} />
-                        <Route path="/Histories" element={<HistoriesPage />} />
-                    </Routes>
-        );
-    }
 }
