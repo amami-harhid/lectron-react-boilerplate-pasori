@@ -24,12 +24,8 @@ import { createTables } from '../db/createTables';
 
 import { CardReader } from '../card/icCardReader';
 
-const cardReaderReady = () => {
-    const reader = new CardReader(logger)
-    reader.ready();
-}
-
-cardReaderReady();
+const reader = new CardReader(logger)
+reader.ready();
 
 
 class AppUpdater {
@@ -58,6 +54,8 @@ ipcMain.on('asynchronous-sql-command', async (event, sql, ...args) => {
     });
 });
 */
+
+
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -170,7 +168,19 @@ app
 
     });
   })
-  .catch(console.log);
+  .catch(
+    (reason: any) => {
+        console.log('uncaught exception occured?????')
+        console.log(reason);
 
+    }
+  );
 
+/**  これはうまくいかない */
+process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
+    console.error("⚠️ Unhandled Rejection at:", promise);
+    console.error("Reason:", reason);
+    app.quit();
 
+    process.exit(1);
+});

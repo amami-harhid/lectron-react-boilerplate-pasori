@@ -2,7 +2,10 @@ import { ipcMain } from 'electron';
 import { BrowserWindow } from 'electron';
 import { NFC, Reader } from "nfc-pcsc";
 import { Logger } from "../log/logger";
-import { CardReaderID } from './cardEventID';
+import { CardReaderID, type TCardReaderChannel } from './cardEventID';
+import { convertSjisToUtf8 } from '../utils/converterUtils';
+import iconv from 'iconv-lite';
+import Encoding from  'encoding-japanese'
 
 interface ICCard {
   uid: string; // とりあえず uid を使えるようにする
@@ -42,8 +45,19 @@ export class CardReader {
                 logger.error(...args);
             },
         };
-    }
 
+        // Reader.ready状態を返す
+        const Channel = CardReaderID.ListenCardIsReady;
+        this.listenIsReady( Channel, (event:Electron.IpcMainEvent)=>{
+            event.reply(Channel, this._ready);
+        });
+    }
+    listenIsReady( channel: TCardReaderChannel, callBack: Electron.IpcMainEventListener ) {
+        ipcMain.on(channel, callBack);
+    }
+    isReady():boolean {
+      return this._ready;
+    }
     ready() {
         console.log('Gooooo ready()')
         /*
@@ -79,15 +93,11 @@ export class CardReader {
             const msg = `CARD TOUCH uid=(${uid})`;
             this._logger.debug(msg);
         }
-        console.log('before nfc.on ready')
+        console.log('before nfc.on ready');
         nfc.on('reader', (reader:TReader)=>{
+            this._ready = true;
             const device_name = reader.reader.name;
             this._logger.debug(`Device ready device=(${device_name})`);
-            //console.log(`Device ready device=(${device_name})`);
-            this._ready = true;
-            // TODO デバイスを認識したときに Renderer側へ伝えたい。準備完了を表示させたい。
-            //const browser = getMainBrowser();
-            //browser.webContents.send(CardReaderID.CARD_READY, device_name);
             reader.on('card', cardTouch);
             reader.on('card.off', cardRelease);
             reader.on('end', () => {
@@ -95,5 +105,12 @@ export class CardReader {
                 this._logger.debug(msg);
             });
         });
+        nfc.on('error', (error:Error)=> {
+            // NFCエラー(例：CardReader接続タイムアウト)を検出する
+            // nfc(pcsclite)のエラー発生元が出すコードがSJISの様子。
+            // というかWindowsが出しているメッセージの様子。
+            // それがWindows->pcsclite->nfc->の途中で文字化けしている。
+            this._logger.error(error);
+        })
     }
 }

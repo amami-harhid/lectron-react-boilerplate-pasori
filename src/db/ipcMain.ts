@@ -12,8 +12,6 @@ import { HistoriesCardRow } from "./histories/historiesRow";
 export function ipcMainSqliteBridge() {
     const channel = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
     const replyChannel = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
-    const channel2 = "asynchronous-sql-command";
-    const replyChannel2 = "asynchronous-sql-reply";
     ipcMain.on(channel, async(event:Electron.IpcMainEvent, command:string, ...args:any[])=>{
         if(command == Cards.cards_selectAll.name){
             const fcno = args[0];
@@ -116,6 +114,13 @@ export function ipcMainSqliteBridge() {
             const fcno:string = args[0];
             const idm:string = args[1];
             const count:number = await Histories.hist_setInRoomByFcnoIdm(db, fcno, idm);
+            event.reply(replyChannel, count);
+            return;
+        }
+        else if(command == Histories.hist_setOutRoomByFcnoIdm.name) {
+            const fcno:string = args[0];
+            const idm:string = args[1];
+            const count:number = await Histories.hist_setOutRoomByFcnoIdm(db, fcno, idm);
             event.reply(replyChannel, count);
             return;
         }

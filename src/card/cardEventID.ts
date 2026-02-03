@@ -4,4 +4,7 @@ export const CardReaderID = {
     CARD_TOUCH : 'card-touch',
     CARD_RELEASE: 'card-release',
     CARD_READY: 'card-ready',
-} 
+    ListenCardIsReady: 'ListenCardIsReady',
+} as const;
+
+export type TCardReaderChannel = (typeof CardReaderID)[keyof typeof CardReaderID];

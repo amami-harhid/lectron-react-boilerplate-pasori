@@ -1,9 +1,9 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { CardReaderID } from "../card/cardEventID";
 import { CardRow } from '../db/cards/cardRow';
 import * as IpcServices from '../channel/ipcService';
+import {CardReaderID, type TCardReaderChannel} from '../card/cardEventID';
 export type Channels = IpcServices.IpcChannelValOfService;
 const electronHandler = {
   ipcRenderer: {
@@ -22,6 +22,7 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
         ipcRenderer.once(channel, (_event, ...args) => {
             const reply = func(...args);
+            // 中途半端　、たぶん使わない。
         });
     },
     asyncOnce<T>(channel: Channels):Promise<T> {
@@ -60,6 +61,14 @@ const electronPasoriCard = {
     ipcRenderer.on( CardReaderID.CARD_READY, async(_, device_name) => {
       await callback(device_name);
     })
+  },
+  isCardReady: async () => {
+      ipcRenderer.send( CardReaderID.ListenCardIsReady);
+      return new Promise<boolean>( (resolve)=>{
+        ipcRenderer.once(CardReaderID.ListenCardIsReady, (_event, ready:boolean) => {
+            resolve(ready);
+        })
+      });
   },
   onCardStart: async () => {
     await ipcRenderer.invoke( CardReaderID.CARD_START);

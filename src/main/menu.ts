@@ -344,7 +344,7 @@ const toGeneral = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, false);
-    sendMessage("navigate", "/top");
+    sendMessage("navigate", "/Top");
     //sendMessage(MenuChannel.APP_GENERAL_HANDLING);
 }
 const toGeneralStop = () => {
@@ -353,7 +353,7 @@ const toGeneralStop = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/stop");
+    sendMessage("navigate", "/Stop");
     //sendMessage(MenuChannel.APP_GENERAL_STOP_HANDLING);
 }
 const toMember = () => {
@@ -362,7 +362,7 @@ const toMember = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, false);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage(MenuChannel.APP_MEMBERS_HANDLING);
+    sendMessage("navigate", "/MemberListPage")
 }
 const openDevTool = () => {
     const browser = BrowserWindow.getFocusedWindow();
@@ -380,7 +380,5 @@ const viewHistories = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/histories");
-
-    sendMessage(MenuChannel.APP_HISTORIES_HANDLING);
+    sendMessage("navigate", "/Histories");
 }

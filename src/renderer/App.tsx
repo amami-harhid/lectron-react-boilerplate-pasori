@@ -5,6 +5,7 @@ import {TopPage} from './pages/topPage';
 import {StopPage} from './pages/stopPage';
 import {HistoriesPage} from './pages/historiesPage';
 import {IdmRegisterPage} from './pages/idmRegisterPage';
+import {MemberListPage} from './pages/memberListPage'
 
 import './css/app.css';
 
@@ -40,6 +41,7 @@ export function App() {
                         <Route path="/Stop" element={<StopPage />} />
                         <Route path="/Histories" element={<HistoriesPage />} />
                         <Route path="/IdmRegister" element={<IdmRegisterPage />} />
+                        <Route path="/MemberListPage" element={<MemberListPage/>} />
                 </Routes>
             </Router>
             </>
