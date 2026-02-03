@@ -11,7 +11,7 @@ import { HistoriesRow } from '../db/histories/historiesRow';
 const cardsDatas:CardRow[] = [
     {
       fcno: '0001',
-      idm: '012e4ce24397797c',
+      idm: '',
       name: 'ひながた みなみ',
       kana: 'ヒナガタ ミナミ',
       in_room: false,
@@ -19,7 +19,7 @@ const cardsDatas:CardRow[] = [
     },
     {
       fcno: '0002',
-      idm: '0000000000000035',
+      idm: '',
       name: 'ジェームス 鴇田',
       kana: 'トキタ ジェームス',
       in_room: false,
@@ -52,8 +52,8 @@ export const createTables = async(db:Sqlite.Database) => {
         console.log('DEBUG DATA SHIKOMI!')
         for(const data of cardsDatas) {
             await Cards.cards_insert(db,data);
-            await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
-            await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
+            //await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
+            //await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
         }
     }
 
