@@ -210,6 +210,7 @@ export default class MenuBuilder {
           {
             label: '読取開始',
             id: GENERAL,
+            enabled: false,
             click() {
               toGeneral();
             },
@@ -217,6 +218,7 @@ export default class MenuBuilder {
           {
             label: '読込停止',
             id: GENERAL_STOP,
+            enabled: true,
             click() {
               toGeneralStop();
             },
@@ -224,6 +226,7 @@ export default class MenuBuilder {
           {
             label: 'メンバー一覧',
             id: MEMBERS,
+            enabled: false,
             click() {
               toMember();
             },
@@ -231,6 +234,7 @@ export default class MenuBuilder {
           {
             label: 'カード管理',
             id: CARD_MANAGE,
+            enabled: false,
             click() {
               toManager();
             },
@@ -243,7 +247,7 @@ export default class MenuBuilder {
           {
             label: '入退室履歴',
             id: HISTORIES,
-            enabled: true,
+            enabled: false,
             click: () => {
                     viewHistories();
             }
@@ -263,6 +267,7 @@ export default class MenuBuilder {
           },
           {
               label: 'Reload',
+              enabled: true,
               click: () => {
                   this.mainWindow.webContents.reload();
               },
@@ -330,7 +335,7 @@ const sendMessage = (messageId: string, ...args:string[]): void => {
 }
 
 const toManager = ()=>{
-    setEnableToMenuItem(GENERAL, false);
+    setEnableToMenuItem(GENERAL, true);
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, true);
@@ -341,8 +346,8 @@ const toManager = ()=>{
 const toGeneral = () => {
     setEnableToMenuItem(GENERAL, false);
     setEnableToMenuItem(GENERAL_STOP, true);
-    setEnableToMenuItem(CARD_MANAGE, true);
-    setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(CARD_MANAGE, false);
+    setEnableToMenuItem(MEMBERS, false);
     setEnableToMenuItem(HISTORIES, false);
     sendMessage("navigate", "/Top");
     //sendMessage(MenuChannel.APP_GENERAL_HANDLING);
