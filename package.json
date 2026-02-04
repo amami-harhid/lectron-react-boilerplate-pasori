@@ -1,7 +1,7 @@
 {
   "name": "electron-react-boilerplate-pasori",
   "description": "IC-Card entry and exit system",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "keywords": [
     "electron",
     "boilerplate",

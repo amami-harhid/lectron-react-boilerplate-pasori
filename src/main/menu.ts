@@ -6,8 +6,9 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-import { MenuChannel } from './menuConstants';
 import { appVersion } from '../version';
+
+import { routePath } from '../renderer/routePath';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -213,7 +214,7 @@ export default class MenuBuilder {
           {
             label: '読取開始',
             id: GENERAL,
-            enabled: false,
+            enabled: true,
             click() {
               toGeneral();
             },
@@ -221,7 +222,7 @@ export default class MenuBuilder {
           {
             label: '読込停止',
             id: GENERAL_STOP,
-            enabled: true,
+            enabled: false,
             click() {
               toGeneralStop();
             },
@@ -229,7 +230,7 @@ export default class MenuBuilder {
           {
             label: 'メンバー一覧',
             id: MEMBERS,
-            enabled: false,
+            enabled: true,
             click() {
               toMember();
             },
@@ -237,7 +238,7 @@ export default class MenuBuilder {
           {
             label: 'カード管理',
             id: CARD_MANAGE,
-            enabled: false,
+            enabled: true,
             click() {
               toManager();
             },
@@ -250,7 +251,7 @@ export default class MenuBuilder {
           {
             label: '入退室履歴',
             id: HISTORIES,
-            enabled: false,
+            enabled: true,
             click: () => {
                     viewHistories();
             }
@@ -350,7 +351,7 @@ const toManager = ()=>{
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/IdmRegister");
+    sendMessage("navigate", routePath.IdmRegister);
 }
 const toGeneral = () => {
     setEnableToMenuItem(GENERAL, false);
@@ -358,7 +359,7 @@ const toGeneral = () => {
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, false);
     setEnableToMenuItem(HISTORIES, false);
-    sendMessage("navigate", "/Top");
+    sendMessage("navigate", routePath.Top);
 }
 const toGeneralStop = () => {
     setEnableToMenuItem(GENERAL, true);
@@ -366,7 +367,7 @@ const toGeneralStop = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/Stop");
+    sendMessage("navigate", routePath.Stop);
 }
 const toMember = () => {
     setEnableToMenuItem(GENERAL, true);
@@ -374,7 +375,7 @@ const toMember = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, false);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/MemberListPage")
+    sendMessage("navigate", routePath.MemberListPage)
 }
 const openDevTool = () => {
     const browser = BrowserWindow.getFocusedWindow();
@@ -382,16 +383,11 @@ const openDevTool = () => {
         browser.webContents.openDevTools(); // 開発者ツールを表示
     }
 }
-const viewAppVersion = () => {
-    const version = appVersion();
-    const menuItem = getMenuItemById(APP_VERSION_VIEW);
-    menuItem.label = version;
-}
 const viewHistories = () => {
     setEnableToMenuItem(GENERAL, true);
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", "/Histories");
+    sendMessage("navigate", routePath.Histories);
 }

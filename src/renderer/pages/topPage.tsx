@@ -178,8 +178,8 @@ export function TopPage() {
                   <p>{view.name}</p>
                 </div>
                 <div className="card" style={{display: view.error_display}}>
-                    <p className="errorMessage">{view.errorMessage01}</p>    
-                    <p className="errorMessage">{view.errorMessage02}</p>    
+                    <p className="errorMessage">{view.errorMessage01}</p>
+                    <p className="errorMessage">{view.errorMessage02}</p>
                 </div>
             </div>
         </div>
