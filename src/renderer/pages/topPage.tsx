@@ -153,7 +153,7 @@ export function TopPage() {
           cardTouchListenerStart();
         }else{
           view.modal_display = Display.block;
-          view.status = `リーダーが動作していません`;
+          view.status = `リーダーの接続を確認してください`;
           setPageView(view);
         }
     }
