@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { Logger } from "../../log/logger";
 import { useLocation } from "react-router-dom";
 import Select, {SingleValue, ActionMeta} from "react-select";
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from "../../db/cards/cardRow";
+
+const logger = new Logger();
 
 type CHANNEL = IpcServices.IpcChannelValOfService;
 const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
@@ -20,6 +23,7 @@ interface IViewData  {
     card_name: string,
     card_kana: string,
     card_message: string,
+    selectOn: string,
     registOn: string,
     deleteOn: string,
     confirm_On: string,
@@ -43,6 +47,7 @@ const viewData: IViewData = {
     card_name: '',
     card_kana: '',
     card_message: '',
+    selectOn: Display.block,
     registOn: Display.none,
     deleteOn: Display.none,
     confirm_On: Display.none,
@@ -54,13 +59,6 @@ const viewData: IViewData = {
 }
 export function IdmRegisterPage() {
     const [view, setView] = useState<IViewData>(viewData);
-
-    const location = useLocation();
-    const from = location.state?.from || "不明";
-    console.log('from=', from);
-    useEffect(() => {
-        console.log('useEffect ------')
-    },[from]);
 
     const setPageView = ( _view: IViewData ) => {
         const _clone = structuredClone(_view);
@@ -99,24 +97,32 @@ export function IdmRegisterPage() {
             // リクエスト
             window.electron.ipcRenderer.sendMessage(
                 CHANNEL_REQUEST,
-                Cards.cards_linkIdmByFcno.name, fcno, idm); // fcno指定依頼
+                Cards.linkIdmByFcno.name, fcno, idm); // fcno指定依頼
             // 応答を待つ
             const count: number
                   = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
 
             view.card_message = 'IDMを登録しました';
+            // 選択を書き換える
+            await redrawSelect(idm);
+
         }else if( view.now_delete === true) {
             // リクエスト
             window.electron.ipcRenderer.sendMessage(
                 CHANNEL_REQUEST,
-                Cards.cards_releaseIdmByFcno.name, fcno); // fcno指定依頼
+                Cards.releaseIdmByFcno.name, fcno); // fcno指定依頼
             // 応答を待つ
             const count: number
                   = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
 
             view.card_message = 'IDM登録を削除しました';
+
+            // 選択を書き換える
+            await redrawSelect(idm);
+
+
         }else{
-            console.log('登録、削除のどちらでもない')
+            logger.debug('IdmRegisterPage confirm_yes_button 登録、削除のどちらでもない');
         }
 
         view.confirm_On = Display.none;
@@ -143,25 +149,27 @@ export function IdmRegisterPage() {
 
     const selectCardChange = async (newValue: SingleValue<CardOption>, actionMeta: ActionMeta<CardOption>) => {
         // 選択されたとき
-        console.log('[1]viewData=',view);
+        logger.debug('[1]viewData=',view);
         if(view && newValue) {
-            console.log('selectedValue=', view.selectedValue);
+            logger.debug('selectedValue=', view.selectedValue);
             const fcno:string = newValue.value;
+            view.selectOn = Display.none;
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
                 // リクエスト
                 window.electron.ipcRenderer.sendMessage(
                     CHANNEL_REQUEST,
-                    Cards.cards_selectRowByFcno.name, fcno); // fcno指定依頼
+                    Cards.selectRowByFcno.name, fcno); // fcno指定依頼
 
-                console.log('[2]viewData=',view);
+                logger.debug('[2]viewData=',view);
                 // 応答を待つ
                 const row: CardRow
                   = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
-                console.log('selected row=', row);
-                console.log('[3]viewData=',view);
+                logger.debug('[3]selected row=', row);
+                logger.debug('[3]viewData=',view);
                 if(row){
-                    console.log('[4]viewData=',view);
+                    view.selectOn = Display.block;
+                    logger.debug('[4]viewData=',view);
                     view.idm = view.idm;
                     view.card_fcno = row.fcno;
                     view.card_name = (row.name)?row.name:'';
@@ -176,10 +184,11 @@ export function IdmRegisterPage() {
                         view.deleteOn = Display.inline_block;
                         view.card_message = `IDM=${card_idm}は紐づいている`;
                     }
-                    console.log('[5]viewData=',view);
+                    logger.debug('[5]viewData=',view);
                     view.guidance = 'ICカードをタッチしてください';
                     setPageView( view );
                 }else{
+                    view.selectOn = Display.none;
                     view.card_fcno = '';
                     view.card_name = '';
                     view.card_kana = '';
@@ -190,12 +199,14 @@ export function IdmRegisterPage() {
                     view.guidance = 'ICカードをタッチしてください';
                     setPageView( view );
                 }
+
             }
         }
     }
     window.pasoriCard.onRelease( async(ipc_idm:string)=>{
         // カードが離れた
-        console.log('release ipc_idm=',ipc_idm);
+        logger.debug('release ipc_idm=',ipc_idm);
+        view.selectOn = Display.none;
         view.idm = '';
         view.card_fcno = '';
         view.card_name = '';
@@ -211,21 +222,16 @@ export function IdmRegisterPage() {
         view.guidance = 'ICカードをタッチしてください';
         view.card_message =  ``;
         setPageView(view);
+    });
 
-
-
-    })
-    window.pasoriCard.onTouch( async(ipc_idm:string)=>{
-        // カードが触った
-        console.log('touch ipc_idm=',ipc_idm);
-
+    const redrawSelect = async (ipc_idm:string) => {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Cards.cards_selectRowByIdm.name, ipc_idm); // idm登録のCardsを取り出す依頼
+            Cards.selectRowByIdm.name, ipc_idm); // idm登録のCardsを取り出す依頼
         const idmRow: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
-        console.log('タッチしたIDMが登録されたカード=', idmRow);
+        logger.debug('タッチしたIDMが登録されたカード=', idmRow);
 
         if(idmRow) {
             // タッチしたIDMが登録済のとき
@@ -234,6 +240,7 @@ export function IdmRegisterPage() {
             view.card_kana = (idmRow.kana)?idmRow.kana:'';
             view.cardsOptions = [];
             view.deleteOn = Display.block; // 削除ボタン表示
+            view.selectOn = Display.none;
             view.card_message =  ``;
             setPageView(view);
         }else{
@@ -241,12 +248,11 @@ export function IdmRegisterPage() {
             // リクエスト
             window.electron.ipcRenderer.sendMessage(
                 CHANNEL_REQUEST,
-                Cards.cards_selectRowsEmptyIdm.name); // idm未登録のCardsを取り出す依頼
-            console.log('wait-----');
+                Cards.selectRowsEmptyIdm.name); // idm未登録のCardsを取り出す依頼
             // 応答を待つ
             const rows: CardRow[]
                 = await window.electron.ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
-            console.log('rows=',rows);
+            logger.debug('rows=',rows);
             const options:CardOption[] = [];
             for(const _row of rows) {
                 const option:CardOption = {
@@ -268,13 +274,24 @@ export function IdmRegisterPage() {
             view.cardsOptions = [...options];
             if(options.length>0){
                 view.card_message =  `登録するメンバーを選択しましょう`;
+                view.selectOn = Display.block;
             }else{
                 view.card_message =  `登録できるメンバーがいません`;
+                view.selectOn = Display.none;
             }
             view.guidance = '登録メンバー選択';
 
             setPageView(view);
         }
+
+
+    };
+
+    window.pasoriCard.onTouch( async(ipc_idm:string)=>{
+        // カードが触った
+        logger.debug('touch ipc_idm=',ipc_idm);
+        view.idm = ipc_idm;
+        await redrawSelect(ipc_idm);
     });
 
     return (
@@ -285,7 +302,7 @@ export function IdmRegisterPage() {
                 <h4>{view.guidance}</h4>
                 <div className="card_manager">
                     <p>IDM&nbsp;(<span>{view.idm}</span>)</p>
-                    <div >
+                    <div style={{display:view.selectOn}}>
                         <Select
                         options={view.cardsOptions}
                         value={view.selectedValue}

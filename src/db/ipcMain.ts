@@ -1,4 +1,6 @@
 import { ipcMain } from "electron";
+import { Logger } from "../log/logger";
+const logger = new Logger();
 import * as IpcServices from '../channel/ipcService';
 export type Channels = IpcServices.IpcChannelValOfService;
 import { db } from "./db";
@@ -13,122 +15,142 @@ export function ipcMainSqliteBridge() {
     const channel = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
     const replyChannel = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
     ipcMain.on(channel, async(event:Electron.IpcMainEvent, command:string, ...args:any[])=>{
-        if(command == Cards.cards_selectAll.name){
-            const fcno = args[0];
-            const rows:CardRow[] = await Cards.cards_selectAll(db);
+        logger.info('command=', command)
+        logger.info('params=', args);
+        logger.info('Cards.cards_selectAll.name=', Cards.selectAll.name);
+        if(command == Cards.selectAll.name){
+            logger.info('[1] command=', command)
+            const rows:CardRow[] = await Cards.selectAll.exec(db);
             event.reply(replyChannel, rows);
             return;
         }
-        else if(command == Cards.cards_selectRowByFcno.name){
+        else if(command == Cards.selectRowByFcno.name){
+            logger.info('[2] command=', command)
             const fcno = args[0];
-            const row:CardRow = await Cards.cards_selectRowByFcno(db, fcno);
+            const row:CardRow = await Cards.selectRowByFcno.exec(db, fcno);
             event.reply(replyChannel, row);
             return;
         }
-        else if(command == Cards.cards_selectRowByIdm.name){
+        else if(command == Cards.selectRowByIdm.name){
+            logger.info('[3] command=', command)
             const idm = args[0];
-            const row:CardRow = await Cards.cards_selectRowByIdm(db, idm);
+            const row:CardRow = await Cards.selectRowByIdm.exec(db, idm);
             event.reply(replyChannel, row);
             return;
         }
-        else if(command == Cards.cards_selectRowsEmptyIdm.name){
-            const rows:CardRow[] = await Cards.cards_selectRowsEmptyIdm(db);
+        else if(command == Cards.selectRowsEmptyIdm.name){
+            logger.info('[4] command=', command)
+            const rows:CardRow[] = await Cards.selectRowsEmptyIdm.exec(db);
             console.log(rows);
             event.reply(replyChannel, rows);
             return;
         }
-        else if(command == Cards.cards_deleteByFcno.name){
+        else if(command == Cards.deleteByFcno.name){
+            logger.info('[5] command=', command)
             const fcno = args[0];
-            const count:number = await Cards.cards_deleteByFcno(db, fcno);
+            const count:number = await Cards.deleteByFcno.exec(db, fcno);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Cards.cards_insert.name){
+        else if(command == Cards.insert.name){
+            logger.info('[6] command=', command)
             const row:CardRow = args[0];
-            const count:number = await Cards.cards_insert(db, row);
+            const count:number = await Cards.insert.exec(db, row);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Cards.cards_linkIdmByFcno.name){
+        else if(command == Cards.linkIdmByFcno.name){
+            logger.info('[7] command=', command)
             const fcno:string = args[0];
             const idm:string = args[1];
-            const count:number = await Cards.cards_linkIdmByFcno(db, fcno, idm);
+            const count:number = await Cards.linkIdmByFcno.exec(db, fcno, idm);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Cards.cards_releaseIdmByFcno.name){
+        else if(command == Cards.releaseIdmByFcno.name){
+            logger.info('[8] command=', command)
             const fcno:string = args[0];
-            const count:number = await Cards.cards_releaseIdmByFcno(db, fcno);
+            const count:number = await Cards.releaseIdmByFcno.exec(db, fcno);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Cards.cards_updateInRoomByFcno.name){
+        else if(command == Cards.updateInRoomByFcno.name){
+            logger.info('[9] command=', command)
             const fcno:string = args[0];
             const in_room: boolean = args[1];
-            const count:number = await Cards.cards_updateInRoomByFcno(db, fcno, in_room);
+            const count:number = await Cards.updateInRoomByFcno.exec(db, fcno, in_room);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Cards.cards_updatePersonalDataByFcno.name){
+        else if(command == Cards.updatePersonalDataByFcno.name){
+            logger.info('[10] command=', command)
             const fcno:string = args[0];
             const row: CardRow = args[1];
-            const count:number = await Cards.cards_updatePersonalDataByFcno(db, fcno, row);
+            const count:number = await Cards.updatePersonalDataByFcno.exec(db, fcno, row);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Histories.hist_insert.name){
+        else if(command == Histories.insert.name){
+            logger.info('[11] command=', command)
             const fcno:string = args[0];
             const idm: string = args[1];
-            const count:number = await Histories.hist_insert(db, fcno, idm);
+            const count:number = await Histories.insert.exec(db, fcno, idm);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Histories.hist_selectAll.name){
-            const rows:HistoriesRow[] = await Histories.hist_selectAll(db);
+        else if(command == Histories.selectAll.name){
+            logger.info('[12] command=', command)
+            const rows:HistoriesRow[] = await Histories.selectAll.exec(db);
             event.reply(replyChannel, rows);
             return;
         }
-        else if(command == Histories.hist_selectByDate.name){
+        else if(command == Histories.selectByDate.name){
+            logger.info('[13] command=', command)
             const date:Date = args[0];
-            const rows:HistoriesRow[] = await Histories.hist_selectByDate(db, date);
+            const rows:HistoriesRow[] = await Histories.selectByDate.exec(db, date);
             console.log(rows);
             event.reply(replyChannel, rows);
             return;
         }
-        else if(command == Histories.hist_selectRowByFcnoDate.name){
+        else if(command == Histories.selectRowByFcnoDate.name){
+            logger.info('[14] command=', command)
             const fcno:string = args[0]
             const date:Date = args[1];
-            const row:HistoriesRow = await Histories.hist_selectRowByFcnoDate(db, fcno, date);
+            const row:HistoriesRow = await Histories.selectRowByFcnoDate.exec(db, fcno, date);
             console.log(row);
             event.reply(replyChannel, row);
             return;
         }
-        else if(command == Histories.hist_selectInRoomByFcnoDate.name){
+        else if(command == Histories.selectInRoomByFcnoDate.name){
+            logger.info('[15] command=', command)
             const fcno:string = args[0];
             const date:Date = args[1];
-            const row:HistoriesCardRow = await Histories.hist_selectInRoomByFcnoDate(db, fcno, date);
+            const row:HistoriesCardRow = await Histories.selectInRoomByFcnoDate.exec(db, fcno, date);
             event.reply(replyChannel, row);
             return;
         }
-        else if(command == Histories.hist_setInRoomByFcnoIdm.name){
+        else if(command == Histories.setInRoomByFcnoIdm.name){
+            logger.info('[16] command=', command)
             const fcno:string = args[0];
             const idm:string = args[1];
-            const count:number = await Histories.hist_setInRoomByFcnoIdm(db, fcno, idm);
+            const count:number = await Histories.setInRoomByFcnoIdm.exec(db, fcno, idm);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Histories.hist_setOutRoomByFcnoIdm.name) {
+        else if(command == Histories.setOutRoomByFcnoIdm.name) {
+            logger.info('[17] command=', command)
             const fcno:string = args[0];
             const idm:string = args[1];
-            const count:number = await Histories.hist_setOutRoomByFcnoIdm(db, fcno, idm);
+            const count:number = await Histories.setOutRoomByFcnoIdm.exec(db, fcno, idm);
             event.reply(replyChannel, count);
             return;
         }
-        else if(command == Histories.hist_updateYesterdayToOutroom.name){
-            const count:number = await Histories.hist_updateYesterdayToOutroom(db);
+        else if(command == Histories.updateYesterdayToOutroom.name){
+            logger.info('[18] command=', command)
+            const count:number = await Histories.updateYesterdayToOutroom.exec(db);
             event.reply(replyChannel, count);
             return;
         }
-        console.log('comman is not match ', command)
+        logger.info(`comman is not match =(${command})`)
     });
 }

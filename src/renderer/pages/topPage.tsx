@@ -1,8 +1,11 @@
 import { useRef, useEffect, useState } from "react";
+import { Logger } from "../../log/logger";
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
+
+const logger = new Logger();
 
 type CHANNEL = IpcServices.IpcChannelValOfService;
 const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
@@ -34,19 +37,26 @@ const initView: View = {
 export function TopPage() {
     const [view, setView] = useState(initView);
 
+    useEffect(()=>{
+        view.modal_display = Display.none,
+        view.is_ready = false;
+    },[]);
+
     const setPageView = ( _view: View ) => {
         const _clone = structuredClone(_view);
-        console.log(_clone);
+        logger.debug('topPage setPageView _clone=', _clone);
         setView(_clone);
     }
     const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Cards.cards_selectRowByIdm.name, idm);
+            Cards.selectRowByIdm.name, idm);
         // 応答を待つ
         const row: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        logger.debug('topPage cardsSelectCardRow cardsSelectCardRow=', row);
+
         return row;
     };
     const setInRoom = async(fcno:string, idm: string) : Promise<number> => {
@@ -54,14 +64,14 @@ export function TopPage() {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Cards.cards_updateInRoomByFcno.name, fcno, in_room);
+            Cards.updateInRoomByFcno.name, fcno, in_room);
         // 応答を待つ
         const card_count: number
             = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
         // 履歴を更新
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Histories.hist_setInRoomByFcnoIdm.name, fcno, idm );
+            Histories.setInRoomByFcnoIdm.name, fcno, idm );
         // 応答を待つ
         const hist_count: number
             = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
@@ -72,14 +82,14 @@ export function TopPage() {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Cards.cards_updateInRoomByFcno.name, fcno, in_room);
+            Cards.updateInRoomByFcno.name, fcno, in_room);
         // 応答を待つ
         const card_count: number
             = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
         // 履歴を更新
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Histories.hist_setOutRoomByFcnoIdm.name, fcno, idm );
+            Histories.setOutRoomByFcnoIdm.name, fcno, idm );
         // 応答を待つ
         const hist_count: number
             = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
@@ -101,6 +111,7 @@ export function TopPage() {
         }
         // idmが登録されている利用者を取得する
         const row = await cardsSelectCardRow(idm);
+        logger.debug('topPage cardTouch row=', row);
         if(row) {
             const fcno = row.fcno;
             if( row.in_room == true ) {
@@ -114,23 +125,23 @@ export function TopPage() {
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`
             }
-            view.modal_display = Display.block;
         }else{
-            view.modal_display = Display.block;
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
+        view.modal_display = Display.block;
         setPageView(view);
 
     }
     const cardTouchListenerStart = () => {
+        logger.debug('topPage ----cardTouchListenerStart----');
         // カードが離れたときの処理
         window.pasoriCard.onRelease( async(ipc_idm:string)=>{
             cardRelease();
         });
 
         // カードタッチしたときの処理
-        window?.pasoriCard.onTouch(async (idm:string)=>{
+        window.pasoriCard.onTouch(async (idm:string)=>{
             await cardTouch(idm);
         });
     }

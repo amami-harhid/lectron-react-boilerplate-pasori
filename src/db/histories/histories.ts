@@ -1,10 +1,12 @@
 
 import sqlite from 'sqlite3';
+import { Logger } from '../../log/logger';
 import { HistoriesRow, HistoriesCardRow } from "./historiesRow";
 import * as Cards from '../cards/cards';
-import { exec } from "../dbCommon";
+import { type Method, exec } from "../dbCommon";
 import * as DateUtils from '../../utils/dateUtils';
-export const hist_createTable = (db:sqlite.Database):Promise<number> => {
+const logger = new Logger();
+export const createTable = (db:sqlite.Database):Promise<number> => {
     const query = `
         CREATE TABLE IF NOT EXISTS histories (
             [id] integer primary key autoincrement,
@@ -18,122 +20,155 @@ export const hist_createTable = (db:sqlite.Database):Promise<number> => {
     `;
     return exec.run(db, query);
 };
-export const hist_deleteByIdm = (db:sqlite.Database, idm:string):Promise<number> => {
-    const query = `DELETE FROM histories WHERE idm = ?`;
-    return exec.run(db, query,[idm]);
-};
-export const hist_deleteHistoriesByFcno = (db:sqlite.Database, fcno:string):Promise<number> => {
-    const query = `DELETE FROM histories WHERE fcno = ?`;
-    return exec.run(db, query,[fcno]);
-};
-export const hist_dropTable = (db:sqlite.Database, ):Promise<number> => {
-    const query = `DROP TABLE IF EXISTS histories`;
-    return exec.run(db, query);
-}
+export const deleteByIdm :Method = {
+    name: 'hist_deleteByIdm',
+    exec: (db:sqlite.Database, idm:string):Promise<number> => {
+        const query = `DELETE FROM histories WHERE idm = ?`;
+        return exec.run(db, query,[idm]);
+    }
+} 
+export const deleteHistoriesByFcno :Method = {
+    name: 'hist_deleteHistoriesByFcno',
+    exec: (db:sqlite.Database, fcno:string):Promise<number> => {
+        const query = `DELETE FROM histories WHERE fcno = ?`;
+        return exec.run(db, query,[fcno]);
+    }
+} 
+export const dropTable :Method = {
+    name: 'hist_dropTable',
+    exec: (db:sqlite.Database, ):Promise<number> => {
+        const query = `DROP TABLE IF EXISTS histories`;
+        return exec.run(db, query);
+    }
+} 
 
-export const hist_insert = (db:sqlite.Database, fcno:string, idm:string ):Promise<number> => {
-    const query =
-    `INSERT INTO histories
-    (idm, fcno, in_room, date_in, date_out, date_time)
-    VALUES(?, ?, TRUE, date('now', 'localtime'), '', datetime('now', 'localtime'))`;
-    return exec.run(db, query,[idm, fcno]);
-}
+export const insert :Method = {
+    name: 'hist_insert',
+    exec: (db:sqlite.Database, fcno:string, idm:string ):Promise<number> => {
+        const query =
+        `INSERT INTO histories
+        (idm, fcno, in_room, date_in, date_out, date_time)
+        VALUES(?, ?, TRUE, date('now', 'localtime'), '', datetime('now', 'localtime'))`;
+        return exec.run(db, query,[idm, fcno]);
+    }
+} 
 
-export const hist_selectAll = (db:sqlite.Database):Promise<HistoriesRow[]> => {
-    const query = `SELECT * FROM histories ORDER BY date_in, fcno ASC`;
-    return exec.all<HistoriesRow>(db, query);
-}
+export const selectAll :Method = {
+    name: 'hist_selectAll',
+    exec: (db:sqlite.Database):Promise<HistoriesRow[]> => {
+        const query = `SELECT * FROM histories ORDER BY date_in, fcno ASC`;
+        return exec.all<HistoriesRow>(db, query);
+    }
+} 
 
 // 指定日に入室した履歴を全員分取得する
-export const hist_selectByDate = (db:sqlite.Database, date:Date):Promise<HistoriesCardRow[]> => {
-    const query =
-        `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
-         LEFT OUTER JOIN cards AS C
-         WHERE H.fcno = C.fcno AND H.idm = C.idm
-         AND H.in_room = C.in_room AND H.date_in = date(?)
-         ORDER BY fcno ASC`;
-    const date_str = DateUtils.dateToSqlite3Date(date);
-    return exec.all<HistoriesCardRow>(db, query, [date_str]);
-}
+export const selectByDate :Method = {
+    name: 'hist_selectByDate',
+    exec: (db:sqlite.Database, date:Date):Promise<HistoriesCardRow[]> => {
+        const query =
+            `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
+             LEFT OUTER JOIN cards AS C
+             WHERE H.fcno = C.fcno AND H.idm = C.idm
+             AND H.in_room = C.in_room AND H.date_in = date(?)
+             ORDER BY fcno ASC`;
+        const date_str = DateUtils.dateToSqlite3Date(date);
+        return exec.all<HistoriesCardRow>(db, query, [date_str]);
+    }
+} 
 
 // 指定日に入室した履歴のうち、指定したFCNOのレコード（１個）を取得する
-export const hist_selectRowByFcnoDate = (db:sqlite.Database, fcno:string, date:Date):Promise<HistoriesCardRow> => {
-    const query =
-        `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
-         LEFT OUTER JOIN cards AS C
-        WHERE H.fcno = ? AND H.fcno = C.fcno AND H.idm = C.idm
-        AND H.in_room = C.in_room AND date_in = date(?)`;
-    const date_str = DateUtils.dateToSqlite3Date(date);
-    return exec.get<HistoriesCardRow>(db, query, [fcno, date_str]);
-}
+export const selectRowByFcnoDate :Method = {
+    name: 'hist_selectRowByFcnoDate',
+    exec: (db:sqlite.Database, fcno:string, date:Date):Promise<HistoriesCardRow> => {
+        const query =
+            `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
+             LEFT OUTER JOIN cards AS C
+            WHERE H.fcno = ? AND H.fcno = C.fcno AND H.idm = C.idm
+            AND H.in_room = C.in_room AND date_in = date(?)`;
+        const date_str = DateUtils.dateToSqlite3Date(date);
+        return exec.get<HistoriesCardRow>(db, query, [fcno, date_str]);
+    }
+} 
 
 // 指定日に入室済（退室含む）の履歴のうち、指定したFCNOのレコード（１個）を取得する
-export const hist_selectInRoomByFcnoDate = (db:sqlite.Database, fcno:string, date:Date):Promise<HistoriesCardRow> => {
-    const query =
-        `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
-         LEFT OUTER JOIN cards AS C
-        WHERE H.fcno = ? AND H.fcno = C.fcno AND H.idm = C.idm
-        AND date_in = date(?)`;
-    const date_str = DateUtils.dateToSqlite3Date(date);
-    return exec.get<HistoriesCardRow>(db, query, [fcno, date_str]);
+export const selectInRoomByFcnoDate :Method = {
+    name: 'hist_selectInRoomByFcnoDate',
+    exec: (db:sqlite.Database, fcno:string, date:Date):Promise<HistoriesCardRow> => {
+        const query =
+            `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
+             LEFT OUTER JOIN cards AS C
+            WHERE H.fcno = ? AND H.fcno = C.fcno AND H.idm = C.idm
+            AND date_in = date(?)`;
+        const date_str = DateUtils.dateToSqlite3Date(date);
+        return exec.get<HistoriesCardRow>(db, query, [fcno, date_str]);
+    }
 }
 
 // 現在日の前日に入室して 退室していないレコードを「退室」にする
-export const hist_updateYesterdayToOutroom = (db:sqlite.Database): Promise<number> => {
-    const query =
-    `UPDATE histories SET in_room = FALSE, date_out = date(?)
-    WHERE in_room = TRUE AND date_in = date(?)`;
-    const toDay = new Date();
-    const yesterday_date = DateUtils.getShiftedDate(toDay, -1);
-    const yesterday_date_str = DateUtils.dateToSqlite3Date(yesterday_date);
-    return exec.run(db, query, [yesterday_date_str, yesterday_date_str]);
+export const updateYesterdayToOutroom :Method = {
+    name: 'hist_updateYesterdayToOutroom',
+    exec: (db:sqlite.Database): Promise<number> => {
+        const query =
+        `UPDATE histories SET in_room = FALSE, date_out = date(?)
+        WHERE in_room = TRUE AND date_in = date(?)`;
+        const toDay = new Date();
+        const yesterday_date = DateUtils.getShiftedDate(toDay, -1);
+        const yesterday_date_str = DateUtils.dateToSqlite3Date(yesterday_date);
+       return exec.run(db, query, [yesterday_date_str, yesterday_date_str]);
+    }
 }
 
 // 履歴更新( 入室にする )
-export const hist_setInRoomByFcnoIdm = async (db:sqlite.Database, fcno:string, idm:string) : Promise<number> => {
-    const today = new Date();
-    const activeCard = await Cards.cards_selectRowByFcno(db, fcno);
-    if( activeCard == undefined) {
-        console.log('setInRoomByFcnoIdm activeCard=', activeCard);
-        return 0;
-    }
-    const in_room_history = await hist_selectInRoomByFcnoDate(db, fcno, today);
-    if(in_room_history == undefined) {
-        // 一度も入室していないとき
-        const insertCount = await hist_insert(db, fcno, idm);
-        console.log('setInRoomByFcnoIdm fcno, idm, insertCount=', fcno, idm, insertCount);
-        return insertCount;
-    }else{
-        // 入室している（退室しているときも含む）
-        const query =
-        `UPDATE histories
-        SET in_room = TRUE, date_out = ''
-        WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
-        const todayStr = DateUtils.dateToSqlite3Date(today);
-        console.log('todayStr=',todayStr);
-        return exec.run(db, query, [fcno, idm, todayStr]);
+export const setInRoomByFcnoIdm :Method = {
+    name: 'hist_setInRoomByFcnoIdm',
+    exec: async (db:sqlite.Database, fcno:string, idm:string) : Promise<number> => {
+        const today = new Date();
+        const activeCard = await Cards.selectRowByFcno.exec(db, fcno);
+        if( activeCard == undefined) {
+            logger.error('setInRoomByFcnoIdm activeCard=', activeCard);
+            return 0;
+        }
+        const in_room_history = await selectInRoomByFcnoDate.exec(db, fcno, today);
+        if(in_room_history == undefined) {
+            // 一度も入室していないとき
+            const insertCount = await insert.exec(db, fcno, idm);
+            console.log('setInRoomByFcnoIdm fcno, idm, insertCount=', fcno, idm, insertCount);
+            return insertCount;
+        }else{
+            // 入室している（退室しているときも含む）
+            const query =
+            `UPDATE histories
+            SET in_room = TRUE, date_out = ''
+            WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
+            const todayStr = DateUtils.dateToSqlite3Date(today);
+            //console.log('todayStr=',todayStr);
+            return exec.run(db, query, [fcno, idm, todayStr]);
+        }
     }
 }
 
 // 履歴更新( 退室にする )
-export const hist_setOutRoomByFcnoIdm = async (db:sqlite.Database, fcno:string, idm:string) : Promise<number> => {
-    const today = new Date();
-    const activeCard = await Cards.cards_selectRowByFcno(db, fcno);
-    if( activeCard == undefined) {
-        console.log('setInRoomByFcnoIdm activeCard=', activeCard);
-        return 0;
+export const setOutRoomByFcnoIdm :Method = {
+    name: 'hist_setOutRoomByFcnoIdm',
+    exec: async (db:sqlite.Database, fcno:string, idm:string) : Promise<number> => {
+        const today = new Date();
+        const activeCard = await Cards.selectRowByFcno.exec(db, fcno);
+        if( activeCard == undefined) {
+            logger.debug('setInRoomByFcnoIdm activeCard=', activeCard);
+            return 0;
+        }
+        const in_room_history = await selectInRoomByFcnoDate.exec(db, fcno, today);
+        if(in_room_history) {
+            // 入室している（退室しているときも含む）
+            const query =
+            `UPDATE histories
+            SET in_room = FALSE, date_out = date(?)
+            WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
+            const todayStr = DateUtils.dateToSqlite3Date(today);
+            logger.debug('todayStr=',todayStr)
+            return exec.run(db, query, [fcno, idm, todayStr]);
+        }else{
+            return 0;
+        }
     }
-    const in_room_history = await hist_selectInRoomByFcnoDate(db, fcno, today);
-    if(in_room_history) {
-        // 入室している（退室しているときも含む）
-        const query =
-        `UPDATE histories
-        SET in_room = FALSE, date_out = date(?)
-        WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
-        const todayStr = DateUtils.dateToSqlite3Date(today);
-        console.log('todayStr=',todayStr);
-        return exec.run(db, query, [fcno, idm, todayStr]);
-    }else{
-        return 0;
-    }
-}
+} 

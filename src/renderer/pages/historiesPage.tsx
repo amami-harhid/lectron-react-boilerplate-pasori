@@ -25,7 +25,7 @@ export function HistoriesPage() {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Histories.hist_selectByDate.name, date);
+            Histories.selectByDate.name, date);
         // 応答を待つ
         const rows: HistoriesCardRow[]
             = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_REPLY);

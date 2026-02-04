@@ -1,8 +1,11 @@
 'use client'
 import { useRef, useEffect, useState } from "react";
+import { Logger } from "../../log/logger";
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from '../../db/cards/cardRow';
+
+const logger = new Logger();
 
 type TABLE_ROW = {
     id:number,
@@ -28,7 +31,7 @@ export function MemberListPage () {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
             CHANNEL_REQUEST,
-            Cards.cards_selectAll.name);
+            Cards.selectAll.name);
         // 応答を待つ
         const rows: CardRow[]
             = await window.electron.ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
@@ -36,25 +39,25 @@ export function MemberListPage () {
     };
 
     const membersToTableData = async ():Promise<void> => {
-            const rows:CardRow[] = await cardsSelectAll();
-            console.log(rows);
-            const _data:TABLE_ROW[] = [];
-            for(const row of rows){
-                const newId = _data.length > 0 ? _data[_data.length - 1].id + 1 : 1;
-                const newRow:TABLE_ROW = {
-                    id: newId,
-                    fcno: row.fcno,
-                    name: (row.name)?row.name:'',
-                    kana: (row.kana)?row.kana:'',
-                    mail: (row.mail)?row.mail:'',
-                }
-                _data.push(newRow);
+        const rows:CardRow[] = await cardsSelectAll();
+        logger.debug('MemberListPage membersToTableData rows=', rows);
+        const _data:TABLE_ROW[] = [];
+        for(const row of rows){
+            const newId = _data.length > 0 ? _data[_data.length - 1].id + 1 : 1;
+            const newRow:TABLE_ROW = {
+                id: newId,
+                fcno: row.fcno,
+                name: (row.name)?row.name:'',
+                kana: (row.kana)?row.kana:'',
+                mail: (row.mail)?row.mail:'',
             }
-            setPageInfo({view:{guidance:""}, tableData: _data});
+            _data.push(newRow);
         }
-    //membersToTableData();
+        setPageInfo({view:{guidance:""}, tableData: _data});
+    }
+
     const reload = () => {
-        console.log('reload');
+        logger.debug('memberListPage reload');
         membersToTableData();
     }
 

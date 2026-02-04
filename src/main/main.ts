@@ -24,8 +24,8 @@ import { createTables } from '../db/createTables';
 
 import { CardReader } from '../card/icCardReader';
 
-const reader = new CardReader(logger)
-reader.ready();
+//const reader = new CardReader(logger)
+//reader.ready();
 
 
 class AppUpdater {
@@ -175,12 +175,3 @@ app
 
     }
   );
-
-/**  これはうまくいかない */
-process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
-    console.error("⚠️ Unhandled Rejection at:", promise);
-    console.error("Reason:", reason);
-    app.quit();
-
-    process.exit(1);
-});
