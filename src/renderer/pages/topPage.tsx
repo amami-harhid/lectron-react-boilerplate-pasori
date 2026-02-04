@@ -1,11 +1,8 @@
 import { useRef, useEffect, useState } from "react";
-import { Logger } from "../../log/logger";
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
-
-const logger = new Logger();
 
 type CHANNEL = IpcServices.IpcChannelValOfService;
 const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
@@ -17,6 +14,10 @@ type View = {
   status: string,
   modal_display: string,
   is_ready: boolean,
+  card_display: string,
+  error_display: string,
+  errorMessage01: string,
+  errorMessage02: string,
 }
 
 const Display = {
@@ -31,6 +32,10 @@ const initView: View = {
   status : '',
   modal_display : Display.none,
   is_ready: false,
+  card_display: Display.block,
+  error_display: Display.none,
+  errorMessage01: '',
+  errorMessage02: '',
 } as const;
 
 
@@ -44,7 +49,6 @@ export function TopPage() {
 
     const setPageView = ( _view: View ) => {
         const _clone = structuredClone(_view);
-        logger.debug('topPage setPageView _clone=', _clone);
         setView(_clone);
     }
     const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
@@ -55,7 +59,6 @@ export function TopPage() {
         // 応答を待つ
         const row: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
-        logger.debug('topPage cardsSelectCardRow cardsSelectCardRow=', row);
 
         return row;
     };
@@ -111,7 +114,6 @@ export function TopPage() {
         }
         // idmが登録されている利用者を取得する
         const row = await cardsSelectCardRow(idm);
-        logger.debug('topPage cardTouch row=', row);
         if(row) {
             const fcno = row.fcno;
             if( row.in_room == true ) {
@@ -134,7 +136,6 @@ export function TopPage() {
 
     }
     const cardTouchListenerStart = () => {
-        logger.debug('topPage ----cardTouchListenerStart----');
         // カードが離れたときの処理
         window.pasoriCard.onRelease( async(ipc_idm:string)=>{
             cardRelease();
@@ -150,10 +151,17 @@ export function TopPage() {
         view.is_ready  = true;
         const isReady = await window.pasoriCard.isCardReady();
         if(isReady){
+          view.card_display = Display.block;
+          view.error_display = Display.none;
+          view.errorMessage01 = ``;
+          view.errorMessage02 = ``;
           cardTouchListenerStart();
         }else{
           view.modal_display = Display.block;
-          view.status = `リーダーの接続を確認してください`;
+          view.card_display = Display.none;
+          view.error_display = Display.block;
+          view.errorMessage01 = `カードリーダーの接続を確認できません`;
+          view.errorMessage02 = `正しく接続してアプリを再起動してください`;
           setPageView(view);
         }
     }
@@ -165,9 +173,13 @@ export function TopPage() {
         <h1 className="pageTitle"><span>{view.pageTitle}</span></h1>
         <div className="modal" style={{display: view.modal_display}}>
             <div className="modal-content">
-                <div className="card">
+                <div className="card" style={{display: view.card_display}}>
                   <p>{view.status}</p>
                   <p>{view.name}</p>
+                </div>
+                <div className="card" style={{display: view.error_display}}>
+                    <p className="errorMessage">{view.errorMessage01}</p>    
+                    <p className="errorMessage">{view.errorMessage02}</p>    
                 </div>
             </div>
         </div>

@@ -24,9 +24,8 @@ import { createTables } from '../db/createTables';
 
 import { CardReader } from '../card/icCardReader';
 
-//const reader = new CardReader(logger)
-//reader.ready();
-
+const reader = new CardReader(logger)
+reader.ready();
 
 class AppUpdater {
   constructor() {

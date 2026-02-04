@@ -20,7 +20,10 @@ const GENERAL_STOP = '#Genaral_STOP';
 const MEMBERS = '#MEMBERS';
 const DEV_TOOL = "#DEV_TOOL";
 const APP_VERSION = "#APP_VERSION";
+const APP_VERSION_VIEW = "#APP_VERSION_VIEW";
 const HISTORIES = "#HISTORIES";
+
+const app_version = appVersion();
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -274,12 +277,20 @@ export default class MenuBuilder {
           },
           {
               label: 'VERSION',
-              id: APP_VERSION,
-              enabled: true,
-              click: () => {
-                  viewAppVersion();
-              }
+              submenu: [
+                {
+                  label: `${app_version}`,
+                }
+              ],
           },
+        ]
+      },
+    ];
+    if(process.env.DEBUG_PROD === 'true'){
+      templateDefault.push(
+      {
+        label: 'DEBUG',
+        submenu: [
           {
               label: '登録なしカード',
               enabled: true,
@@ -306,9 +317,8 @@ export default class MenuBuilder {
           },
 
         ]
-      },
-    ];
-
+      });
+    }
     return templateDefault;
   }
 }
@@ -341,7 +351,6 @@ const toManager = ()=>{
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", "/IdmRegister");
-    sendMessage(MenuChannel.APP_MANAGER_HANDLING);
 }
 const toGeneral = () => {
     setEnableToMenuItem(GENERAL, false);
@@ -350,7 +359,6 @@ const toGeneral = () => {
     setEnableToMenuItem(MEMBERS, false);
     setEnableToMenuItem(HISTORIES, false);
     sendMessage("navigate", "/Top");
-    //sendMessage(MenuChannel.APP_GENERAL_HANDLING);
 }
 const toGeneralStop = () => {
     setEnableToMenuItem(GENERAL, true);
@@ -359,7 +367,6 @@ const toGeneralStop = () => {
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", "/Stop");
-    //sendMessage(MenuChannel.APP_GENERAL_STOP_HANDLING);
 }
 const toMember = () => {
     setEnableToMenuItem(GENERAL, true);
@@ -377,7 +384,8 @@ const openDevTool = () => {
 }
 const viewAppVersion = () => {
     const version = appVersion();
-    sendMessage(MenuChannel.APP_VERSION_HANDLING, version);
+    const menuItem = getMenuItemById(APP_VERSION_VIEW);
+    menuItem.label = version;
 }
 const viewHistories = () => {
     setEnableToMenuItem(GENERAL, true);
