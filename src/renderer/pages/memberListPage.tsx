@@ -1,11 +1,8 @@
 'use client'
 import { useRef, useEffect, useState } from "react";
-import { Logger } from "../../log/logger";
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from '../../db/cards/cardRow';
-
-const logger = new Logger();
 
 type TABLE_ROW = {
     id:number,
@@ -40,7 +37,6 @@ export function MemberListPage () {
 
     const membersToTableData = async ():Promise<void> => {
         const rows:CardRow[] = await cardsSelectAll();
-        logger.debug('MemberListPage membersToTableData rows=', rows);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].id + 1 : 1;
@@ -57,13 +53,17 @@ export function MemberListPage () {
     }
 
     const reload = () => {
-        logger.debug('memberListPage reload');
         membersToTableData();
     }
 
     useEffect(() => {
         membersToTableData();
     },[]);
+    
+    // カードが離れたときの処理
+    window.pasoriCard.onRelease(async()=>{});
+    // カードタッチしたときの処理
+    window.pasoriCard.onTouch(async ()=>{});
 
     return (
         <>
