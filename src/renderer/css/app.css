@@ -122,6 +122,25 @@ h1 {
     align-items: center; /* 中央寄せ用 */
 
 }
+.member_appTable {
+    border: 1px solid blue;
+    border-collapse: separate; /* 二重線を一本化 */
+    border-spacing: 10px; /* セル間隔 */
+    width:90%;
+}
+.member_appTable th {
+    font-size: 80%;
+    border: 1px solid blue;
+}
+.member_appTable th {
+    background-color: black;
+    color: whitesmoke;
+    font-weight: bolder;
+}
+.member_appTable td {
+    font-size: 80%;
+    border: 1px solid blue;
+}
 
 .hist_appTable {
     border: 1px solid black;
