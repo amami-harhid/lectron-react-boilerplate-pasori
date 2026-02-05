@@ -2,12 +2,12 @@
   "name": "electron-react-boilerplate",
   "version": "4.6.0",
   "description": "A foundation for scalable desktop apps",
+  "keywords": [
+    "sqlite3",
+    "pcsclite"
+  ],
   "license": "MIT",
-  "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
-  },
+  "author": "Electron React Boilerplate Maintainers, @amami-harhid",
   "main": "./dist/main/main.js",
   "scripts": {
     "rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
