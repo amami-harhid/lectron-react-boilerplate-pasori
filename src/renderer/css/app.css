@@ -126,7 +126,7 @@ h1 {
     border: 1px solid blue;
     border-collapse: separate; /* 二重線を一本化 */
     border-spacing: 10px; /* セル間隔 */
-    width:90%;
+    width:100%;
 }
 .member_appTable th {
     font-size: 80%;
@@ -165,4 +165,24 @@ h1 {
 
 .hist_selectedDate {
     margin-bottom: 0;
+}
+
+.modal-button-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-btn:hover {
+    background-color: #45a049;
 }

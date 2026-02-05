@@ -41,6 +41,7 @@ type PAGEINFO = {
     fcnoReadOnly : boolean,
     etcReadOnly : boolean,
     isModalOpen : boolean,
+    counter: number,
 }
 const initPageInfo: PAGEINFO = {
     view: {guidance: ''},
@@ -60,6 +61,7 @@ const initPageInfo: PAGEINFO = {
         mail: '',
     },
     isModalOpen: false,
+    counter: 0,
 };
 type FormValues = {
   fcno: string,
@@ -76,6 +78,10 @@ export function MemberListPage () {
     const updatePageInfo = ( info: PAGEINFO ) => {
         const _clone = structuredClone(info);
         setPageInfo(_clone);
+    }
+    const redrawPageInfo = ( info: PAGEINFO ) => {
+        info.counter += 1;
+        updatePageInfo(info);
     }
     // TODO FORM を使わないようにする予定？
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>();
@@ -129,6 +135,7 @@ export function MemberListPage () {
         ]
     const handleCancel = () =>{
         pageInfo.tableDisplay = Display.block;
+        pageInfo.isModalOpen = false;
         pageInfo.registButtonDisplay = Display.none;
         pageInfo.deleteButtonDisplay = Display.none;
         pageInfo.fcnoReadOnly = false;
@@ -211,8 +218,8 @@ export function MemberListPage () {
             await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
             pageInfo.isModalOpen = false;
             pageInfo.tableDisplay = Display.block;
-            updatePageInfo(pageInfo);
-            reload();
+            redrawPageInfo(pageInfo);
+            //reload();
         }else{
             // fcnoが重複
         }
@@ -244,11 +251,11 @@ export function MemberListPage () {
                 Cards.updatePersonalDataByFcno.name, fcno, newRow);
             // 応答を待つ
             await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+            pageInfo.isModalOpen = false;
+            pageInfo.tableDisplay = Display.block;
+            redrawPageInfo(pageInfo);
         }
-        pageInfo.isModalOpen = false;
-        pageInfo.tableDisplay = Display.block;
-        updatePageInfo(pageInfo);
-        reload();
+        //reload();
 
     }
     const formSubmitDelete = async (data:FormValues) => {
@@ -276,11 +283,11 @@ export function MemberListPage () {
                 Cards.deleteByFcno.name, fcno);
             // 応答を待つ
             await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+            pageInfo.isModalOpen = false;
+            pageInfo.tableDisplay = Display.block;
+            redrawPageInfo(pageInfo);
         }
-        pageInfo.isModalOpen = false;
-        pageInfo.tableDisplay = Display.block;
-        updatePageInfo(pageInfo);
-        reload();
+//        reload();
     }
     const cardsSelectAll = async (): Promise<CardRow[]> => {
         // リクエスト
@@ -317,8 +324,9 @@ export function MemberListPage () {
     }
 
     useEffect(() => {
-        membersToTableData();
-    },[]);
+        console.log('----useEffect----')
+        reload();
+    },[pageInfo.counter]);
 
     // カードが離れたときの処理
     window.pasoriCard.onRelease(async()=>{});
@@ -440,21 +448,14 @@ export function MemberListPage () {
                     </table>
                 </div>
                 </form>
-                <div>
-                    <p><button onClick={handleCancel}>中止</button>&nbsp;
-                        <button type="submit" onClick={handleSubmit(formSubmitRegist)}
-                            style={{display:pageInfo.registButtonDisplay}}>追加</button>&nbsp;
-                        <button type="submit" onClick={handleSubmit(formSubmitReplace)}
-                            style={{display:pageInfo.replaceButtonDisplay}}>更新</button>&nbsp;
-                        <button type="submit" onClick={handleSubmit(formSubmitDelete)}
-                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button>&nbsp;
-                        <button onClick={() => {
-                            pageInfo.isModalOpen = false;
-                            pageInfo.tableDisplay = Display.block;
-                            updatePageInfo(pageInfo);
-                        }}>閉じる</button>
-
-                    </p>
+                <div className="modal-button-container">
+                    <button className="modal-btn" onClick={handleCancel}>中止</button>
+                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitRegist)}
+                            style={{display:pageInfo.registButtonDisplay}}>追加</button>
+                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitReplace)}
+                            style={{display:pageInfo.replaceButtonDisplay}}>更新</button>
+                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitDelete)}
+                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button>
                 </div>
         </Modal>
         </>
