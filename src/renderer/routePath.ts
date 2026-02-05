@@ -1,4 +1,5 @@
 export const routePath = {
+    Home: '/',
     Top: '/top',
     Stop: '/stop',
     Histories: '/histories',

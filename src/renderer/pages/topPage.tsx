@@ -42,11 +42,6 @@ const initView: View = {
 export function TopPage() {
     const [view, setView] = useState(initView);
 
-    useEffect(()=>{
-        view.modal_display = Display.none,
-        view.is_ready = false;
-    },[]);
-
     const setPageView = ( _view: View ) => {
         const _clone = structuredClone(_view);
         setView(_clone);
@@ -161,16 +156,19 @@ export function TopPage() {
           view.card_display = Display.none;
           view.error_display = Display.block;
           view.errorMessage01 = `カードリーダーの接続を確認できません`;
-          view.errorMessage02 = `正しく接続してアプリを再起動してください`;
+          view.errorMessage02 = `接続し再起動してください`;
           setPageView(view);
         }
     }
-    if(view.is_ready === false) // 2回目の動作を抑止
+
+    useEffect(()=>{
+        view.modal_display = Display.none,
+        view.is_ready = false;
         isReaderReady();
+    },[]);
 
     return (
         <>
-        <h1 className="pageTitle"><span>{view.pageTitle}</span></h1>
         <div className="modal" style={{display: view.modal_display}}>
             <div className="modal-content">
                 <div className="card" style={{display: view.card_display}}>

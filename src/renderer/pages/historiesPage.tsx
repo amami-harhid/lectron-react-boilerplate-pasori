@@ -78,22 +78,21 @@ export function HistoriesPage() {
                         <input type="date" value={pageInfo.date} onChange={handleInputChange}/>
                         &nbsp;<button onClick={pageInit}>初期化</button>
                     </label>
-                    <p>選択された日付: <span>{pageInfo.date}</span></p>
-                </div>
-                <table className="appTable">
-                  <tbody>
-                    <tr>
-                        <th>NO</th>
-                        <th>FCNO</th>
-                        <th>名前</th>
-                        <th>カナ</th>
-                        <th>入室</th>
-                        <th>退室</th>
-                    </tr>
-                </tbody>
-                <tbody>
+                    <p className="hist_selectedDate">選択された日付: <span>{pageInfo.date}</span></p>
+                    <table className="hist_appTable">
+                    <tbody>
+                        <tr>
+                            <th>NO</th>
+                            <th>FCNO</th>
+                            <th>名前</th>
+                            <th>カナ</th>
+                            <th>入室</th>
+                            <th>退室</th>
+                        </tr>
+                    </tbody>
+                    <tbody>
                     {pageInfo.tableData.map(row=>(
-                       <tr key={row.id}>
+                        <tr key={row.id}>
                             <td>{row.id}</td>
                             <td>{row.fcno}</td>
                             <td>{row.name}</td>
@@ -102,8 +101,9 @@ export function HistoriesPage() {
                             <td>{row.out}</td>
                        </tr>
                     ))}
-                </tbody>
-                </table>
+                    </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

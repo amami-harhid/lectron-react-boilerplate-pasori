@@ -123,23 +123,15 @@ h1 {
 
 }
 
-.appTable {
+.hist_appTable {
     border: 1px solid black;
     border-collapse: collapse; /* 二重線を一本化 */
     border-spacing: 10px; /* セル間隔 */
+    width:90%;
 }
-.appTable th, td {
+.hist_appTable th, td {
     font-size: 80%;
     border: 1px dashed blue;
-}
-
-.app_version {
-    position: absolute;
-    top: 80%;
-    left: 0;
-    width: 100%;
-    height: 20%;
-
 }
 
 .card p.errorMessage {
@@ -150,4 +142,8 @@ h1 {
 .errorMessage {
     color: #ff0000;
     font-weight: bold;
+}
+
+.hist_selectedDate {
+    margin-bottom: 0;
 }

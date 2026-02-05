@@ -1,16 +1,43 @@
-import { useState } from "react";
-type View = {
-  pageTitle: string,
-}
-const initView: View = {
-  pageTitle: '入退室チェッカー',
-} as const;
+import { useRef, useEffect, useState } from "react";
 
+type View = {
+    isReady: string,
+    errorMessage01: string,
+    errorMessage02: string,
+}
+const intView:View = {
+    isReady: '',
+    errorMessage01: '',
+    errorMessage02: '',
+}
 export const HomePage = () =>  {
-    const [view] = useState(initView);
+    const [view, setView] = useState<View>(intView);
+    const setPageView = ( _view: View ) => {
+        const _clone = structuredClone(_view);
+        setView(_clone);
+    }
+    const isReaderReady = async () => {
+        const _isReady = await window.pasoriCard.isCardReady();
+        if(_isReady) {
+            view.isReady = 'TRUE';
+            view.errorMessage01 = '操作⇒読取開始で始めましょう'
+        }else{
+            view.isReady = 'FALSE';
+            view.errorMessage01 = 'カードリーダー接続を確認できません'
+            view.errorMessage02 = '接続し再起動してください'
+        }
+        setPageView(view);
+    }
+    
+    useEffect(()=>{
+        isReaderReady();
+    },[])
     return (
         <>
-            <h1 className="pageTitle"><span>{view.pageTitle}</span></h1>
+          <div className="card">
+            <p className="errorMessage">{view.errorMessage01}</p>
+            <p className="errorMessage">{view.errorMessage02}</p>
+          </div>
         </>
     );
 }

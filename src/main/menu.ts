@@ -209,6 +209,17 @@ export default class MenuBuilder {
   buildDefaultTemplate() {
     const templateDefault = [
       {
+        label: 'File',
+        submenu: [
+          {
+            label: 'HOME',
+            click() {
+                toHome();
+            }
+          }
+        ]
+      },
+      {
         label: '操作',
         submenu: [
           {
@@ -343,6 +354,15 @@ const sendMessage = (messageId: string, ...args:string[]): void => {
     if( browserWindow ) {
       browserWindow.webContents.send(messageId, ...args);
     }
+}
+
+const toHome = ()=>{
+    setEnableToMenuItem(GENERAL, true);
+    setEnableToMenuItem(GENERAL_STOP, false);
+    setEnableToMenuItem(CARD_MANAGE, true);
+    setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(HISTORIES, true);
+    sendMessage("navigate", routePath.Home);
 }
 
 const toManager = ()=>{

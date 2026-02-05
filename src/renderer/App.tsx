@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { Masterhead } from './pages/mastheads/mainMasthead';
 import { routePath } from './routePath';
 import { HomePage } from './pages/homePage';
 import { TopPage } from './pages/topPage';
@@ -32,7 +33,8 @@ const IPCNavigator = () => {
 export function App() {
     const [path, ] = useState<typeof routePath>(routePath)
     return (
-        <>
+        <>  
+            <div><Masterhead/></div>
             <Router>
                 <IPCNavigator/>
                 <Routes>
