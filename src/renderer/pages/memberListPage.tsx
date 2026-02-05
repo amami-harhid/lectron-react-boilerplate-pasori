@@ -77,12 +77,8 @@ export function MemberListPage () {
         const _clone = structuredClone(info);
         setPageInfo(_clone);
     }
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
-        defaultValues: {
-            fcno: "aaaaa", //pageInfo.modalPageInfo.fcno,
-            name: "bbbbb", //pageInfo.modalPageInfo.name,
-        }
-    });
+    // TODO FORM を使わないようにする予定？
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>();
     const content = useRef(null);
     const element = content.current
     if(element){
@@ -176,11 +172,18 @@ export function MemberListPage () {
         console.log('formSubmitRegist')
         // DBレコード上書きをする
         console.log(data);
+        pageInfo.isModalOpen = false;
+        pageInfo.tableDisplay = Display.block;
+        updatePageInfo(pageInfo);
+
     }
     const formSubmitDelete = (data:FormValues) => {
         console.log('formSubmitDelete')
         // DBレコード削除をする
         console.log(data);
+        pageInfo.isModalOpen = false;
+        pageInfo.tableDisplay = Display.block;
+        updatePageInfo(pageInfo);
     }
     const cardsSelectAll = async (): Promise<CardRow[]> => {
         // リクエスト
@@ -328,12 +331,14 @@ export function MemberListPage () {
             isOpen={pageInfo.isModalOpen}
             onRequestClose={() => {
                 console.log('onRequestClose');
-                pageInfo.isModalOpen = false;
-                pageInfo.tableDisplay = Display.block;
-                updatePageInfo(pageInfo);
+//                pageInfo.isModalOpen = false;
+//                pageInfo.tableDisplay = Display.block;
+//                updatePageInfo(pageInfo);
             }}
             style={{
                 content: {
+                    width: "60%",
+                    height: "50%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
@@ -349,6 +354,58 @@ export function MemberListPage () {
             }}
             >
             <h2>モーダルの中身</h2>
+                <form>
+                <div>
+                    <table className='member_appTable'>
+                        <tbody>
+                        <tr>
+                            <td>FCNO</td>
+                            <td><input type="text"
+                                {
+                                    ...register("fcno")
+                                }
+                                size={4} 
+                                readOnly={pageInfo.fcnoReadOnly}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>名前</td>
+                            <td><input type="text" 
+                                {
+                                    ...register("name")
+                                }
+                                size={50} 
+                                readOnly={pageInfo.etcReadOnly}/></td>
+                        </tr>
+                        <tr>
+                            <td>カナ</td>
+                            <td><input type="text" 
+                                {
+                                    ...register("kana")
+                                }
+                                size={50} 
+                                readOnly={pageInfo.etcReadOnly}/></td>
+                        </tr>
+                        <tr>
+                            <td>MAIL</td>
+                            <td><input type="text" 
+                                {
+                                    ...register("mail")
+                                }
+                                size={50} 
+                                readOnly={pageInfo.etcReadOnly}/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </form>
+                <div>
+                    <p><button onClick={handleCancel}>中止</button>&nbsp;
+                        <button type="submit" onClick={handleSubmit(formSubmitRegist)}
+                            style={{display:pageInfo.registButtonDisplay}}>{pageInfo.registButtonName}</button>&nbsp;
+                        <button type="submit" onClick={handleSubmit(formSubmitDelete)}
+                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button></p>
+                </div>
             <button onClick={() => {
                 pageInfo.isModalOpen = false;
                 pageInfo.tableDisplay = Display.block;
