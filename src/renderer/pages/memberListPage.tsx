@@ -32,9 +32,9 @@ type TABLE_ROW = {
 type PAGEINFO = {
     view: {guidance:string},
     tableDisplay: string,
-    modalDisplay: string,
     tableData: TABLE_ROW[],
     registButtonDisplay: string,
+    replaceButtonDisplay: string,
     deleteButtonDisplay: string,
     registButtonName: string,
     modalPageInfo: TABLE_ROW,
@@ -45,9 +45,9 @@ type PAGEINFO = {
 const initPageInfo: PAGEINFO = {
     view: {guidance: ''},
     tableDisplay: Display.block,
-    modalDisplay: Display.none,
     tableData: [],
     registButtonDisplay: Display.none,
+    replaceButtonDisplay: Display.none,
     deleteButtonDisplay: Display.none,
     registButtonName: RegistName.update,
     fcnoReadOnly: false,
@@ -129,7 +129,6 @@ export function MemberListPage () {
         ]
     const handleCancel = () =>{
         pageInfo.tableDisplay = Display.block;
-        pageInfo.modalDisplay = Display.none;
         pageInfo.registButtonDisplay = Display.none;
         pageInfo.deleteButtonDisplay = Display.none;
         pageInfo.fcnoReadOnly = false;
@@ -137,6 +136,7 @@ export function MemberListPage () {
         updatePageInfo(pageInfo);
     }
     const handleEdit = (row: MRT_Row<TABLE_ROW> ) => {
+            pageInfo.isModalOpen = true;
             pageInfo.modalPageInfo.no = row.original.no;
             pageInfo.modalPageInfo.fcno = row.original.fcno;
             pageInfo.modalPageInfo.name = row.original.name;
@@ -144,16 +144,15 @@ export function MemberListPage () {
             pageInfo.modalPageInfo.mail = row.original.mail;
             reset(pageInfo.modalPageInfo);
             pageInfo.tableDisplay = Display.none;
-            //pageInfo.modalDisplay = Display.block;
-            pageInfo.modalDisplay = Display.none;
-            pageInfo.isModalOpen = true;
-            pageInfo.registButtonDisplay = Display.inline_block;
+            pageInfo.registButtonDisplay = Display.none;
+            pageInfo.replaceButtonDisplay = Display.inline_block;
             pageInfo.deleteButtonDisplay = Display.none;
             pageInfo.fcnoReadOnly = true;
             pageInfo.etcReadOnly = false;
             updatePageInfo(pageInfo);
     };
     const handleDelete = (row: MRT_Row<TABLE_ROW>) => {
+            pageInfo.isModalOpen = true;
             pageInfo.modalPageInfo.no = row.original.no;
             pageInfo.modalPageInfo.fcno = row.original.fcno;
             pageInfo.modalPageInfo.name = row.original.name;
@@ -161,29 +160,127 @@ export function MemberListPage () {
             pageInfo.modalPageInfo.mail = row.original.mail;
             reset(pageInfo.modalPageInfo);
             pageInfo.tableDisplay = Display.none;
-            pageInfo.modalDisplay = Display.block;
             pageInfo.registButtonDisplay = Display.none;
+            pageInfo.replaceButtonDisplay = Display.none;
             pageInfo.deleteButtonDisplay = Display.inline_block;
             pageInfo.fcnoReadOnly = true;
             pageInfo.etcReadOnly = true;
             updatePageInfo(pageInfo);
     };
-    const formSubmitRegist = (data:FormValues) => {
+    const handleAdd = () => {
+            pageInfo.isModalOpen = true;
+            pageInfo.modalPageInfo.no = 0;
+            pageInfo.modalPageInfo.fcno = '';
+            pageInfo.modalPageInfo.name = '';
+            pageInfo.modalPageInfo.kana = '';
+            pageInfo.modalPageInfo.mail = '';
+            reset(pageInfo.modalPageInfo);
+            pageInfo.tableDisplay = Display.none;
+            pageInfo.registButtonDisplay = Display.inline_block;
+            pageInfo.replaceButtonDisplay = Display.none;
+            pageInfo.deleteButtonDisplay = Display.none;
+            pageInfo.fcnoReadOnly = false;
+            pageInfo.etcReadOnly = false;
+            updatePageInfo(pageInfo);
+    };
+    const formSubmitRegist = async (data:FormValues) => {
+        // DBレコードを追加する
         console.log('formSubmitRegist')
-        // DBレコード上書きをする
-        console.log(data);
-        pageInfo.isModalOpen = false;
-        pageInfo.tableDisplay = Display.block;
-        updatePageInfo(pageInfo);
+        const fcno = data.fcno;
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.selectRowByFcno.name, fcno);
+        // 応答を待つ
+        const row: CardRow
+            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        if(row == undefined) {
+            // 上書きする
+            const newRow:CardRow = {
+                fcno: data.fcno,
+                name: data.name,
+                kana: data.kana,
+                mail: data.mail,
+                idm : '',
+            };
+            // リクエスト
+            window.electron.ipcRenderer.sendMessage(
+                CHANNEL_REQUEST,
+                Cards.insert.name, newRow);
+            // 応答を待つ
+            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+            pageInfo.isModalOpen = false;
+            pageInfo.tableDisplay = Display.block;
+            updatePageInfo(pageInfo);
+            reload();
+        }else{
+            // fcnoが重複
+        }
 
     }
-    const formSubmitDelete = (data:FormValues) => {
-        console.log('formSubmitDelete')
-        // DBレコード削除をする
-        console.log(data);
+    const formSubmitReplace = async (data:FormValues) => {
+        console.log('formSubmitRegist')
+        // DBレコード上書きをする
+        const fcno = data.fcno;
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.selectRowByFcno.name, fcno);
+        // 応答を待つ
+        const row: CardRow
+            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        if(row) {
+            // 上書きする
+            const newRow:CardRow = {
+                fcno: data.fcno,
+                name: data.name,
+                kana: data.kana,
+                mail: data.mail,
+                idm : '',
+            };
+            // リクエスト
+            window.electron.ipcRenderer.sendMessage(
+                CHANNEL_REQUEST,
+                Cards.updatePersonalDataByFcno.name, fcno, newRow);
+            // 応答を待つ
+            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        }
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
         updatePageInfo(pageInfo);
+        reload();
+
+    }
+    const formSubmitDelete = async (data:FormValues) => {
+        console.log('formSubmitDelete')
+        const fcno = data.fcno;
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.selectRowByFcno.name, fcno);
+        // 応答を待つ
+        const row: CardRow
+            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        if(row) {
+            // 論理削除する
+            const newRow:CardRow = {
+                fcno: data.fcno,
+                name: data.name,
+                kana: data.kana,
+                mail: data.mail,
+                idm : '',
+            };
+            // リクエスト
+            window.electron.ipcRenderer.sendMessage(
+                CHANNEL_REQUEST,
+                Cards.deleteByFcno.name, fcno);
+            // 応答を待つ
+            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        }
+        pageInfo.isModalOpen = false;
+        pageInfo.tableDisplay = Display.block;
+        updatePageInfo(pageInfo);
+        reload();
     }
     const cardsSelectAll = async (): Promise<CardRow[]> => {
         // リクエスト
@@ -222,7 +319,7 @@ export function MemberListPage () {
     useEffect(() => {
         membersToTableData();
     },[]);
-    
+
     // カードが離れたときの処理
     window.pasoriCard.onRelease(async()=>{});
     // カードタッチしたときの処理
@@ -244,14 +341,12 @@ export function MemberListPage () {
                     enableSorting
                     createDisplayMode="modal"
                     onCreatingRowSave={async ({ values, table }) => {
-                        pageInfo.tableData = [...pageInfo.tableData, values]
-                        updatePageInfo(pageInfo);
-                        table.setCreatingRow(null); // Exit Create mode
+                        // 何もしない。
                     }}
                     renderTopToolbarCustomActions={({ table }) => (
                         <Box>
                             <Tooltip title="追加">
-                                <IconButton onClick={() => table.setCreatingRow(true) /* 別のモーダルにしたい*/}>
+                                <IconButton onClick={() => handleAdd()}>
                                     <AddIcon/>
                                 </IconButton>
                             </Tooltip>
@@ -274,66 +369,12 @@ export function MemberListPage () {
                     )}
                 />
             </div>
-            <div style={{display:pageInfo.modalDisplay}} className="modal-content">
-                <h2></h2>
-                <form>
-                <div>
-                    <table className='member_appTable'>
-                        <tbody>
-                        <tr>
-                            <td>FCNO</td>
-                            <td><input type="text"
-                                {
-                                    ...register("fcno")
-                                }
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>名前</td>
-                            <td><input type="text" 
-                                {
-                                    ...register("name")
-                                }
-                                size={20} 
-                                readOnly={pageInfo.etcReadOnly}/></td>
-                        </tr>
-                        <tr>
-                            <td>カナ</td>
-                            <td><input type="text" 
-                                {
-                                    ...register("kana")
-                                }
-                                readOnly={pageInfo.etcReadOnly}/></td>
-                        </tr>
-                        <tr>
-                            <td>MAIL</td>
-                            <td><input type="text" 
-                                {
-                                    ...register("mail")
-                                }
-                                readOnly={pageInfo.etcReadOnly}/></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                </form>
-                <div>
-                    <p><button onClick={handleCancel}>中止</button>&nbsp;
-                        <button type="submit" onClick={handleSubmit(formSubmitRegist)}
-                            style={{display:pageInfo.registButtonDisplay}}>{pageInfo.registButtonName}</button>&nbsp;
-                        <button type="submit" onClick={handleSubmit(formSubmitDelete)}
-                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button></p>
-                </div>
-            </div>
         </div>
         <Modal
             isOpen={pageInfo.isModalOpen}
             onRequestClose={() => {
-                console.log('onRequestClose');
-//                pageInfo.isModalOpen = false;
-//                pageInfo.tableDisplay = Display.block;
-//                updatePageInfo(pageInfo);
+                // モーダルの外をクリックしたときに
+                // ここに来る。
             }}
             style={{
                 content: {
@@ -364,35 +405,35 @@ export function MemberListPage () {
                                 {
                                     ...register("fcno")
                                 }
-                                size={4} 
+                                size={4}
                                 readOnly={pageInfo.fcnoReadOnly}/>
                             </td>
                         </tr>
                         <tr>
                             <td>名前</td>
-                            <td><input type="text" 
+                            <td><input type="text"
                                 {
                                     ...register("name")
                                 }
-                                size={50} 
+                                size={50}
                                 readOnly={pageInfo.etcReadOnly}/></td>
                         </tr>
                         <tr>
                             <td>カナ</td>
-                            <td><input type="text" 
+                            <td><input type="text"
                                 {
                                     ...register("kana")
                                 }
-                                size={50} 
+                                size={50}
                                 readOnly={pageInfo.etcReadOnly}/></td>
                         </tr>
                         <tr>
                             <td>MAIL</td>
-                            <td><input type="text" 
+                            <td><input type="text"
                                 {
                                     ...register("mail")
                                 }
-                                size={50} 
+                                size={50}
                                 readOnly={pageInfo.etcReadOnly}/></td>
                         </tr>
                         </tbody>
@@ -402,15 +443,19 @@ export function MemberListPage () {
                 <div>
                     <p><button onClick={handleCancel}>中止</button>&nbsp;
                         <button type="submit" onClick={handleSubmit(formSubmitRegist)}
-                            style={{display:pageInfo.registButtonDisplay}}>{pageInfo.registButtonName}</button>&nbsp;
+                            style={{display:pageInfo.registButtonDisplay}}>追加</button>&nbsp;
+                        <button type="submit" onClick={handleSubmit(formSubmitReplace)}
+                            style={{display:pageInfo.replaceButtonDisplay}}>更新</button>&nbsp;
                         <button type="submit" onClick={handleSubmit(formSubmitDelete)}
-                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button></p>
+                            style={{display:pageInfo.deleteButtonDisplay}}>削除</button>&nbsp;
+                        <button onClick={() => {
+                            pageInfo.isModalOpen = false;
+                            pageInfo.tableDisplay = Display.block;
+                            updatePageInfo(pageInfo);
+                        }}>閉じる</button>
+
+                    </p>
                 </div>
-            <button onClick={() => {
-                pageInfo.isModalOpen = false;
-                pageInfo.tableDisplay = Display.block;
-                updatePageInfo(pageInfo);
-            }}>閉じる</button>
         </Modal>
         </>
     );
