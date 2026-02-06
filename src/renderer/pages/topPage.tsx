@@ -6,8 +6,6 @@ import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
 
-import { Sounds } from "../sounds/sounds";
-
 type View = {
   pageTitle: string,
   name: string,
@@ -41,6 +39,11 @@ const initView: View = {
 
 export function TopPage() {
     const [view, setView] = useState(initView);
+
+    // AUDIOエレメント
+    const audioByby = useRef<HTMLAudioElement>(null);
+    const audioNg = useRef<HTMLAudioElement>(null);
+    const audioIn = useRef<HTMLAudioElement>(null);
 
     const setPageView = ( _view: View ) => {
         const _clone = structuredClone(_view);
@@ -83,19 +86,22 @@ export function TopPage() {
             const fcno = row.fcno;
             if( row.in_room == true ) {
                 // 入室中
-                Sounds.soundByePlay();
+                //Sounds.soundByePlay();
+                audioByby.current?.play();
                 await setOutRoom( fcno, idm);
                 view.status = '退室しました';
                 view.name = `(${row.name}さん)`
             }else{
                 // 退室中
-                Sounds.soundInPlay();
+                //Sounds.soundInPlay();
+                audioIn.current?.play();
                 await setInRoom( fcno, idm);
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`
             }
         }else{
-            Sounds.soundNGPlay();
+            //Sounds.soundNGPlay();
+            audioNg.current?.play();
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
@@ -143,7 +149,11 @@ export function TopPage() {
 
     return (
         <>
-        
+        {/* 音を読み込む( public ) */}
+        <audio ref={audioIn} src="./sounds/audioIn.wav"/>
+        <audio ref={audioByby} src="./sounds/Jinx-_Bye_Bye_.mp3"/>
+        <audio ref={audioNg} src="./sounds/se_nogood09.mp3"/>
+        {/* モーダル */}
         <div className="modal" style={{display: view.modal_display}}>
             <div className="modal-content">
                 <div className="card" style={{display: view.card_display}}>

@@ -126,7 +126,7 @@ export function MemberTrashedListPage () {
         updatePageInfo(pageInfo);
     };
 
-    /** 論理削除中のメンバーを取り出す */ 
+    /** 論理削除中のメンバーを取り出す */
     const cardsSelectAllSoftDeleted = async (): Promise<CardRow[]> => {
         const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectAllSoftDeleted.name)
         return rows;
@@ -197,6 +197,7 @@ export function MemberTrashedListPage () {
                 <h2><span>削除済の利用者一覧</span></h2>
                 <div><button onClick={reload}>リロード</button></div>
                 <h4></h4>
+                {/* テーブル */}
                 <MaterialReactTable
                     columns={columns}
                     data={pageInfo.tableData}
@@ -205,9 +206,8 @@ export function MemberTrashedListPage () {
                     }}
                     enableRowActions
                     enableSorting
-                    createDisplayMode="modal"
                     onCreatingRowSave={async ({ values, table }) => {
-                        // 何もしない。
+                        {/* 追加処理時入力モーダルの結果を受け取る。何もしない。 */}
                     }}
                     positionActionsColumn="last"
                     renderRowActions={({ row }) => (
@@ -230,8 +230,7 @@ export function MemberTrashedListPage () {
         <Modal
             isOpen={pageInfo.isConfirmOpen}
             onRequestClose={() => {
-                // モーダルの外をクリックしたときに
-                // ここに来る。
+                {/* モーダル外をタッチするときの処理。何もしない */}
             }}
             style={{
                 content: {
