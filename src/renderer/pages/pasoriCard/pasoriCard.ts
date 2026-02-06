@@ -6,5 +6,4 @@ export const onRelease = async (fn: CallBack) => {
 export const onTouch = (fn:CallBack) => {
     // カードタッチしたときの処理
     window.pasoriCard.onTouch(fn);
-
 }

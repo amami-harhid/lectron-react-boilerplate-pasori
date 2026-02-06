@@ -1,13 +1,9 @@
 import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
-import * as IpcServices from '../../channel/ipcService';
+import { RenderService } from "../../service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from "../../db/cards/cardRow";
-
-type CHANNEL = IpcServices.IpcChannelValOfService;
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
 
 type CardOption = {
   value: string,
@@ -90,33 +86,16 @@ export function IdmRegisterPage() {
         const idm = view.idm;
         if( view.now_regist === true) {
             // fcno を指定して cardを読み込む
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.linkIdmByFcno.name, fcno, idm); // fcno指定依頼
-            // 応答を待つ
-            const count: number
-                  = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
-
+            await RenderService.exe<number>(Cards.linkIdmByFcno.name, fcno, idm);
             view.card_message = 'IDMを登録しました';
             // 選択を書き換える
             await redrawSelect(idm);
 
         }else if( view.now_delete === true) {
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.releaseIdmByFcno.name, fcno); // fcno指定依頼
-            // 応答を待つ
-            const count: number
-                  = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
-
+            await RenderService.exe<number>(Cards.releaseIdmByFcno.name, fcno);
             view.card_message = 'IDM登録を削除しました';
-
             // 選択を書き換える
             await redrawSelect(idm);
-
-
         }
 
         view.confirm_On = Display.none;
@@ -147,14 +126,7 @@ export function IdmRegisterPage() {
             view.selectOn = Display.none;
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
-                // リクエスト
-                window.electron.ipcRenderer.sendMessage(
-                    CHANNEL_REQUEST,
-                    Cards.selectRowByFcno.name, fcno); // fcno指定依頼
-
-                // 応答を待つ
-                const row: CardRow
-                  = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+                const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno);
                 if(row){
                     view.selectOn = Display.block;
                     view.idm = view.idm;
@@ -192,13 +164,7 @@ export function IdmRegisterPage() {
 
     /** 選択リストを作る */
     const redrawSelect = async (ipc_idm:string) => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectRowByIdm.name, ipc_idm); // idm登録のCardsを取り出す依頼
-        const idmRow: CardRow
-            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
-
+        const idmRow: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, ipc_idm);
         if(idmRow) {
             // タッチしたIDMが登録済のとき
             view.card_fcno = idmRow.fcno;
@@ -211,13 +177,8 @@ export function IdmRegisterPage() {
             setPageView(view);
         }else{
             // タッチしたIDMが未登録のとき
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.selectRowsEmptyIdm.name); // idm未登録のCardsを取り出す依頼
-            // 応答を待つ
-            const rows: CardRow[]
-                = await window.electron.ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
+            // idm未登録のCardsを取り出す
+            const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectRowsEmptyIdm.name);
             const options:CardOption[] = [];
             for(const _row of rows) {
                 const option:CardOption = {

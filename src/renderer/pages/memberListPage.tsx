@@ -3,12 +3,12 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { useForm } from 'react-hook-form';
 import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
-import { Box, Button, IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 
-import * as IpcServices from '../../channel/ipcService';
+import { RenderService } from "../../service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from '../../db/cards/cardRow';
@@ -76,9 +76,6 @@ type FormValues = {
   kana: string,
   mail: string,
 };
-type CHANNEL = IpcServices.IpcChannelValOfService;
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
 
 export function MemberListPage () {
     const [pageInfo, setPageInfo] = useState<PAGEINFO>(initPageInfo);
@@ -200,15 +197,8 @@ export function MemberListPage () {
         // DBレコードを追加する
         console.log('formSubmitRegist')
         const fcno = data.fcno;
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectRowByFcno.name, fcno);
-        // 応答を待つ
-        const row: CardRow
-            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row == undefined) {
-
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
             pageInfo.tempData.kana = data.kana;
@@ -226,13 +216,7 @@ export function MemberListPage () {
         console.log('formSubmitRegist')
         // DBレコード上書きをする
         const fcno = data.fcno;
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectRowByFcno.name, fcno);
-        // 応答を待つ
-        const row: CardRow
-            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -248,13 +232,7 @@ export function MemberListPage () {
     const formSubmitDelete = async (data:FormValues) => {
         console.log('formSubmitDelete')
         const fcno = data.fcno;
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectRowByFcno.name, fcno);
-        // 応答を待つ
-        const row: CardRow
-            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.isConfirmOpen = true;
@@ -264,13 +242,7 @@ export function MemberListPage () {
 //        reload();
     }
     const cardsSelectAll = async (): Promise<CardRow[]> => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectAll.name);
-        // 応答を待つ
-        const rows: CardRow[]
-            = await window.electron.ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
+        const rows = await RenderService.exe<CardRow[]>(Cards.selectAll.name)
         return rows;
     };
 
@@ -335,12 +307,7 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.insert.name, newRow);
-        // 応答を待つ
-        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        await RenderService.exe<number>(Cards.insert.name)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
@@ -353,23 +320,13 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.updatePersonalDataByFcno.name, data.fcno, newRow);
-        // 応答を待つ
-        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        await RenderService.exe<number>(Cards.updatePersonalDataByFcno.name, data.fcno, newRow)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
-    // 完全削除する
+    // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.deleteByFcno.name, data.fcno);
-        // 応答を待つ
-        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
     }
 
     // カードが離れたときの処理

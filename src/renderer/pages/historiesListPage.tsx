@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import * as DateUtils from '../../utils/dateUtils';
-import * as IpcServices from '../../channel/ipcService';
+import { RenderService } from "../../service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Histories from '../../db/histories/histories';
 import { HistoriesCardRow } from '../../db/histories/historiesRow';
@@ -16,9 +16,6 @@ type PAGEINFO = {
     date: string,
     tableData: TABLE_ROW[],
 }
-type CHANNEL = IpcServices.IpcChannelValOfService;
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
 
 /** 履歴一覧ページ */
 export function HistoriesListPage() {
@@ -27,13 +24,7 @@ export function HistoriesListPage() {
 
     /** 指定日付の履歴を取り出す */
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Histories.selectByDate.name, date);
-        // 応答を待つ
-        const rows: HistoriesCardRow[]
-            = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_REPLY);
+        const rows:HistoriesCardRow[] = await RenderService.exe<HistoriesCardRow[]>(Histories.selectByDate.name, date)
         return rows;
     };
 

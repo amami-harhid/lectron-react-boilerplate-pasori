@@ -6,7 +6,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 
-import * as IpcServices from '../../channel/ipcService';
+import { RenderService } from "../../service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
@@ -42,9 +42,6 @@ const initPageInfo: PAGEINFO = {
     tempData: {no: 0, fcno:'', name:'', kana:''},
     counter: 0,
 };
-type CHANNEL = IpcServices.IpcChannelValOfService;
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
 
 /**
  * 論理削除されたメンバーを一覧化し、選択したメンバーを復旧させる、
@@ -131,13 +128,7 @@ export function MemberTrashedListPage () {
 
     /** 論理削除中のメンバーを取り出す */ 
     const cardsSelectAllSoftDeleted = async (): Promise<CardRow[]> => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectAllSoftDeleted.name);
-        // 応答を待つ
-        const rows: CardRow[]
-            = await window.electron.ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
+        const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectAllSoftDeleted.name)
         return rows;
     };
 
@@ -168,29 +159,14 @@ export function MemberTrashedListPage () {
         pageInfo.isConfirmOpen = false;
         const data = pageInfo.tempData;
         if(pageInfo.typeRegist==TypeRegist.Recover){
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.recoveryByFcno.name, data.fcno);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+            await RenderService.exe<number>(Cards.recoveryByFcno.name, data.fcno)
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
 
         }else if(pageInfo.typeRegist == TypeRegist.Delete){
             // 物理削除する（履歴も削除）
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.deletePhisycalByFcno.name, data.fcno);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Histories.deleteHistoriesByFcno.name, data.fcno);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+            await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno)
+            await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno)
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
 

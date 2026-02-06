@@ -27,34 +27,10 @@ import { CardReader } from '../card/icCardReader';
 const reader = new CardReader(logger)
 reader.ready();
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
 let mainWindow: BrowserWindow | null = null;
-
-// MAIN<-->RENDERER の通信チェック
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 // MAIN<-->RENDERERのDB通信
 ipcMainSqliteBridge();
-/*
-ipcMain.on('asynchronous-sql-command', async (event, sql, ...args) => {
-    db.run(sql, args, (err:Error, result:any) => {
-        event.reply('asynchronous-sql-reply', result);
-    });
-});
-*/
-
-
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -107,6 +83,8 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.setAlwaysOnTop(true, 'screen-saver'); // 常時トップ表示
+  mainWindow.moveTop();
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -136,11 +114,6 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  //new AppUpdater();
-
-
 };
 
 /**
@@ -169,8 +142,7 @@ app
   })
   .catch(
     (reason: any) => {
-        console.log('uncaught exception occured?????')
-        console.log(reason);
-
+        logger.error('uncaught exception occured?????')
+        logger.error(reason);
     }
   );

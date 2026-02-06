@@ -1,13 +1,12 @@
 import { useRef, useEffect, useState } from "react";
-import * as IpcServices from '../../channel/ipcService';
+
+import { RenderService } from "../../service/render";
 import * as PasoriCard from "./pasoriCard/pasoriCard";
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
 
-type CHANNEL = IpcServices.IpcChannelValOfService;
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
+import { Sounds } from "../sounds/sounds";
 
 type View = {
   pageTitle: string,
@@ -48,51 +47,21 @@ export function TopPage() {
         setView(_clone);
     }
     const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.selectRowByIdm.name, idm);
-        // 応答を待つ
-        const row: CardRow
-            = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
-
+        const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, idm);
         return row;
     };
-    const setInRoom = async(fcno:string, idm: string) : Promise<number> => {
+    const setInRoom = async(fcno:string, idm: string) : Promise<void> => {
         const in_room = true;
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.updateInRoomByFcno.name, fcno, in_room);
-        // 応答を待つ
-        const card_count: number
-            = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
+        // Cardsを更新
+        await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
         // 履歴を更新
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Histories.setInRoomByFcnoIdm.name, fcno, idm );
-        // 応答を待つ
-        const hist_count: number
-            = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
-        return hist_count;
+        await RenderService.exe<number>(Histories.setInRoomByFcnoIdm.name, fcno, idm);
     }
-    const setOutRoom = async(fcno:string, idm: string) : Promise<number> => {
+    const setOutRoom = async(fcno:string, idm: string) : Promise<void> => {
         const in_room = false;
-        // リクエスト
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Cards.updateInRoomByFcno.name, fcno, in_room);
-        // 応答を待つ
-        const card_count: number
-            = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
+        await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
         // 履歴を更新
-        window.electron.ipcRenderer.sendMessage(
-            CHANNEL_REQUEST,
-            Histories.setOutRoomByFcnoIdm.name, fcno, idm );
-        // 応答を待つ
-        const hist_count: number
-            = await window.electron.ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
-        return hist_count;
+        await RenderService.exe<number>(Histories.setOutRoomByFcnoIdm.name, fcno, idm);
     }
 
     const cardRelease = () => {
@@ -114,16 +83,19 @@ export function TopPage() {
             const fcno = row.fcno;
             if( row.in_room == true ) {
                 // 入室中
+                Sounds.soundByePlay();
                 await setOutRoom( fcno, idm);
                 view.status = '退室しました';
                 view.name = `(${row.name}さん)`
             }else{
                 // 退室中
+                Sounds.soundInPlay();
                 await setInRoom( fcno, idm);
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`
             }
         }else{
+            Sounds.soundNGPlay();
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
@@ -171,6 +143,7 @@ export function TopPage() {
 
     return (
         <>
+        
         <div className="modal" style={{display: view.modal_display}}>
             <div className="modal-content">
                 <div className="card" style={{display: view.card_display}}>
