@@ -98,6 +98,14 @@ export const selectAll :Method = {
     }
 }
 
+export const selectAllSoftDeleted :Method = {
+    name: 'cards_selectAllSoftDeleted',
+    exec:(db:sqlite.Database):Promise<CardRow[]> => {
+        const query = `SELECT * FROM cards WHERE soft_delete = TRUE ORDER BY kana ASC`;
+        return exec.all<CardRow>(db, query);
+    }
+}
+
 export const selectRowsEmptyIdm :Method = {
     name: 'cards_selectRowsEmptyIdm',
     exec: (db:sqlite.Database):Promise<CardRow[]> => {

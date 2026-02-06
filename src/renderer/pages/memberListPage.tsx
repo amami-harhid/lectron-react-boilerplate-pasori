@@ -6,7 +6,7 @@ import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-rea
 import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from '@mui/icons-material/PersonAdd';
 
 import * as IpcServices from '../../channel/ipcService';
 import * as Cards from '../../db/cards/cards';
@@ -28,7 +28,13 @@ type TABLE_ROW = {
     kana:string,
     mail:string,
 }
-
+const TypeRegist = {
+    None: '',
+    Regist: 'regist',
+    Replace: 'replace',
+    Delete: 'delete',
+} as const;
+type TTypeRegist =  (typeof TypeRegist)[keyof typeof TypeRegist];
 type PAGEINFO = {
     view: {guidance:string},
     tableDisplay: string,
@@ -41,6 +47,9 @@ type PAGEINFO = {
     fcnoReadOnly : boolean,
     etcReadOnly : boolean,
     isModalOpen : boolean,
+    isConfirmOpen: boolean,
+    typeRegist: TTypeRegist,
+    tempData: TABLE_ROW,
     counter: number,
 }
 const initPageInfo: PAGEINFO = {
@@ -53,14 +62,11 @@ const initPageInfo: PAGEINFO = {
     registButtonName: RegistName.update,
     fcnoReadOnly: false,
     etcReadOnly: false,
-    modalPageInfo: {
-        no: 0,
-        fcno: '',
-        name: '',
-        kana: '',
-        mail: '',
-    },
+    modalPageInfo: { no: 0, fcno: '', name: '', kana: '', mail: ''},
     isModalOpen: false,
+    isConfirmOpen: false,
+    typeRegist: '',
+    tempData: {no: 0, fcno:'', name:'', kana:'', mail: ''},
     counter: 0,
 };
 type FormValues = {
@@ -83,7 +89,6 @@ export function MemberListPage () {
         info.counter += 1;
         updatePageInfo(info);
     }
-    // TODO FORM を使わないようにする予定？
     const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>();
     const content = useRef(null);
     const element = content.current
@@ -202,23 +207,14 @@ export function MemberListPage () {
         const row: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
         if(row == undefined) {
-            // 上書きする
-            const newRow:CardRow = {
-                fcno: data.fcno,
-                name: data.name,
-                kana: data.kana,
-                mail: data.mail,
-                idm : '',
-            };
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.insert.name, newRow);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
-            pageInfo.isModalOpen = false;
-            pageInfo.tableDisplay = Display.block;
-            redrawPageInfo(pageInfo);
+
+            pageInfo.tempData.fcno = fcno;
+            pageInfo.tempData.name = data.name;
+            pageInfo.tempData.kana = data.kana;
+            pageInfo.tempData.mail = data.mail;
+            pageInfo.isConfirmOpen = true;
+            pageInfo.typeRegist = TypeRegist.Regist;
+            updatePageInfo(pageInfo);
             //reload();
         }else{
             // fcnoが重複
@@ -237,23 +233,13 @@ export function MemberListPage () {
         const row: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
         if(row) {
-            // 上書きする
-            const newRow:CardRow = {
-                fcno: data.fcno,
-                name: data.name,
-                kana: data.kana,
-                mail: data.mail,
-                idm : '',
-            };
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.updatePersonalDataByFcno.name, fcno, newRow);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
-            pageInfo.isModalOpen = false;
-            pageInfo.tableDisplay = Display.block;
-            redrawPageInfo(pageInfo);
+            pageInfo.tempData.fcno = fcno;
+            pageInfo.tempData.name = data.name;
+            pageInfo.tempData.kana = data.kana;
+            pageInfo.tempData.mail = data.mail;
+            pageInfo.isConfirmOpen = true;
+            pageInfo.typeRegist = TypeRegist.Replace;
+            updatePageInfo(pageInfo);
         }
         //reload();
 
@@ -269,23 +255,10 @@ export function MemberListPage () {
         const row: CardRow
             = await window.electron.ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
         if(row) {
-            // 論理削除する
-            const newRow:CardRow = {
-                fcno: data.fcno,
-                name: data.name,
-                kana: data.kana,
-                mail: data.mail,
-                idm : '',
-            };
-            // リクエスト
-            window.electron.ipcRenderer.sendMessage(
-                CHANNEL_REQUEST,
-                Cards.deleteByFcno.name, fcno);
-            // 応答を待つ
-            await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
-            pageInfo.isModalOpen = false;
-            pageInfo.tableDisplay = Display.block;
-            redrawPageInfo(pageInfo);
+            pageInfo.tempData.fcno = fcno;
+            pageInfo.isConfirmOpen = true;
+            pageInfo.typeRegist = TypeRegist.Delete;
+            updatePageInfo(pageInfo);            
         }
 //        reload();
     }
@@ -323,15 +296,92 @@ export function MemberListPage () {
         membersToTableData();
     }
 
-    useEffect(() => {
-        console.log('----useEffect----')
-        reload();
-    },[pageInfo.counter]);
-
     // カードが離れたときの処理
     window.pasoriCard.onRelease(async()=>{});
     // カードタッチしたときの処理
     window.pasoriCard.onTouch(async ()=>{});
+
+    // 確認モーダル（はい）
+    const confirmYes = async () => {
+        pageInfo.isConfirmOpen = false;
+        const data = pageInfo.tempData;
+        if(pageInfo.typeRegist==TypeRegist.Regist){
+            await memberRegist(data);
+            redrawPageInfo(pageInfo);
+
+        }else if(pageInfo.typeRegist == TypeRegist.Replace){
+            await memberReplace(data);
+            redrawPageInfo(pageInfo);
+
+        }else if(pageInfo.typeRegist == TypeRegist.Delete){
+            console.log('delete')
+            pageInfo.isModalOpen = false;
+            pageInfo.tableDisplay = Display.block;
+            await memberDelete(data);
+            redrawPageInfo(pageInfo);
+
+        }else{
+            redrawPageInfo(pageInfo);
+            return;
+        }
+    }
+    // 確認モーダル（いいえ）
+    const confirmNo = () => {
+        pageInfo.isConfirmOpen = false;
+        updatePageInfo(pageInfo);
+    }
+    // 追加する
+    const memberRegist = async (data: TABLE_ROW) => {
+        const newRow:CardRow = {
+            fcno: data.fcno,
+            name: data.name,
+            kana: data.kana,
+            mail: data.mail,
+            idm : '',
+        };
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.insert.name, newRow);
+        // 応答を待つ
+        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        pageInfo.isModalOpen = false;
+        pageInfo.tableDisplay = Display.block;
+    }
+    // 上書きする
+    const memberReplace = async (data: TABLE_ROW) => {
+        const newRow:CardRow = {
+            fcno: data.fcno,
+            name: data.name,
+            kana: data.kana,
+            mail: data.mail,
+            idm : '',
+        };
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.updatePersonalDataByFcno.name, data.fcno, newRow);
+        // 応答を待つ
+        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+        pageInfo.isModalOpen = false;
+        pageInfo.tableDisplay = Display.block;
+    }
+    // 完全削除する
+    const memberDelete = async (data: TABLE_ROW) => {
+        // リクエスト
+        window.electron.ipcRenderer.sendMessage(
+            CHANNEL_REQUEST,
+            Cards.deleteByFcno.name, data.fcno);
+        // 応答を待つ
+        await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
+    }
+
+    // redrawPageInfo()が実行されたとき 
+    // リロードが実行され、メンバー一覧を最新化する仕組み
+    useEffect(() => {
+        reload();
+    },[pageInfo.counter]); 
+
     return (
         <>
         <div ref={content} className="modal_manager" >
@@ -387,7 +437,7 @@ export function MemberListPage () {
             style={{
                 content: {
                     width: "60%",
-                    height: "50%",
+                    height: "40%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
@@ -402,7 +452,7 @@ export function MemberListPage () {
                 }
             }}
             >
-            <h2>モーダルの中身</h2>
+            <h2>入力パネル</h2>
                 <form>
                 <div>
                     <table className='member_appTable'>
@@ -415,6 +465,7 @@ export function MemberListPage () {
                                 }
                                 size={4}
                                 readOnly={pageInfo.fcnoReadOnly}/>
+                                &nbsp;<span style={{color:'red'}}>必須、半角数字のみ</span>
                             </td>
                         </tr>
                         <tr>
@@ -424,7 +475,8 @@ export function MemberListPage () {
                                     ...register("name")
                                 }
                                 size={50}
-                                readOnly={pageInfo.etcReadOnly}/></td>
+                                readOnly={pageInfo.etcReadOnly}/>
+                                &nbsp;<span style={{color:'red'}}>必須項目</span></td>
                         </tr>
                         <tr>
                             <td>カナ</td>
@@ -433,7 +485,8 @@ export function MemberListPage () {
                                     ...register("kana")
                                 }
                                 size={50}
-                                readOnly={pageInfo.etcReadOnly}/></td>
+                                readOnly={pageInfo.etcReadOnly}/>
+                                &nbsp;<span style={{color:'red'}}>必須項目</span></td>
                         </tr>
                         <tr>
                             <td>MAIL</td>
@@ -442,20 +495,53 @@ export function MemberListPage () {
                                     ...register("mail")
                                 }
                                 size={50}
-                                readOnly={pageInfo.etcReadOnly}/></td>
+                                readOnly={pageInfo.etcReadOnly}/>
+                                &nbsp;<span>任意項目、メールアドレス形式</span></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 </form>
-                <div className="modal-button-container">
+                <div className="modal-button-container" style={{margin:30}}>
                     <button className="modal-btn" onClick={handleCancel}>中止</button>
-                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitRegist)}
+                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitRegist)}
                             style={{display:pageInfo.registButtonDisplay}}>追加</button>
-                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitReplace)}
+                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitReplace)}
                             style={{display:pageInfo.replaceButtonDisplay}}>更新</button>
-                    <button className="modal-btn" type="submit" onClick={handleSubmit(formSubmitDelete)}
+                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitDelete)}
                             style={{display:pageInfo.deleteButtonDisplay}}>削除</button>
+                </div>
+        </Modal>
+        <Modal
+            isOpen={pageInfo.isConfirmOpen}
+            onRequestClose={() => {
+                // モーダルの外をクリックしたときに
+                // ここに来る。
+            }}
+            style={{
+                content: {
+                    width: "15%",
+                    height: "15%",
+                    top: '50%',
+                    left: '50%',
+                    right: 'auto',
+                    bottom: 'auto',
+                    transform: 'translate(-50%, -50%)',
+                    padding: '2rem',
+                    zIndex: 102,
+                },
+                overlay: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    zIndex: 2,
+                }
+            }}
+            >
+            <h2>確認</h2>
+                <div className="modal-button-container">
+                    <button className="modal-btn" onClick={confirmNo}
+                        >いいえ</button>
+                    <button className="modal-alert-btn" onClick={confirmYes}
+                        >はい</button>
                 </div>
         </Modal>
         </>

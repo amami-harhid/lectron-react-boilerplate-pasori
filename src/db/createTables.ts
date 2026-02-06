@@ -41,7 +41,7 @@ export const createTables = async(db:Sqlite.Database) => {
 
     console.log('process.env.DEBUG_PROD=',process.env.DEBUG_PROD);
 
-    if(process.env.DEBUG_PROD !== 'true'){
+    if(process.env.DEBUG_PROD == 'true'){
         console.log('DEBUG DATA SHIKOMI!')
         await Cards.dropTable.exec(db);
         await Histories.dropTable.exec(db);
@@ -49,7 +49,7 @@ export const createTables = async(db:Sqlite.Database) => {
     await Cards.createTable(db);
     await Histories.createTable(db);
 
-    if(process.env.DEBUG_PROD !== 'true'){
+    if(process.env.DEBUG_PROD == 'true'){
         console.log('DEBUG DATA SHIKOMI!')
         for(const data of cardsDatas) {
             await Cards.insert.exec(db,data);

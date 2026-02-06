@@ -216,6 +216,12 @@ export default class MenuBuilder {
             click() {
                 toHome();
             }
+          },
+          {
+            label: 'ゴミ箱',
+            click() {
+                viewMemberTrashedList();
+            }
           }
         ]
       },
@@ -410,4 +416,12 @@ const viewHistories = () => {
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.Histories);
+}
+const viewMemberTrashedList = () => {
+    setEnableToMenuItem(GENERAL, true);
+    setEnableToMenuItem(GENERAL_STOP, false);
+    setEnableToMenuItem(CARD_MANAGE, true);
+    setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(HISTORIES, true);
+    sendMessage("navigate", routePath.MemberTrashedListPage);
 }
