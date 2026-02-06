@@ -86,7 +86,7 @@ export const linkIdmByFcno :Method = {
     exec:(db:sqlite.Database, fcno:string, idm:string):Promise<number> => {
         const query =
             `UPDATE cards SET idm = ?, date_time = datetime('now', 'localtime')
-            WHERE fcno=? AND soft_delete = FALSE`;
+            WHERE fcno = ? AND soft_delete = FALSE`;
         return exec.run(db, query, [idm, fcno]);
     }
 }

@@ -150,7 +150,7 @@ export function TopPage() {
     return (
         <>
         {/* 音を読み込む( public ) */}
-        <audio ref={audioIn} src="./sounds/audioIn.wav"/>
+        <audio ref={audioIn} src="./sounds/tm2_quiz000good.wav"/>
         <audio ref={audioByby} src="./sounds/Jinx-_Bye_Bye_.mp3"/>
         <audio ref={audioNg} src="./sounds/se_nogood09.mp3"/>
         {/* モーダル */}
