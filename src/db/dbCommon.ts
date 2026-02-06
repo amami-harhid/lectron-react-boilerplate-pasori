@@ -21,8 +21,6 @@ const run = (db:sqlite.Database, query:string, params:any[]=[]):Promise<number> 
 };
 // 対象の行をすべて返す
 const all = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T[]> => {
-    logger.info('all called params=', params);
-    logger.info('query=', query);
     return new Promise<T[]>((resolve, reject)=>{
         const stmt = db.prepare(query);
         stmt.all(params,(err:Error, rows:T[])=>{
@@ -31,22 +29,17 @@ const all = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T[]> 
                 throw(err);
             }
             stmt.finalize();
-            logger.info('all row=',rows);
             resolve(rows);            
         })
     });
 }
 // 1行だけ返す
 const get = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T> => {
-    logger.info('get params=', params);
-    logger.info('query=', query);
     return new Promise<T>((resolve, reject)=>{
         const stmt = db.prepare(query);
         stmt.get(params,(err:Error, row:T)=>{
             if (err) reject(err);
             stmt.finalize();
-            logger.debug('get row=',row);
-            logger.info('get row=',row);
             resolve(row);
         });
     });

@@ -95,6 +95,12 @@ export function ipcMainSqliteBridge() {
             event.reply(replyChannel, count);
             return;
         }
+        else if(command == Histories.deleteHistoriesByFcno.name){
+            const fcno:string = args[0];
+            const count:number = await Histories.deleteHistoriesByFcno.exec(db, fcno);
+            event.reply(replyChannel, count);
+            return;
+        }
         else if(command == Histories.insert.name){
             const fcno:string = args[0];
             const idm: string = args[1];

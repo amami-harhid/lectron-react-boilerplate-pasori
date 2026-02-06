@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import * as Histories from '../../db/histories/histories';
-import { HistoriesCardRow } from '../../db/histories/historiesRow';
 import * as DateUtils from '../../utils/dateUtils';
 import * as IpcServices from '../../channel/ipcService';
+import * as PasoriCard from './pasoriCard/pasoriCard';
+import * as Histories from '../../db/histories/histories';
+import { HistoriesCardRow } from '../../db/histories/historiesRow';
 type TABLE_ROW = {
     id:number,
     fcno:string,
@@ -18,9 +19,13 @@ type PAGEINFO = {
 type CHANNEL = IpcServices.IpcChannelValOfService;
 const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
 const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
-export function HistoriesPage() {
+
+/** 履歴一覧ページ */
+export function HistoriesListPage() {
 
     const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
+
+    /** 指定日付の履歴を取り出す */
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
@@ -31,6 +36,8 @@ export function HistoriesPage() {
             = await window.electron.ipcRenderer.asyncOnce<HistoriesCardRow[]>(CHANNEL_REPLY);
         return rows;
     };
+
+    /** 履歴をテーブル化 */
     const historiesToTableData = async (date:Date):Promise<TABLE_ROW[]> => {
         const rows:HistoriesCardRow[] = await histSelectByDate(date);
         const _data:TABLE_ROW[] = [];
@@ -48,7 +55,7 @@ export function HistoriesPage() {
         }
         return _data;
     }
-    // 日付選択値が変更されたときに呼び出される。
+    /** 日付選択値が変更されたとき */ 
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>)=>{
         const date = event.target.valueAsDate;
         if(date){
@@ -62,13 +69,19 @@ export function HistoriesPage() {
         }
 
     }
+    /** ページレンダリング */
     const pageRender = (_data:string='', _tableData:TABLE_ROW[]=[]) => {
         setPageInfo( {date:_data, tableData:_tableData} )
     }
+
+    /** 初期化 */
     const pageInit = () => {
       // ページレンダリングされる
       pageRender();
     }
+    
+    PasoriCard.onRelease(async ()=>{});
+    PasoriCard.onTouch(async ()=>{});
 
     return (
         <div className ="mainPanel">

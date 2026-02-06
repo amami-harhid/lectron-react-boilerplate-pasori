@@ -5,7 +5,7 @@ import { routePath } from './routePath';
 import { HomePage } from './pages/homePage';
 import { TopPage } from './pages/topPage';
 import { StopPage } from './pages/stopPage';
-import { HistoriesPage } from './pages/historiesPage';
+import { HistoriesListPage } from './pages/historiesListPage';
 import { IdmRegisterPage } from './pages/idmRegisterPage';
 import { MemberListPage } from './pages/memberListPage';
 import { MemberTrashedListPage } from './pages/memberTrashedListPage';
@@ -42,7 +42,7 @@ export function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path={path.Top} element={<TopPage />} />
                         <Route path={path.Stop} element={<StopPage />} />
-                        <Route path={path.Histories} element={<HistoriesPage />} />
+                        <Route path={path.HistoriesListPage} element={<HistoriesListPage />} />
                         <Route path={path.IdmRegister} element={<IdmRegisterPage />} />
                         <Route path={path.MemberListPage} element={<MemberListPage/>} />
                         <Route path={path.MemberTrashedListPage} element={<MemberTrashedListPage/>} />

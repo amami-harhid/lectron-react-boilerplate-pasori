@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 
 import * as IpcServices from '../../channel/ipcService';
+import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from '../../db/cards/cardRow';
 
@@ -296,11 +297,6 @@ export function MemberListPage () {
         membersToTableData();
     }
 
-    // カードが離れたときの処理
-    window.pasoriCard.onRelease(async()=>{});
-    // カードタッチしたときの処理
-    window.pasoriCard.onTouch(async ()=>{});
-
     // 確認モーダル（はい）
     const confirmYes = async () => {
         pageInfo.isConfirmOpen = false;
@@ -376,6 +372,11 @@ export function MemberListPage () {
         await window.electron.ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
     }
 
+    // カードが離れたときの処理
+    PasoriCard.onRelease(async()=>{});
+    // カードタッチしたときの処理
+    PasoriCard.onTouch(async ()=>{});
+
     // redrawPageInfo()が実行されたとき 
     // リロードが実行され、メンバー一覧を最新化する仕組み
     useEffect(() => {
@@ -436,8 +437,8 @@ export function MemberListPage () {
             }}
             style={{
                 content: {
-                    width: "60%",
-                    height: "40%",
+                    width: "50%",
+                    height: "70%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
@@ -452,65 +453,78 @@ export function MemberListPage () {
                 }
             }}
             >
-            <h2>入力パネル</h2>
-                <form>
+            <h2 style={{marginBottom:10}}>入力パネル</h2>
+            <form>
                 <div>
                     <table className='member_appTable'>
                         <tbody>
                         <tr>
                             <td>FCNO</td>
                             <td><input type="text"
+                                pattern="[0-9]*"
                                 {
-                                    ...register("fcno")
+                                    ...register("fcno", {
+                                        required: 'FCNOは必須です',
+                                        pattern: { value: /^\d+$/, message: '半角数字にしてください' }
+                                    })
                                 }
                                 size={4}
                                 readOnly={pageInfo.fcnoReadOnly}/>
-                                &nbsp;<span style={{color:'red'}}>必須、半角数字のみ</span>
+                                {errors.fcno && <p style={{margin:'0', fontSize:'smaller', color:'red'}}>{errors.fcno.message}</p>}
                             </td>
                         </tr>
                         <tr>
                             <td>名前</td>
                             <td><input type="text"
                                 {
-                                    ...register("name")
+                                    ...register("name",{
+                                        required: '名前は必須です'
+                                    })
                                 }
                                 size={50}
                                 readOnly={pageInfo.etcReadOnly}/>
-                                &nbsp;<span style={{color:'red'}}>必須項目</span></td>
+                                {errors.name && <p style={{margin:'0', fontSize:'smaller', color:'red'}}>{errors.name.message}</p>}
+                            </td>
                         </tr>
                         <tr>
                             <td>カナ</td>
                             <td><input type="text"
                                 {
-                                    ...register("kana")
+                                    ...register("kana",{
+                                        required: 'カナは必須です'
+                                    })
                                 }
                                 size={50}
                                 readOnly={pageInfo.etcReadOnly}/>
-                                &nbsp;<span style={{color:'red'}}>必須項目</span></td>
+                                {errors.kana && <p style={{margin:'0', fontSize:'smaller', color:'red'}}>{errors.kana.message}</p>}
+                            </td>
                         </tr>
                         <tr>
                             <td>MAIL</td>
                             <td><input type="text"
                                 {
-                                    ...register("mail")
+                                    ...register("mail",{
+                                        pattern: { value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/, message: '正しいメールアドレスを入力してください' }
+                                    })
                                 }
                                 size={50}
                                 readOnly={pageInfo.etcReadOnly}/>
-                                &nbsp;<span>任意項目、メールアドレス形式</span></td>
+                                {errors.mail && <p style={{margin:'0', fontSize:'smaller',color:'red'}}>{errors.mail.message}</p>}
+                                </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                </form>
-                <div className="modal-button-container" style={{margin:30}}>
-                    <button className="modal-btn" onClick={handleCancel}>中止</button>
-                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitRegist)}
+            </form>
+            <div className="modal-button-container" style={{margin:20}}>
+                <button className="modal-btn" onClick={handleCancel}>中止</button>
+                <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitRegist)}
                             style={{display:pageInfo.registButtonDisplay}}>追加</button>
-                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitReplace)}
+                <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitReplace)}
                             style={{display:pageInfo.replaceButtonDisplay}}>更新</button>
-                    <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitDelete)}
+                <button className="modal-alert-btn" type="submit" onClick={handleSubmit(formSubmitDelete)}
                             style={{display:pageInfo.deleteButtonDisplay}}>削除</button>
-                </div>
+            </div>
         </Modal>
         <Modal
             isOpen={pageInfo.isConfirmOpen}
@@ -520,8 +534,8 @@ export function MemberListPage () {
             }}
             style={{
                 content: {
-                    width: "15%",
-                    height: "15%",
+                    width: "20%",
+                    height: "25%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
@@ -536,13 +550,13 @@ export function MemberListPage () {
                 }
             }}
             >
-            <h2>確認</h2>
-                <div className="modal-button-container">
-                    <button className="modal-btn" onClick={confirmNo}
+            <h2 style={{margin:0}}>確認</h2>
+            <div className="modal-button-container" style={{margin:5}}>
+                <button className="modal-btn" onClick={confirmNo} 
                         >いいえ</button>
-                    <button className="modal-alert-btn" onClick={confirmYes}
+                <button className="modal-alert-btn" onClick={confirmYes} 
                         >はい</button>
-                </div>
+            </div>
         </Modal>
         </>
     );

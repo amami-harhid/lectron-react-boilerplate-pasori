@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import * as IpcServices from '../../channel/ipcService';
+import * as PasoriCard from "./pasoriCard/pasoriCard";
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
@@ -130,17 +131,6 @@ export function TopPage() {
         setPageView(view);
 
     }
-    const cardTouchListenerStart = () => {
-        // カードが離れたときの処理
-        window.pasoriCard.onRelease( async(ipc_idm:string)=>{
-            cardRelease();
-        });
-
-        // カードタッチしたときの処理
-        window.pasoriCard.onTouch(async (idm:string)=>{
-            await cardTouch(idm);
-        });
-    }
 
     const isReaderReady = async () => {
         view.is_ready  = true;
@@ -159,6 +149,18 @@ export function TopPage() {
           view.errorMessage02 = `接続し再起動してください`;
           setPageView(view);
         }
+    }
+
+    const cardTouchListenerStart = () => {
+        // カードが離れたときの処理
+        PasoriCard.onRelease( async(ipc_idm:string)=>{
+            cardRelease();
+        });
+
+        // カードタッチしたときの処理
+        PasoriCard.onTouch( async (idm:string)=>{
+            await cardTouch(idm);
+        });
     }
 
     useEffect(()=>{

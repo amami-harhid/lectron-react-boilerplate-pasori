@@ -1,9 +1,10 @@
+import * as PasoriCard from './pasoriCard/pasoriCard';
 export function StopPage() {
 
     // カードが離れたときの処理
-    window.pasoriCard.onRelease(async()=>{});
+    PasoriCard.onRelease(async()=>{});
     // カードタッチしたときの処理
-    window.pasoriCard.onTouch(async ()=>{});
+    PasoriCard.onTouch(async ()=>{});
 
     return (
       <div id="stopPanel" className ="mainPanel">

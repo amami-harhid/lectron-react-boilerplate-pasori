@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
 import * as IpcServices from '../../channel/ipcService';
+import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import { CardRow } from "../../db/cards/cardRow";
 
@@ -62,8 +62,8 @@ export function IdmRegisterPage() {
         setView(_clone);
     }
 
+    /** IDMを登録するときの確認モーダルを表示 */
     const register = (_: React.MouseEvent<HTMLButtonElement, MouseEvent>):void => {
-        // idmを紐づける確認モーダルを表示
         view.now_regist = true;
         view.now_delete = false;
         view.confirm_On = Display.block;
@@ -72,9 +72,8 @@ export function IdmRegisterPage() {
         view.deleteOn = Display.none;
         setPageView( view );
     }
-
+    /** IDMの登録を切るときの確認モーダルを表示 */
     const remover = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        // idmの紐づを切る確認モーダルを表示
         view.now_regist = false;
         view.now_delete = true;
         view.confirm_On = Display.block;
@@ -85,8 +84,8 @@ export function IdmRegisterPage() {
 
     }
 
+    /** 確認モーダルではいのとき */
     const confirm_yes_button = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        // 確認モーダルでYESのとき
         const fcno = view.card_fcno;
         const idm = view.idm;
         if( view.now_regist === true) {
@@ -128,9 +127,9 @@ export function IdmRegisterPage() {
         view.now_delete = false;
         setPageView( view );
     }
-    const confirm_no_button = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        // 確認モーダルでNOのとき
 
+    /** 確認モーダルでいいえのとき */
+    const confirm_no_button = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         view.now_regist = false;
         view.now_delete = false;
         view.card_message = '';
@@ -141,9 +140,8 @@ export function IdmRegisterPage() {
         setPageView( view );
 
     }
-
+    /** 選択リストを選択したとき */
     const selectCardChange = async (newValue: SingleValue<CardOption>, actionMeta: ActionMeta<CardOption>) => {
-        // 選択されたとき
         if(view && newValue) {
             const fcno:string = newValue.value;
             view.selectOn = Display.none;
@@ -191,26 +189,8 @@ export function IdmRegisterPage() {
             }
         }
     }
-    window.pasoriCard.onRelease( async(ipc_idm:string)=>{
-        // カードが離れた
-        view.selectOn = Display.none;
-        view.idm = '';
-        view.card_fcno = '';
-        view.card_name = '';
-        view.card_kana = '';
-        view.registOn = Display.none;
-        view.deleteOn = Display.none;
-        view.confirm_On = Display.none;
-        view.confirm_message = '';
-        view.now_regist = false;
-        view.now_delete = false;
-        view.cardsOptions = [];
-        view.selectedValue = null;
-        view.guidance = 'ICカードをタッチしてください';
-        view.card_message =  ``;
-        setPageView(view);
-    });
 
+    /** 選択リストを作る */
     const redrawSelect = async (ipc_idm:string) => {
         // リクエスト
         window.electron.ipcRenderer.sendMessage(
@@ -272,11 +252,34 @@ export function IdmRegisterPage() {
 
     };
 
-    window.pasoriCard.onTouch( async(ipc_idm:string)=>{
-        // カードが触った
+    /** カードが触った */
+    const cardOnTouch = async(ipc_idm:string)=>{
         view.idm = ipc_idm;
         await redrawSelect(ipc_idm);
-    });
+    };
+
+    /** カードが離れた */
+    const cardOnRelease = async(ipc_idm:string) => {
+        view.selectOn = Display.none;
+        view.idm = '';
+        view.card_fcno = '';
+        view.card_name = '';
+        view.card_kana = '';
+        view.registOn = Display.none;
+        view.deleteOn = Display.none;
+        view.confirm_On = Display.none;
+        view.confirm_message = '';
+        view.now_regist = false;
+        view.now_delete = false;
+        view.cardsOptions = [];
+        view.selectedValue = null;
+        view.guidance = 'ICカードをタッチしてください';
+        view.card_message =  ``;
+        setPageView(view);
+    }
+
+    PasoriCard.onRelease( cardOnRelease );
+    PasoriCard.onTouch( cardOnTouch );
 
     return (
         <>

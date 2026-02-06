@@ -2,8 +2,8 @@ export const routePath = {
     Home: '/',
     Top: '/top',
     Stop: '/stop',
-    Histories: '/histories',
-    IdmRegister: '/idmregister',
+    HistoriesListPage: '/historieslistpage',
+    IdmRegister: '/idmregisterpage',
     MemberListPage: '/memberlistpage',
     MemberTrashedListPage: '/membertrashedlistpage',
 } as const;

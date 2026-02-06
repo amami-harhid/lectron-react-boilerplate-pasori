@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-
+import * as PasoriCard from './pasoriCard/pasoriCard';
 type View = {
     isReady: string,
     errorMessage01: string,
@@ -28,10 +28,14 @@ export const HomePage = () =>  {
         }
         setPageView(view);
     }
-    
+        
+    PasoriCard.onRelease(async ()=>{});
+    PasoriCard.onTouch(async ()=>{});
+
     useEffect(()=>{
         isReaderReady();
     },[])
+    
     return (
         <>
           <div className="card">

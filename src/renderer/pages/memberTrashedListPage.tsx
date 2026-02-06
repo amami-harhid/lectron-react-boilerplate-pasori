@@ -7,6 +7,7 @@ import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 
 import * as IpcServices from '../../channel/ipcService';
+import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
@@ -24,19 +25,19 @@ const TypeRegist = {
 } as const;
 type TTypeRegist =  (typeof TypeRegist)[keyof typeof TypeRegist];
 type PAGEINFO = {
-    view: {guidance:string},
     tableData: TABLE_ROW[],
     typeRegist: TTypeRegist,
     confirmTitle: string,
+    confirmGuide: string,
     isConfirmOpen: boolean,
     tempData: TABLE_ROW,
     counter: number,
 }
 const initPageInfo: PAGEINFO = {
-    view: {guidance: ''},
     tableData: [],
     typeRegist: '',
     confirmTitle: '',
+    confirmGuide: '',
     isConfirmOpen: false,
     tempData: {no: 0, fcno:'', name:'', kana:''},
     counter: 0,
@@ -105,6 +106,7 @@ export function MemberTrashedListPage () {
         pageInfo.isConfirmOpen = true;
         pageInfo.typeRegist = TypeRegist.Recover;
         pageInfo.confirmTitle = '復活させますか';
+        pageInfo.confirmGuide = '';
         pageInfo.tempData = {
             no: 0,
             fcno: row.original.fcno,
@@ -116,7 +118,8 @@ export function MemberTrashedListPage () {
     const handleDelete = (row: MRT_Row<TABLE_ROW>) => {
         pageInfo.isConfirmOpen = true;
         pageInfo.typeRegist = TypeRegist.Delete;
-        pageInfo.confirmTitle = '完全に削除しますか(元に戻せません)';
+        pageInfo.confirmTitle = '完全削除しますか';
+        pageInfo.confirmGuide = '元に戻せません、構いませんか？';
         pageInfo.tempData = {
             no: 0,
             fcno: row.original.fcno,
@@ -161,16 +164,6 @@ export function MemberTrashedListPage () {
         membersToTableData();
     }
 
-    useEffect(() => {
-        console.log('----useEffect----')
-        reload();
-    },[pageInfo.counter]);
-
-    // カードが離れたときの処理
-    window.pasoriCard.onRelease(async()=>{});
-    // カードタッチしたときの処理
-    window.pasoriCard.onTouch(async ()=>{});
-
     const confirmYes = async () => {
         pageInfo.isConfirmOpen = false;
         const data = pageInfo.tempData;
@@ -210,13 +203,24 @@ export function MemberTrashedListPage () {
         pageInfo.isConfirmOpen = false;
         updatePageInfo(pageInfo);
     }
+
+    // カードが離れたときの処理
+    PasoriCard.onRelease(async()=>{});
+    // カードタッチしたときの処理
+    PasoriCard.onTouch(async ()=>{});
+
+    useEffect(() => {
+        console.log('----useEffect----')
+        reload();
+    },[pageInfo.counter]);
+
     return (
         <>
         <div ref={content} className="modal_manager" >
             <div className="modal-content">
                 <h2><span>削除済の利用者一覧</span></h2>
                 <div><button onClick={reload}>リロード</button></div>
-                <h4>{pageInfo.view.guidance}</h4>
+                <h4></h4>
                 <MaterialReactTable
                     columns={columns}
                     data={pageInfo.tableData}
@@ -256,7 +260,7 @@ export function MemberTrashedListPage () {
             style={{
                 content: {
                     width: "30%",
-                    height: "20%",
+                    height: "25%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
@@ -271,15 +275,16 @@ export function MemberTrashedListPage () {
                 }
             }}
             >
-            <h2>確認</h2>
-                <p>{pageInfo.confirmTitle}</p>
+            <div style={{margin:'0', textAlign:'center'}}>
+                <h1 style={{margin:'0'}}>{pageInfo.confirmTitle}</h1>
+                <h2 style={{color:'red', fontSize:'smaller'}}>{pageInfo.confirmGuide}</h2>
                 <div className="modal-button-container">
-                    
                     <button className="modal-btn" onClick={confirmNo}
                         >いいえ</button>
                     <button className="modal-alert-btn" onClick={confirmYes}
                         >はい</button>
                 </div>
+            </div>
         </Modal>
         </>
     );

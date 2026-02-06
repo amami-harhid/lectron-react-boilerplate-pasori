@@ -415,7 +415,7 @@ const viewHistories = () => {
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
     setEnableToMenuItem(HISTORIES, true);
-    sendMessage("navigate", routePath.Histories);
+    sendMessage("navigate", routePath.HistoriesListPage);
 }
 const viewMemberTrashedList = () => {
     setEnableToMenuItem(GENERAL, true);
