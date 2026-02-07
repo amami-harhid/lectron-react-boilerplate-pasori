@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import * as PasoriCard from './pasoriCard/pasoriCard';
+import * as Sounds from '@/renderer/lib/sounds';
+
 type View = {
     isReady: string,
     errorMessage01: string,
@@ -34,6 +36,9 @@ export const HomePage = () =>  {
 
     useEffect(()=>{
         isReaderReady();
+        console.log('home useEffect')
+        // 音を取り込む。
+        Sounds.preload();
     },[])
     
     return (

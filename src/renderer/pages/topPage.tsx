@@ -6,6 +6,8 @@ import * as Cards from '../../db/cards/cards';
 import * as Histories from '../../db/histories/histories';
 import { CardRow } from '../../db/cards/cardRow';
 
+import * as Sounds from "../lib/sounds";
+
 type View = {
   pageTitle: string,
   name: string,
@@ -38,12 +40,8 @@ const initView: View = {
 
 
 export function TopPage() {
-    const [view, setView] = useState(initView);
 
-    // AUDIOエレメント
-    const audioByby = useRef<HTMLAudioElement>(null);
-    const audioNg = useRef<HTMLAudioElement>(null);
-    const audioIn = useRef<HTMLAudioElement>(null);
+    const [view, setView] = useState(initView);
 
     const setPageView = ( _view: View ) => {
         const _clone = structuredClone(_view);
@@ -86,22 +84,30 @@ export function TopPage() {
             const fcno = row.fcno;
             if( row.in_room == true ) {
                 // 入室中
+                Sounds.play({name:"CARD_OUT"})
                 //Sounds.soundByePlay();
-                audioByby.current?.play();
+                //audioByby.current?.play();
                 await setOutRoom( fcno, idm);
                 view.status = '退室しました';
                 view.name = `(${row.name}さん)`
             }else{
                 // 退室中
+                //Sounds.play({name:"CARD_IN"})
                 //Sounds.soundInPlay();
-                audioIn.current?.play();
+                //if(soundNg){
+                //    const _soundNg = soundNg as HTMLAudioElement;
+                //    _soundNg.play();
+                //}
+                //audioIn.current?.play();
+                Sounds.play({name:"CARD_IN"})
                 await setInRoom( fcno, idm);
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`
             }
         }else{
             //Sounds.soundNGPlay();
-            audioNg.current?.play();
+            //audioNg.current?.play();
+            Sounds.play({name:"CARD_NG"})
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
@@ -149,10 +155,6 @@ export function TopPage() {
 
     return (
         <>
-        {/* 音を読み込む( public ) */}
-        <audio ref={audioIn} src="./sounds/tm2_quiz000good.wav"/>
-        <audio ref={audioByby} src="./sounds/Jinx-_Bye_Bye_.mp3"/>
-        <audio ref={audioNg} src="./sounds/se_nogood09.mp3"/>
         {/* モーダル */}
         <div className="modal" style={{display: view.modal_display}}>
             <div className="modal-content">

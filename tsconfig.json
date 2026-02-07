@@ -15,6 +15,7 @@
     "outDir": ".erb/dll",
     "paths": {
       "sqlite3": ["./.erb/node_modules/sqlite3"],
+      "@/*": ["./src/*"],
       "@sounds": ["./assets/sounds"],
     }
   },

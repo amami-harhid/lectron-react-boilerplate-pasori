@@ -9,7 +9,6 @@ import { HistoriesListPage } from './pages/historiesListPage';
 import { IdmRegisterPage } from './pages/idmRegisterPage';
 import { MemberListPage } from './pages/memberListPage';
 import { MemberTrashedListPage } from './pages/memberTrashedListPage';
-
 import './css/app.css';
 
 const IPCNavigator = () => {
