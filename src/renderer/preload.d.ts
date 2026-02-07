@@ -2,6 +2,7 @@ import {
   ElectronHandler,
   ElectronNavigate,
   ElectronPasoriCard,
+  ElectronProduct
 //  ElectronPasoriDb
  } from '../main/preload';
 
@@ -11,6 +12,7 @@ declare global {
     electron: ElectronHandler;
     navigate: ElectronNavigate;
     pasoriCard: ElectronPasoriCard;
+    is: ElectronProduct;
 //    pasoriDb: ElectronPasoriDb;
   }
 }

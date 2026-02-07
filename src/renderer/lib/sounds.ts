@@ -1,4 +1,7 @@
-import { PROTOCOL, BASEPATH, VOLUME } from "@/conf/soundConf";
+import {
+        PROTOCOL_DEV, PROTOCOL_PROD,
+        BASEPATH_DEV, BASEPATH_PROD,
+        VOLUME } from "@/conf/soundConf";
 
 /** Cache of Audio elements, for instant playback */
 const cache: Record<string, HTMLAudioElement> = {};
@@ -19,19 +22,21 @@ const sounds: Record<string, { url: string; volume: number }> = {
     }
 } as const;
 
-type SoundsName = (typeof sounds)[keyof typeof sounds]; 
-export const preload = (basepath = BASEPATH) => {
+type SoundsName = (typeof sounds)[keyof typeof sounds];
+export const preload = async (basepath = BASEPATH_PROD) => {
+    const isProduction = await window?.is.production();
+    console.log('isProduction=', isProduction);
     console.log('render/lib/sounds.ts: basepath=',basepath);
 
-	Object.keys(sounds).forEach((name) => {
+  	Object.keys(sounds).forEach((name) => {
         if (!cache[name]) {
             const sound = sounds[name];
-            const url = `${PROTOCOL}://${basepath}${sound.url}`;
+            const url = (isProduction)?`${PROTOCOL_PROD}://${BASEPATH_PROD}${sound.url}`:`${PROTOCOL_DEV}://${BASEPATH_DEV}${sound.url}`;
             console.warn(`Preloading sound: ${name}, URL: ${url}`);
             cache[name] = new window.Audio();
-			cache[name].crossOrigin = '*';
-			cache[name].volume = sound.volume;
-			cache[name].src = url;
+		        cache[name].crossOrigin = '*';
+			      cache[name].volume = sound.volume;
+			      cache[name].src = url;
         }
     });
 };

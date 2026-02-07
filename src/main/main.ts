@@ -13,8 +13,10 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, is } from './util';
 import { ipcMainSqliteBridge } from '../db/ipcMain';
+
+import { ipc_is_production } from './ipc';
 
 import { Logger } from "../log/logger";
 const logger = new Logger();
@@ -37,12 +39,13 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-const isDebug =
-  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
+const isDebug = is.debug;
+const isProd = is.prod;
 if (isDebug) {
   require('electron-debug').default();
 }
+
+ipc_is_production(isProd);
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');

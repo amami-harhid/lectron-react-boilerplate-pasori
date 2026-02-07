@@ -82,6 +82,20 @@ contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 
+const production = {
+    production : (): Promise<boolean> => {
+        const Channel = "IS_PRODUCTION";
+        ipcRenderer.send( Channel );
+        return new Promise<boolean>((resolve)=>{
+            ipcRenderer.once( Channel, (_event, isProduction:boolean) => {
+                resolve(isProduction);
+            })
+        });
+    }
+}
+
+contextBridge.exposeInMainWorld('is', production);
+
 /*
 export type DbChannels = 'cards' | 'histories';
 const electronPasoriDb = {
@@ -102,4 +116,5 @@ contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
+export type ElectronProduct = typeof production;
 //export type ElectronPasoriDb = typeof electronPasoriDb;
