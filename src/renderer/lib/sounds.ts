@@ -9,7 +9,7 @@ const cache: Record<string, HTMLAudioElement> = {};
 const sounds: Record<string, { url: string; volume: number }> = {
 
     CARD_IN: {
-        url: 'sounds/tm2_quiz000good.wav',
+        url: 'tm2_quiz000good.wav',
         volume: VOLUME,
     },
     CARD_OUT: {
