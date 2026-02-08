@@ -97,46 +97,46 @@ export function MemberListPage () {
 
     // Define columns
     const columns = [
-            {
+        {
             accessorKey: 'no',
             header: 'NO',
             size: 20,
             minSize: 20,
             maxSize: 20,
             enableSorting: false,
-            },
-            {
+        },
+        {
             accessorKey: 'fcno',
             header: 'FCNO',
             size: 80,
             minSize: 80,
             maxSize: 80,
             enableSorting: false,
-            },
-            {
+        },
+        {
             accessorKey: 'name',
             header: '名前',
             size: 150,
             minSize: 150,
             maxSize: 200,
             enableSorting: false,
-            },
-            {
+        },
+        {
             accessorKey: 'kana',
             header: 'カナ',
             size: 150,
             minSize: 150,
             maxSize: 200,
-            },
-            {
+        },
+        {
             accessorKey: 'mail',
             header: 'Mail',
             size: 150,
             minSize: 150,
             maxSize: 200,
             enableSorting: false,
-            }
-        ]
+        }
+    ];
     const handleCancel = () =>{
         pageInfo.tableDisplay = Display.block;
         pageInfo.isModalOpen = false;
@@ -147,52 +147,52 @@ export function MemberListPage () {
         updatePageInfo(pageInfo);
     }
     const handleEdit = (row: MRT_Row<TABLE_ROW> ) => {
-            pageInfo.isModalOpen = true;
-            pageInfo.modalPageInfo.no = row.original.no;
-            pageInfo.modalPageInfo.fcno = row.original.fcno;
-            pageInfo.modalPageInfo.name = row.original.name;
-            pageInfo.modalPageInfo.kana = row.original.kana;
-            pageInfo.modalPageInfo.mail = row.original.mail;
-            reset(pageInfo.modalPageInfo);
-            pageInfo.tableDisplay = Display.none;
-            pageInfo.registButtonDisplay = Display.none;
-            pageInfo.replaceButtonDisplay = Display.inline_block;
-            pageInfo.deleteButtonDisplay = Display.none;
-            pageInfo.fcnoReadOnly = true;
-            pageInfo.etcReadOnly = false;
-            updatePageInfo(pageInfo);
+        pageInfo.isModalOpen = true;
+        pageInfo.modalPageInfo.no = row.original.no;
+        pageInfo.modalPageInfo.fcno = row.original.fcno;
+        pageInfo.modalPageInfo.name = row.original.name;
+        pageInfo.modalPageInfo.kana = row.original.kana;
+        pageInfo.modalPageInfo.mail = row.original.mail;
+        reset(pageInfo.modalPageInfo);
+        pageInfo.tableDisplay = Display.none;
+        pageInfo.registButtonDisplay = Display.none;
+        pageInfo.replaceButtonDisplay = Display.inline_block;
+        pageInfo.deleteButtonDisplay = Display.none;
+        pageInfo.fcnoReadOnly = true;
+        pageInfo.etcReadOnly = false;
+        updatePageInfo(pageInfo);
     };
     const handleDelete = (row: MRT_Row<TABLE_ROW>) => {
-            pageInfo.isModalOpen = true;
-            pageInfo.modalPageInfo.no = row.original.no;
-            pageInfo.modalPageInfo.fcno = row.original.fcno;
-            pageInfo.modalPageInfo.name = row.original.name;
-            pageInfo.modalPageInfo.kana = row.original.kana;
-            pageInfo.modalPageInfo.mail = row.original.mail;
-            reset(pageInfo.modalPageInfo);
-            pageInfo.tableDisplay = Display.none;
-            pageInfo.registButtonDisplay = Display.none;
-            pageInfo.replaceButtonDisplay = Display.none;
-            pageInfo.deleteButtonDisplay = Display.inline_block;
-            pageInfo.fcnoReadOnly = true;
-            pageInfo.etcReadOnly = true;
-            updatePageInfo(pageInfo);
+        pageInfo.isModalOpen = true;
+        pageInfo.modalPageInfo.no = row.original.no;
+        pageInfo.modalPageInfo.fcno = row.original.fcno;
+        pageInfo.modalPageInfo.name = row.original.name;
+        pageInfo.modalPageInfo.kana = row.original.kana;
+        pageInfo.modalPageInfo.mail = row.original.mail;
+        reset(pageInfo.modalPageInfo);
+        pageInfo.tableDisplay = Display.none;
+        pageInfo.registButtonDisplay = Display.none;
+        pageInfo.replaceButtonDisplay = Display.none;
+        pageInfo.deleteButtonDisplay = Display.inline_block;
+        pageInfo.fcnoReadOnly = true;
+        pageInfo.etcReadOnly = true;
+        updatePageInfo(pageInfo);
     };
     const handleAdd = () => {
-            pageInfo.isModalOpen = true;
-            pageInfo.modalPageInfo.no = 0;
-            pageInfo.modalPageInfo.fcno = '';
-            pageInfo.modalPageInfo.name = '';
-            pageInfo.modalPageInfo.kana = '';
-            pageInfo.modalPageInfo.mail = '';
-            reset(pageInfo.modalPageInfo);
-            pageInfo.tableDisplay = Display.none;
-            pageInfo.registButtonDisplay = Display.inline_block;
-            pageInfo.replaceButtonDisplay = Display.none;
-            pageInfo.deleteButtonDisplay = Display.none;
-            pageInfo.fcnoReadOnly = false;
-            pageInfo.etcReadOnly = false;
-            updatePageInfo(pageInfo);
+        pageInfo.isModalOpen = true;
+        pageInfo.modalPageInfo.no = 0;
+        pageInfo.modalPageInfo.fcno = '';
+        pageInfo.modalPageInfo.name = '';
+        pageInfo.modalPageInfo.kana = '';
+        pageInfo.modalPageInfo.mail = '';
+        reset(pageInfo.modalPageInfo);
+        pageInfo.tableDisplay = Display.none;
+        pageInfo.registButtonDisplay = Display.inline_block;
+        pageInfo.replaceButtonDisplay = Display.none;
+        pageInfo.deleteButtonDisplay = Display.none;
+        pageInfo.fcnoReadOnly = false;
+        pageInfo.etcReadOnly = false;
+        updatePageInfo(pageInfo);
     };
     const formSubmitRegist = async (data:FormValues) => {
         // DBレコードを追加する
@@ -240,7 +240,6 @@ export function MemberListPage () {
             pageInfo.typeRegist = TypeRegist.Delete;
             updatePageInfo(pageInfo);            
         }
-//        reload();
     }
     const cardsSelectAll = async (): Promise<CardRow[]> => {
         const rows = await RenderService.exe<CardRow[]>(Cards.selectAll.name)

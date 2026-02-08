@@ -1,16 +1,16 @@
 import { useRef, useState } from "react";
+import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
 import * as DateUtils from '@/utils/dateUtils';
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Histories from '@/db/histories/histories';
 import { HistoriesCardRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
-    id:number,
+    no:number,
     fcno:string,
     name:string,
     kana:string,
     in:string,
-    out:string,
 }
 type PAGEINFO = {
     date: string,
@@ -21,6 +21,51 @@ type PAGEINFO = {
 export function HistoriesListPage() {
 
     const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
+
+    // Define columns
+    const columns = [
+        {
+            accessorKey: 'no',
+            header: 'NO',
+            size: 15,
+            minSize: 15,
+            maxSize: 15,
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'fcno',
+            header: 'FCNO',
+            size: 80,
+            minSize: 80,
+            maxSize: 80,
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'name',
+            header: '名前',
+            size: 150,
+            minSize: 150,
+            maxSize: 200,
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'kana',
+            header: 'カナ',
+            size: 150,
+            minSize: 150,
+            maxSize: 200,
+            enableSorting: false,
+        },
+        {
+            accessorKey: 'in',
+            header: '状態',
+            size: 50,
+            minSize: 50,
+            maxSize: 50,
+            enableSorting: false,
+        }
+    ];
+
 
     /** 指定日付の履歴を取り出す */
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
@@ -33,14 +78,13 @@ export function HistoriesListPage() {
         const rows:HistoriesCardRow[] = await histSelectByDate(date);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
-            const newId = _data.length > 0 ? _data[_data.length - 1].id + 1 : 1;
+            const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
             const newRow:TABLE_ROW = {
-                id: newId,
+                no: newId,
                 fcno: row.fcno,
                 name: (row.name)?row.name:'',
                 kana: (row.kana)?row.kana:'',
-                in: (row.date_in)?row.date_in:'',
-                out: (row.date_out)?row.date_out:'',
+                in: (row.date_out)? '退室':'入室'
             }
             _data.push(newRow);
         }
@@ -83,30 +127,15 @@ export function HistoriesListPage() {
                         &nbsp;<button onClick={pageInit}>初期化</button>
                     </label>
                     <p className="hist_selectedDate">選択された日付: <span>{pageInfo.date}</span></p>
-                    <table className="hist_appTable">
-                    <tbody>
-                        <tr>
-                            <th>NO</th>
-                            <th>FCNO</th>
-                            <th>名前</th>
-                            <th>カナ</th>
-                            <th>入室</th>
-                            <th>退室</th>
-                        </tr>
-                    </tbody>
-                    <tbody>
-                    {pageInfo.tableData.map(row=>(
-                        <tr key={row.id}>
-                            <td>{row.id}</td>
-                            <td>{row.fcno}</td>
-                            <td>{row.name}</td>
-                            <td>{row.kana}</td>
-                            <td>{row.in}</td>
-                            <td>{row.out}</td>
-                       </tr>
-                    ))}
-                    </tbody>
-                    </table>
+                    <MaterialReactTable
+                        columns={columns}
+                        data={pageInfo.tableData}
+                        muiTableProps={{
+                            className: 'hist_appTable',
+                        }}
+                        enableSorting
+                        positionActionsColumn="last"
+                    />
                 </div>
             </div>
         </div>

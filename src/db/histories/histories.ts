@@ -65,11 +65,12 @@ export const selectAll :Method = {
 export const selectByDate :Method = {
     name: 'hist_selectByDate',
     exec: (db:sqlite.Database, date:Date):Promise<HistoriesCardRow[]> => {
+//             AND H.in_room = C.in_room AND H.date_in = date(?)
         const query =
             `SELECT H.*,C.name,C.kana,C.mail FROM histories AS H
              LEFT OUTER JOIN cards AS C
              WHERE H.fcno = C.fcno AND H.idm = C.idm
-             AND H.in_room = C.in_room AND H.date_in = date(?)
+             AND H.date_in = date(?)
              ORDER BY fcno ASC`;
         const date_str = DateUtils.dateToSqlite3Date(date);
         return exec.all<HistoriesCardRow>(db, query, [date_str]);
@@ -166,7 +167,7 @@ export const setOutRoomByFcnoIdm :Method = {
             WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
             const todayStr = DateUtils.dateToSqlite3Date(today);
             logger.debug('todayStr=',todayStr)
-            return exec.run(db, query, [fcno, idm, todayStr]);
+            return exec.run(db, query, [todayStr, fcno, idm, todayStr]);
         }else{
             return 0;
         }
