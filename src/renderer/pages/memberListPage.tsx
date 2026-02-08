@@ -7,6 +7,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
+import { toast } from 'sonner';
 
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
@@ -275,17 +276,19 @@ export function MemberListPage () {
         const data = pageInfo.tempData;
         if(pageInfo.typeRegist==TypeRegist.Regist){
             await memberRegist(data);
+            toast.success("追加しました");
             redrawPageInfo(pageInfo);
 
         }else if(pageInfo.typeRegist == TypeRegist.Replace){
             await memberReplace(data);
+            toast.success("更新しました");
             redrawPageInfo(pageInfo);
 
         }else if(pageInfo.typeRegist == TypeRegist.Delete){
-            console.log('delete')
             pageInfo.isModalOpen = false;
             pageInfo.tableDisplay = Display.block;
             await memberDelete(data);
+            toast.warning("削除しました");
             redrawPageInfo(pageInfo);
 
         }else{
@@ -327,6 +330,7 @@ export function MemberListPage () {
     // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
         await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
+        
     }
 
     // カードが離れたときの処理

@@ -5,7 +5,8 @@ import { MaterialReactTable, type MRT_Row } from 'material-react-table';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
-
+import { toast } from 'sonner';
+ 
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '@/db/cards/cards';
@@ -102,7 +103,7 @@ export function MemberTrashedListPage () {
     const handleRecover = (row: MRT_Row<TABLE_ROW> ) => {
         pageInfo.isConfirmOpen = true;
         pageInfo.typeRegist = TypeRegist.Recover;
-        pageInfo.confirmTitle = '復活させますか';
+        pageInfo.confirmTitle = '復元しますか';
         pageInfo.confirmGuide = '';
         pageInfo.tempData = {
             no: 0,
@@ -115,7 +116,7 @@ export function MemberTrashedListPage () {
     const handleDelete = (row: MRT_Row<TABLE_ROW>) => {
         pageInfo.isConfirmOpen = true;
         pageInfo.typeRegist = TypeRegist.Delete;
-        pageInfo.confirmTitle = '完全削除しますか';
+        pageInfo.confirmTitle = '抹消しますか';
         pageInfo.confirmGuide = '元に戻せません、構いませんか？';
         pageInfo.tempData = {
             no: 0,
@@ -162,13 +163,15 @@ export function MemberTrashedListPage () {
         const data = pageInfo.tempData;
         if(pageInfo.typeRegist==TypeRegist.Recover){
             await RenderService.exe<number>(Cards.recoveryByFcno.name, data.fcno)
+            toast.success("復元しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
 
         }else if(pageInfo.typeRegist == TypeRegist.Delete){
             // 物理削除する（履歴も削除）
-            await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno)
-            await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno)
+            await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno);
+            await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno);
+            toast.success("抹消しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
 
@@ -197,7 +200,7 @@ export function MemberTrashedListPage () {
         <>
         <div ref={content} className="modal_manager" >
             <div className="modal-content">
-                <h2><span>削除済の利用者一覧</span></h2>
+                <h2><span>ゴミ箱（削除済）の利用者一覧</span></h2>
                 <div><button onClick={reload}>リロード</button></div>
                 <h4></h4>
                 {/* テーブル */}
@@ -215,12 +218,12 @@ export function MemberTrashedListPage () {
                     positionActionsColumn="last"
                     renderRowActions={({ row }) => (
                         <Box sx={{ display: 'flex', gap: '0.2rem' }}>
-                            <Tooltip title="復活させる">
+                            <Tooltip title="復元">
                                 <IconButton onClick={() => handleRecover(row)}>
                                     <RecoverIcon />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="完全削除">
+                            <Tooltip title="抹消">
                                 <IconButton color="error" onClick={() => handleDelete(row)}>
                                     <DeleteIcon />
                                 </IconButton>

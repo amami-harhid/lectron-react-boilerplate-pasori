@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
 import { RenderService } from "@/service/render";
+import { toast } from 'sonner';
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import * as Cards from '@/db/cards/cards';
 import { CardRow } from "@/db/cards/cardRow";
@@ -87,12 +88,15 @@ export function IdmRegisterPage() {
         if( view.now_regist === true) {
             // fcno を指定して cardを読み込む
             await RenderService.exe<number>(Cards.linkIdmByFcno.name, fcno, idm);
+            toast.success("IMD登録しました");
+
             view.card_message = 'IDMを登録しました';
             // 選択を書き換える
             await redrawSelect(idm);
 
         }else if( view.now_delete === true) {
             await RenderService.exe<number>(Cards.releaseIdmByFcno.name, fcno);
+            toast.warning("IMD登録削除しました");
             view.card_message = 'IDM登録を削除しました';
             // 選択を書き換える
             await redrawSelect(idm);
@@ -274,8 +278,11 @@ export function IdmRegisterPage() {
         <div style={{display: view.confirm_On}} className="confirm">
             <div>
                 <p>{view.confirm_message}</p>
-                <button onClick={confirm_yes_button}>はい</button>
-                <button onClick={confirm_no_button}>いいえ</button>
+                <div style={{width:'80%', marginLeft:'10%', display: "flex", justifyContent: "space-between"}}>
+                    <button onClick={confirm_yes_button}>はい</button>
+                    <button onClick={confirm_no_button}>いいえ</button>
+                </div>
+                <p></p>
             </div>
         </div>
         </>

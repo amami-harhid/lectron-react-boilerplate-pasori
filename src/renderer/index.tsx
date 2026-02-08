@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from 'react-dom/client';
+import { Toaster } from 'sonner'
 
 import {App} from './App';
 
@@ -8,5 +9,6 @@ const root = createRoot(container);
 root.render(
     <StrictMode>
         <App />
+        <Toaster/>
     </StrictMode>
 );
