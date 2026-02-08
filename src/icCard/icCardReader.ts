@@ -1,11 +1,8 @@
 import { ipcMain } from 'electron';
 import { BrowserWindow } from 'electron';
 import { NFC, Reader } from "nfc-pcsc";
-import { Logger } from "../log/logger";
+import { Logger } from "@/log/logger";
 import { CardReaderID, type TCardReaderChannel } from './cardEventID';
-import { convertSjisToUtf8 } from '../utils/converterUtils';
-import iconv from 'iconv-lite';
-import Encoding from  'encoding-japanese'
 
 interface ICCard {
   uid: string; // とりあえず uid を使えるようにする
@@ -26,7 +23,6 @@ const getMainBrowser = ():BrowserWindow => {
 }
 
 export class CardReader {
-//    private enableRead:boolean = false;
     private enableRead:boolean = true;
     private _ready:boolean = false;
     private _logger:Logger;

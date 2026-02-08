@@ -8,10 +8,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 
-import { RenderService } from "../../service/render";
+import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '../../db/cards/cards';
-import { CardRow } from '../../db/cards/cardRow';
+import * as Cards from '@/db/cards/cards';
+import { CardRow } from '@/db/cards/cardRow';
 
 const Display = {
     block: 'block',

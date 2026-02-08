@@ -14,17 +14,17 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, is } from './util';
-import { ipcMainSqliteBridge } from '../db/ipcMain';
+import { ipcMainSqliteBridge } from '@/db/ipcMain';
 
-import { ipc_is_production } from './ipc';
+import { ipc_is_production, ipc_assets_path } from './ipc';
 
-import { Logger } from "../log/logger";
+import { Logger } from "@/log/logger";
 const logger = new Logger();
 
-import { db } from '../db/db';
-import { createTables } from '../db/createTables';
+import { db } from "@/db/db";
+import { createTables } from '@/db/createTables';
 
-import { CardReader } from '../card/icCardReader';
+import { CardReader } from '@/icCard/icCardReader';
 
 const reader = new CardReader(logger)
 reader.ready();
@@ -73,12 +73,17 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  const assetsPath = getAssetPath();
+  logger.info('Asset path=', getAssetPath());
+  ipc_assets_path(assetsPath);
+
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      webSecurity: (isDebug)? false:true, // デバッグ時には ローカルリソースロード可能とする
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),

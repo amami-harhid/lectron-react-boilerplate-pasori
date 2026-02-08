@@ -6,11 +6,11 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 
-import { RenderService } from "../../service/render";
+import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '../../db/cards/cards';
-import * as Histories from '../../db/histories/histories';
-import { CardRow } from '../../db/cards/cardRow';
+import * as Cards from '@/db/cards/cards';
+import * as Histories from '@/db/histories/histories';
+import { CardRow } from '@/db/cards/cardRow';
 
 type TABLE_ROW = {
     no:number,
@@ -31,7 +31,7 @@ type PAGEINFO = {
     confirmGuide: string,
     isConfirmOpen: boolean,
     tempData: TABLE_ROW,
-    counter: number,
+    tableChange: boolean,
 }
 const initPageInfo: PAGEINFO = {
     tableData: [],
@@ -40,7 +40,7 @@ const initPageInfo: PAGEINFO = {
     confirmGuide: '',
     isConfirmOpen: false,
     tempData: {no: 0, fcno:'', name:'', kana:''},
-    counter: 0,
+    tableChange: false,
 };
 
 /**
@@ -54,7 +54,7 @@ export function MemberTrashedListPage () {
         setPageInfo(_clone);
     }
     const redrawPageInfo = ( info: PAGEINFO ) => {
-        info.counter += 1;
+        info.tableChange = !(info.tableChange);
         updatePageInfo(info);
     }
 
@@ -151,10 +151,12 @@ export function MemberTrashedListPage () {
         updatePageInfo(pageInfo);
     }
 
+    /** テーブルリロード */
     const reload = () => {
         membersToTableData();
     }
 
+    /** 確認画面でYES */
     const confirmYes = async () => {
         pageInfo.isConfirmOpen = false;
         const data = pageInfo.tempData;
@@ -175,20 +177,21 @@ export function MemberTrashedListPage () {
             return;
         }
     }
+    /** 確認画面でNO */
     const confirmNo = () => {
         pageInfo.isConfirmOpen = false;
         updatePageInfo(pageInfo);
     }
 
-    // カードが離れたときの処理
+    /** カードが離れたときの処理 */ 
     PasoriCard.onRelease(async()=>{});
-    // カードタッチしたときの処理
+    /** カードタッチしたときの処理 */
     PasoriCard.onTouch(async ()=>{});
 
+    // テーブル内容変化する都度、リロード
     useEffect(() => {
-        console.log('----useEffect----')
         reload();
-    },[pageInfo.counter]);
+    },[pageInfo.tableChange]);
 
     return (
         <>

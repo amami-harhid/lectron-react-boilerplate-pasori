@@ -3,9 +3,13 @@ IC-Card entry and exit system ( electron-react-boilerplate )
 
 # requirements for npm install
 
-Node 20.11.1
+Node (20.11.1)
 
 Visual Studio 2019 Build Tools
+
+# Electron
+
+Electron (35.0.2)
 
 # start
 
@@ -15,29 +19,36 @@ npm start
 
 # package
 
-## Error(1)
+```
+npm run package
+```
+
+## packageする前の対応
+
+### .erb/scripts/clean.js
+
+#### Error-1
 ```
 .erb\scripts\clean.js:14
 foldersToRemove.forEach((folder) => {
                 ^
 TypeError: rimrafSync is not a function
 ```
-## action
+#### 対応
 ```:.erb/scripts/clean.js
 //import { rimrafSync } from 'rimraf';
 import * as rimraf from 'rimraf';
 const rimrafSync = rimraf.sync;
 ```
-## Error(2)
+#### Error-2
 
 ```
 ⨯ Unable to `require`  moduleName=～.erb\scripts\notarize.js message=require() of ES Module 
 ```
 
-## action
+#### 対応
 
 ```:.erb\scripts\notarize.js
 //const { notarize } = require('@electron/notarize');
 const { notarize } = import('@electron/notarize'); // 動的にしないとエラーになる
 ```
-

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
-import { RenderService } from "../../service/render";
+import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '../../db/cards/cards';
-import { CardRow } from "../../db/cards/cardRow";
+import * as Cards from '@/db/cards/cards';
+import { CardRow } from "@/db/cards/cardRow";
 
 type CardOption = {
   value: string,

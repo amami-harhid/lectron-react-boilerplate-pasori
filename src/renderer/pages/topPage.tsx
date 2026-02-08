@@ -1,12 +1,12 @@
 import { useRef, useEffect, useState } from "react";
 
-import { RenderService } from "../../service/render";
+import { RenderService } from "@/service/render";
 import * as PasoriCard from "./pasoriCard/pasoriCard";
-import * as Cards from '../../db/cards/cards';
-import * as Histories from '../../db/histories/histories';
-import { CardRow } from '../../db/cards/cardRow';
+import * as Cards from '@/db/cards/cards';
+import * as Histories from '@/db/histories/histories';
+import { CardRow } from '@/db/cards/cardRow';
 
-import * as Sounds from "../lib/sounds";
+import * as Sounds from "@/renderer/lib/sounds";
 
 type View = {
   pageTitle: string,
@@ -65,15 +65,16 @@ export function TopPage() {
         await RenderService.exe<number>(Histories.setOutRoomByFcnoIdm.name, fcno, idm);
     }
 
+    /** カードリリース */
     const cardRelease = () => {
-        console.log('カードリリース')
+        //console.log('カードリリース')
         view.status = '';
         view.modal_display = Display.none;
         setPageView(view);
     }
+    /** カードタッチ */
     const cardTouch = async (idm :string) => {
-        console.log('カードタッチ')
-        console.log('TOP PAGE idm=', idm);
+        //console.log('カードタッチ idm=', idm);
         if(idm.length==0){
             // 安全のために空チェック
             return;
@@ -85,28 +86,17 @@ export function TopPage() {
             if( row.in_room == true ) {
                 // 入室中
                 Sounds.play({name:"CARD_OUT"})
-                //Sounds.soundByePlay();
-                //audioByby.current?.play();
                 await setOutRoom( fcno, idm);
                 view.status = '退室しました';
                 view.name = `(${row.name}さん)`
             }else{
                 // 退室中
-                //Sounds.play({name:"CARD_IN"})
-                //Sounds.soundInPlay();
-                //if(soundNg){
-                //    const _soundNg = soundNg as HTMLAudioElement;
-                //    _soundNg.play();
-                //}
-                //audioIn.current?.play();
                 Sounds.play({name:"CARD_IN"})
                 await setInRoom( fcno, idm);
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`
             }
         }else{
-            //Sounds.soundNGPlay();
-            //audioNg.current?.play();
             Sounds.play({name:"CARD_NG"})
             view.status = `未登録カード(${idm})`;
             view.name = ``
@@ -116,6 +106,7 @@ export function TopPage() {
 
     }
 
+    /** カードリーダー準備完了確認 */
     const isReaderReady = async () => {
         view.is_ready  = true;
         const isReady = await window.pasoriCard.isCardReady();
@@ -124,6 +115,7 @@ export function TopPage() {
           view.error_display = Display.none;
           view.errorMessage01 = ``;
           view.errorMessage02 = ``;
+          // カードリーダー接続していたらリッスン開始
           cardTouchListenerStart();
         }else{
           view.modal_display = Display.block;

@@ -36,8 +36,7 @@ export const HomePage = () =>  {
 
     useEffect(()=>{
         isReaderReady();
-        console.log('home useEffect')
-        // 音を取り込む。
+        // 音を事前に取り込む
         Sounds.preload();
     },[])
     

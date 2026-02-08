@@ -1,7 +1,7 @@
 {
   "name": "electron-react-boilerplate-pasori",
   "description": "Simple IC-Card application",
-  "version": "0.1.5",
+  "version": "0.2.1",
   "keywords": [
     "electron",
     "boilerplate",
@@ -229,7 +229,7 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "assets/**"
     ],
     "publish": {
       "provider": "github",

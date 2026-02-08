@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import * as DateUtils from '../../utils/dateUtils';
-import { RenderService } from "../../service/render";
+import * as DateUtils from '@/utils/dateUtils';
+import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Histories from '../../db/histories/histories';
-import { HistoriesCardRow } from '../../db/histories/historiesRow';
+import * as Histories from '@/db/histories/histories';
+import { HistoriesCardRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
     id:number,
     fcno:string,

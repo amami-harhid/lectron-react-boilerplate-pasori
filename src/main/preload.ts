@@ -1,9 +1,7 @@
-// Disable no-unused-vars, broken for spread args
-/* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { CardRow } from '../db/cards/cardRow';
-import * as IpcServices from '../channel/ipcService';
-import {CardReaderID, type TCardReaderChannel} from '../card/cardEventID';
+//import { CardRow } from '../db/cards/cardRow';
+import * as IpcServices from '@/channel/ipcService';
+import {CardReaderID, type TCardReaderChannel} from '@/icCard/cardEventID';
 export type Channels = IpcServices.IpcChannelValOfService;
 const electronHandler = {
   ipcRenderer: {
@@ -82,8 +80,8 @@ contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 
-const production = {
-    production : (): Promise<boolean> => {
+const buildEnv = {
+    isProduction : (): Promise<boolean> => {
         const Channel = "IS_PRODUCTION";
         ipcRenderer.send( Channel );
         return new Promise<boolean>((resolve)=>{
@@ -91,10 +89,19 @@ const production = {
                 resolve(isProduction);
             })
         });
+    },
+    getAssetsPath: (): Promise<string> => {
+        const Channel = "ASSETS_PATH";
+        ipcRenderer.send( Channel );
+        return new Promise<string>((resolve)=>{
+            ipcRenderer.once( Channel, (_event, assetsPath:string) => {
+                resolve(assetsPath);
+            })
+        });
     }
 }
 
-contextBridge.exposeInMainWorld('is', production);
+contextBridge.exposeInMainWorld('buildEnv', buildEnv);
 
 /*
 export type DbChannels = 'cards' | 'histories';
@@ -116,5 +123,5 @@ contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
-export type ElectronProduct = typeof production;
+export type ElectronProduct = typeof buildEnv;
 //export type ElectronPasoriDb = typeof electronPasoriDb;

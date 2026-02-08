@@ -7,17 +7,21 @@ import os from 'os';
 export const electronVersion = process.versions.electron;
 
 // Via electron-util: https://github.com/sindresorhus/electron-util/blob/main/source/is.js
+/**  */
 export const is = {
+  /** デバッグ指定 */
 	debug:
 		process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',
+  /** 製品ビルド */
 	prod: process.env.NODE_ENV === 'production',
-	macos: process.platform === 'darwin',
-	linux: process.platform === 'linux',
+	//macos: process.platform === 'darwin',
+	//linux: process.platform === 'linux',
 	windows: process.platform === 'win32',
 	main: process.type === 'browser',
 	renderer: process.type === 'renderer',
+  /** 開発ビルド */
 	development: process.env.NODE_ENV === 'development',
-	macAppStore: process.mas === true,
+	//macAppStore: process.mas === true,
 	windowsStore: process.windowsStore === true,
 };
 

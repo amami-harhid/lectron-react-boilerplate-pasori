@@ -3,8 +3,7 @@ import {
   ElectronNavigate,
   ElectronPasoriCard,
   ElectronProduct
-//  ElectronPasoriDb
- } from '../main/preload';
+ } from '@/main/preload';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -12,8 +11,7 @@ declare global {
     electron: ElectronHandler;
     navigate: ElectronNavigate;
     pasoriCard: ElectronPasoriCard;
-    is: ElectronProduct;
-//    pasoriDb: ElectronPasoriDb;
+    buildEnv: ElectronProduct;
   }
 }
 
