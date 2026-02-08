@@ -40,7 +40,10 @@ TypeError: rimrafSync is not a function
 import * as rimraf from 'rimraf';
 const rimrafSync = rimraf.sync;
 ```
-#### Error-2
+
+### .erb\scripts\notarize.js
+
+#### Error
 
 ```
 ⨯ Unable to `require`  moduleName=～.erb\scripts\notarize.js message=require() of ES Module 
@@ -52,3 +55,25 @@ const rimrafSync = rimraf.sync;
 //const { notarize } = require('@electron/notarize');
 const { notarize } = import('@electron/notarize'); // 動的にしないとエラーになる
 ```
+
+## .erb\config\webpack.config.renderer.dev.ts
+
+#### 対応
+
+開発時に 静的にassetsの中を参照できない問題があるので、publicPathを変える。
+
+```:.erb\config\webpack.config.renderer.dev.ts
+devServer: {
+    static: {
+      publicPath: '/',
+    },
+```
+↓
+```:.erb\config\webpack.config.renderer.dev.ts
+devServer: {
+    static: {
+      directory: path.join(__dirname, '../../assets'),
+      publicPath: '/static',
+    },
+```
+開発時、`./static/～`とすると、./assetsのなかにアクセスできる

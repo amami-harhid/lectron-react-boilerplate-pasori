@@ -1,4 +1,5 @@
 import logger from 'electron-log';
+//import { is } from '@/main/util';
 
 export interface ILogger {
     info: CallableFunction;
@@ -8,11 +9,14 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
+
+    static _debug_mode:boolean = false;
+
     info(...args: any[]) {
         logger.info(args);
     }
     debug(...args: any[]) {
-        if(process.env.DEBUG_PROD === 'true'){
+        if( Logger._debug_mode ){
             logger.debug(args);
         }
     }

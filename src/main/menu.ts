@@ -7,8 +7,8 @@ import {
 } from 'electron';
 
 import { appVersion } from '../version';
-
-import { routePath } from '../renderer/routePath';
+import { routePath } from '@/renderer/routePath';
+import { envIs } from './util';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -34,10 +34,7 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
+    if ( envIs.debug ) {
       this.setupDevelopmentEnvironment();
     }
 
@@ -199,8 +196,7 @@ export default class MenuBuilder {
     };
 
     const subMenuView =
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
+      envIs.debug
         ? subMenuViewDev
         : subMenuViewProd;
 
@@ -304,7 +300,7 @@ export default class MenuBuilder {
         ]
       },
     ];
-    if(process.env.DEBUG_PROD === 'true'){
+    if( envIs.debug ){
       templateDefault.push(
       {
         label: 'DEBUG',

@@ -5,13 +5,13 @@ import sqlite from 'sqlite3';
 const sqlite3 = sqlite.verbose();
 import webpackPaths from '../../.erb/configs/webpack.paths';
 
-const logger = new Logger();
-const databaseName = "pasori2.sqlite3";
+import { envIs } from '@/main/util'
 
-console.log('process.env.NODE_ENV=', process.env.NODE_ENV);
-logger.info('process.env.NODE_ENV=', process.env.NODE_ENV);
+const logger = new Logger();
+const databaseName = "pasori.sqlite3";
+
 const sqlPath = ():string => {
-    if(process.env.NODE_ENV === 'development'){
+    if( envIs.development){
         const sqlPath = path.join(webpackPaths.appPath,'sql',databaseName);
         return sqlPath;
     }
@@ -19,9 +19,6 @@ const sqlPath = ():string => {
     const sqlPath = path.join(db_path, databaseName);
     return sqlPath;
 }
-
-console.log(sqlPath());
-logger.info('sqlPath()=', sqlPath());
 
 export const db = new sqlite3.Database(sqlPath(), (err:Error|null):void =>{
     if(err){

@@ -13,12 +13,13 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, is } from './util';
+import { resolveHtmlPath, envIs } from './util';
 import { ipcMainSqliteBridge } from '@/db/ipcMain';
 
 import { ipc_is_production, ipc_assets_path } from './ipc';
 
 import { Logger } from "@/log/logger";
+Logger._debug_mode = envIs.debug; // デバッグモード(true)のときだけ logger.debug() を処理する
 const logger = new Logger();
 
 import { db } from "@/db/db";
@@ -34,13 +35,13 @@ let mainWindow: BrowserWindow | null = null;
 // MAIN<-->RENDERERのDB通信
 ipcMainSqliteBridge();
 
-if (process.env.NODE_ENV === 'production') {
+const isDebug = envIs.debug;
+const isProd = envIs.prod;
+if ( isProd ) {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
 
-const isDebug = is.debug;
-const isProd = is.prod;
 if (isDebug) {
   require('electron-debug').default();
 }
@@ -83,7 +84,7 @@ const createWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      webSecurity: (isDebug)? false:true, // デバッグ時には ローカルリソースロード可能とする
+      webSecurity: true, // ローカルリソースロード不可
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),

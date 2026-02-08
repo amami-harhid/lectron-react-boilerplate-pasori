@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-//import { CardRow } from '../db/cards/cardRow';
 import * as IpcServices from '@/channel/ipcService';
 import {CardReaderID, type TCardReaderChannel} from '@/icCard/cardEventID';
 export type Channels = IpcServices.IpcChannelValOfService;

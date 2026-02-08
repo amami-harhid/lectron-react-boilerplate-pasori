@@ -175,7 +175,8 @@ const configuration: webpack.Configuration = {
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
-      publicPath: '/',
+      directory: path.join(__dirname, '../../assets'),
+      publicPath: '/static',
     },
     historyApiFallback: {
       verbose: true,

@@ -1,7 +1,4 @@
-import {
-        PROTOCOL_DEV, PROTOCOL_PROD,
-        BASEPATH_DEV, BASEPATH_PROD,
-        VOLUME } from "@/conf/soundConf";
+import { BASEPATH_DEV } from "./soundConf";
 import { soundRecords } from './soundsRecord';
 
 /** Audioのキャッシュ */
@@ -19,8 +16,8 @@ export const preload = async () => {
         if (!audioCache[name]) {
             const sound = soundRecords[name];
             // 製品ビルドのときは絶対パスにする
-            //const url = (isProduction)?`${assetsPath}/${sound.url}`:`${PROTOCOL_DEV}://${BASEPATH_DEV}${sound.url}`;
-            const url = `${assetsPath}/${sound.url}`;
+            const url = (isProduction)?`${assetsPath}/${sound.url}`:`${BASEPATH_DEV}/${sound.url}`;
+            //const url = `${assetsPath}/${sound.url}`;
             audioCache[name] = new window.Audio();
 		    audioCache[name].crossOrigin = '*';
 			audioCache[name].volume = sound.volume;
@@ -32,7 +29,7 @@ export const preload = async () => {
 /** 音を鳴らす */
 export const play = async({ name }: { name: string }) => {
     const sound = name.toUpperCase();
-	console.info(`Playing sound: ${name}`);
+	//console.info(`Playing sound: ${name}`);
 
 	let audio: HTMLAudioElement | undefined = audioCache[sound];
 	if (!audio) {

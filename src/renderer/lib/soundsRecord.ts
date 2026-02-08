@@ -1,4 +1,4 @@
-import { VOLUME } from "@/conf/soundConf";
+import { VOLUME } from "./soundConf";
 
 export const soundRecords: Record<string, { url: string; volume: number }> = {
     // url は assetsの中とする

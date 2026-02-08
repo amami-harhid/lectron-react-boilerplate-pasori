@@ -1,6 +1,6 @@
 import * as DotEnv from 'dotenv';
 DotEnv.config();
-
+import { envIs } from '@/main/util';
 import Sqlite from 'sqlite3';
 import * as Cards from '../db/cards/cards';
 import * as Histories from '../db/histories/histories';
@@ -39,9 +39,7 @@ const cardsDatas:CardRow[] = [
 
 export const createTables = async(db:Sqlite.Database) => {
 
-    console.log('process.env.DEBUG_PROD=',process.env.DEBUG_PROD);
-
-    if(process.env.DEBUG_PROD == 'true'){
+    if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
         await Cards.dropTable.exec(db);
         await Histories.dropTable.exec(db);
@@ -49,7 +47,7 @@ export const createTables = async(db:Sqlite.Database) => {
     await Cards.createTable(db);
     await Histories.createTable(db);
 
-    if(process.env.DEBUG_PROD == 'true'){
+    if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
         for(const data of cardsDatas) {
             await Cards.insert.exec(db,data);
