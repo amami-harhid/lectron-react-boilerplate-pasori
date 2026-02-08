@@ -406,7 +406,7 @@ export function MemberListPage () {
                     bottom: 'auto',
                     transform: 'translate(-50%, -50%)',
                     padding: '2rem',
-                    zIndex: 100,
+                    zIndex: 1,
                 },
                 overlay: {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -496,22 +496,24 @@ export function MemberListPage () {
             style={{
                 content: {
                     width: "20%",
-                    height: "25%",
+                    height: "20%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',
                     bottom: 'auto',
                     transform: 'translate(-50%, -50%)',
                     padding: '2rem',
-                    zIndex: 102,
+                    zIndex: 1,
+                    border: '3px double #0090a0',
                 },
                 overlay: {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    zIndex: 2,
+                    zIndex: 1,
                 }
             }}
             >
             <h2 style={{margin:0}}>確認</h2>
+            <p></p>
             <div className="modal-button-container" style={{margin:5}}>
                 <button className="modal-btn" onClick={confirmNo} 
                         >いいえ</button>

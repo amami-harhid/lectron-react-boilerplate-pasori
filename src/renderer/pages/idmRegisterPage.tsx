@@ -17,6 +17,8 @@ interface IViewData  {
     card_name: string,
     card_kana: string,
     card_message: string,
+    detailOn: string,
+    idmOn: string,
     selectOn: string,
     registOn: string,
     deleteOn: string,
@@ -41,6 +43,8 @@ const viewData: IViewData = {
     card_name: '',
     card_kana: '',
     card_message: '',
+    detailOn: '',
+    idmOn: '',
     selectOn: Display.block,
     registOn: Display.none,
     deleteOn: Display.none,
@@ -127,6 +131,7 @@ export function IdmRegisterPage() {
     const selectCardChange = async (newValue: SingleValue<CardOption>, actionMeta: ActionMeta<CardOption>) => {
         if(view && newValue) {
             const fcno:string = newValue.value;
+            view.idmOn = Display.block;
             view.selectOn = Display.none;
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
@@ -141,16 +146,20 @@ export function IdmRegisterPage() {
                     const card_idm = row.idm;
                     if( card_idm == '') {
                         // カードに紐づいていないとき
+                        view.detailOn = Display.block;
                         view.registOn = Display.inline_block;
                         view.deleteOn = Display.none;
                     }else{
+                        view.detailOn = Display.block;
                         view.deleteOn = Display.inline_block;
                         view.card_message = `IDM=${card_idm}は紐づいている`;
                     }
                     view.guidance = 'ICカードをタッチしてください';
                     setPageView( view );
                 }else{
+                    view.idmOn = Display.block;
                     view.selectOn = Display.none;
+                    view.detailOn = Display.none;
                     view.card_fcno = '';
                     view.card_name = '';
                     view.card_kana = '';
@@ -176,8 +185,10 @@ export function IdmRegisterPage() {
             view.card_kana = (idmRow.kana)?idmRow.kana:'';
             view.cardsOptions = [];
             view.deleteOn = Display.block; // 削除ボタン表示
+            view.idmOn = Display.block;
             view.selectOn = Display.none;
             view.card_message =  ``;
+            view.detailOn = Display.block;
             setPageView(view);
         }else{
             // タッチしたIDMが未登録のとき
@@ -192,6 +203,7 @@ export function IdmRegisterPage() {
                 options.push(option);
             }
             view.idm = ipc_idm;
+            view.detailOn = Display.none;
             view.card_fcno = '';
             view.card_name = '';
             view.card_kana = '';
@@ -220,12 +232,15 @@ export function IdmRegisterPage() {
     /** カードが触った */
     const cardOnTouch = async(ipc_idm:string)=>{
         view.idm = ipc_idm;
+        view.idmOn = Display.block;
         await redrawSelect(ipc_idm);
     };
 
     /** カードが離れた */
     const cardOnRelease = async(ipc_idm:string) => {
+        view.idmOn = Display.none;
         view.selectOn = Display.none;
+        view.detailOn = Display.none;
         view.idm = '';
         view.card_fcno = '';
         view.card_name = '';
@@ -252,8 +267,8 @@ export function IdmRegisterPage() {
             <div className="modal-content">
                 <h2>管理者の操作</h2>
                 <h4>{view.guidance}</h4>
-                <div className="card_manager">
-                    <p>IDM&nbsp;(<span>{view.idm}</span>)</p>
+                <div className="card_manager" >
+                    <p style={{display:view.idmOn}}>IDM&nbsp;(<span>{view.idm}</span>)</p>
                     <div style={{display:view.selectOn}}>
                         <Select
                         options={view.cardsOptions}
@@ -263,7 +278,7 @@ export function IdmRegisterPage() {
                         placeholder="選択してください"
                         />
                     </div>
-                    <div >
+                    <div style={{display: view.detailOn}}>
                         <p>FC-NO&nbsp;(<span>{view.card_fcno}</span>)</p>
                         <p>名前&nbsp;(<span>{view.card_name}</span>)</p>
                         <p>カナ&nbsp;(<span>{view.card_kana}</span>)</p>
