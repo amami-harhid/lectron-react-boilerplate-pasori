@@ -39,6 +39,9 @@ const configuration: webpack.Configuration = {
     minimizer: [
       new TerserPlugin({
         parallel: true,
+        terserOptions: {
+          keep_fnames: true // preserve function name
+        }
       }),
     ],
   },
