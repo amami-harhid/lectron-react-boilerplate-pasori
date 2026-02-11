@@ -1,4 +1,4 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from './ipcChannel';
+import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
 import { Cards } from '@/db/cards/cards';
 import { Histories } from '@/db/histories/histories';
 import { CardRow } from '@/db/cards/cardRow';

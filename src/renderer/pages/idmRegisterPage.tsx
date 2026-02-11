@@ -1,9 +1,8 @@
 import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
-import { RenderService } from "@/service/render";
+import { idmRegisterService } from "@/service/ipcRenderer/idmRegisterPageService";
 import { toast } from 'sonner';
-import * as PasoriCard from './pasoriCard/pasoriCard';
-import { Cards } from '@/db/cards/cards';
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from "@/db/cards/cardRow";
 
 type CardOption = {
@@ -90,8 +89,9 @@ export function IdmRegisterPage() {
         const fcno = view.card_fcno;
         const idm = view.idm;
         if( view.now_regist === true) {
-            // fcno を指定して cardを読み込む
-            await RenderService.exe<number>(Cards.linkIdmByFcno.name, fcno, idm);
+            // fcno を指定して idmを登録する
+            await idmRegisterService.registIdmToMemberByFcno(fcno, idm);
+            //await RenderService.exe<number>(Cards.linkIdmByFcno.name, fcno, idm);
             toast.success("IMD登録しました");
 
             view.card_message = 'IDMを登録しました';
@@ -99,7 +99,8 @@ export function IdmRegisterPage() {
             await redrawSelect(idm);
 
         }else if( view.now_delete === true) {
-            await RenderService.exe<number>(Cards.releaseIdmByFcno.name, fcno);
+            await idmRegisterService.releaseIdmToMemberByFcno(fcno);
+            //await RenderService.exe<number>(Cards.releaseIdmByFcno.name, fcno);
             toast.warning("IMD登録削除しました");
             view.card_message = 'IDM登録を削除しました';
             // 選択を書き換える
@@ -135,7 +136,8 @@ export function IdmRegisterPage() {
             view.selectOn = Display.none;
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
-                const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno);
+                const row: CardRow = await idmRegisterService.getMemberByFcno(fcno);
+                //const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno);
                 if(row){
                     view.selectOn = Display.block;
                     view.idm = view.idm;
@@ -177,7 +179,8 @@ export function IdmRegisterPage() {
 
     /** 選択リストを作る */
     const redrawSelect = async (ipc_idm:string) => {
-        const idmRow: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, ipc_idm);
+        const idmRow: CardRow = await idmRegisterService.getMemberByIdm(ipc_idm);
+        //const idmRow: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, ipc_idm);
         if(idmRow) {
             // タッチしたIDMが登録済のとき
             view.card_fcno = idmRow.fcno;
@@ -193,7 +196,8 @@ export function IdmRegisterPage() {
         }else{
             // タッチしたIDMが未登録のとき
             // idm未登録のCardsを取り出す
-            const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectRowsEmptyIdm.name);
+            const rows: CardRow[] = await idmRegisterService.getMemberIdmIsEmpty();
+            //const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectRowsEmptyIdm.name);
             const options:CardOption[] = [];
             for(const _row of rows) {
                 const option:CardOption = {

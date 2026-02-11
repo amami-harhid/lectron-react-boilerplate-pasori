@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as PasoriCard from './pasoriCard/pasoriCard';
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import * as Sounds from '@/renderer/lib/sounds';
 
 type View = {

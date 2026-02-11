@@ -1,4 +1,4 @@
-import * as PasoriCard from './pasoriCard/pasoriCard';
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 export function StopPage() {
 
     // カードが離れたときの処理

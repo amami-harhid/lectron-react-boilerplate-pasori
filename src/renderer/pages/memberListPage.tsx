@@ -9,9 +9,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 import { toast } from 'sonner';
 
-import { memberListService } from "@/service/memberListService";
-import * as PasoriCard from './pasoriCard/pasoriCard';
-import { Cards } from '@/db/cards/cards';
+import { memberListService } from "@/service/ipcRenderer/memberListService";
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 
 const Display = {

@@ -1,4 +1,4 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from './ipcChannel';
+import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
 import { Histories } from '@/db/histories/histories';
 import { HistoriesRow } from '@/db/histories/historiesRow';
 

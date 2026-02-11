@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { MaterialReactTable } from 'material-react-table';
 import * as DateUtils from '@/utils/dateUtils';
-import { historiesPageService } from "@/service/historiesPageService";
-import * as PasoriCard from './pasoriCard/pasoriCard';
+import { historiesPageService } from "@/service/ipcRenderer/historiesPageService";
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { HistoriesCardRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
     no:number,

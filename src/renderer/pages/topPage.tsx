@@ -1,10 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 
-import { RenderService } from "@/service/render";
-import { topPageService } from "@/service/topPageService";
-import * as PasoriCard from "./pasoriCard/pasoriCard";
-import { Cards } from '@/db/cards/cards';
-import { Histories } from '@/db/histories/histories';
+import { topPageService } from '@/service/ipcRenderer/topPageService';
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 
 import * as Sounds from "@/renderer/lib/sounds";

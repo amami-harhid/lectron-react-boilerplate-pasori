@@ -7,10 +7,8 @@ import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 import { toast } from 'sonner';
  
-import { RenderService } from "@/service/render";
-import * as PasoriCard from './pasoriCard/pasoriCard';
-import { Cards } from '@/db/cards/cards';
-import * as Histories from '@/db/histories/histories';
+import { memberTrashedListService } from "@/service/ipcRenderer/memberTrashedListService";
+import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 
 type TABLE_ROW = {
@@ -127,15 +125,10 @@ export function MemberTrashedListPage () {
         updatePageInfo(pageInfo);
     };
 
-    /** 論理削除中のメンバーを取り出す */
-    const cardsSelectAllSoftDeleted = async (): Promise<CardRow[]> => {
-        const rows: CardRow[] = await RenderService.exe<CardRow[]>(Cards.selectAllSoftDeleted.name)
-        return rows;
-    };
-
     /** 論理削除されたメンバー一覧を作成する */
     const membersToTableData = async ():Promise<void> => {
-        const rows:CardRow[] = await cardsSelectAllSoftDeleted();
+        //const rows:CardRow[] = await cardsSelectAllSoftDeleted();
+        const rows:CardRow[] = await memberTrashedListService.getTrashedMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
@@ -162,15 +155,17 @@ export function MemberTrashedListPage () {
         pageInfo.isConfirmOpen = false;
         const data = pageInfo.tempData;
         if(pageInfo.typeRegist==TypeRegist.Recover){
-            await RenderService.exe<number>(Cards.recoveryByFcno.name, data.fcno)
+            await memberTrashedListService.setRecorverMemberByFcno(data.fcno);
+            //await RenderService.exe<number>(Cards.recoveryByFcno.name, data.fcno)
             toast.success("復元しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
 
         }else if(pageInfo.typeRegist == TypeRegist.Delete){
             // 物理削除する（履歴も削除）
-            await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno);
-            await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno);
+            await memberTrashedListService.deleteCompletelyByFcno(data.fcno);
+            //await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno);
+            //await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno);
             toast.success("抹消しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
