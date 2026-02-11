@@ -68,7 +68,8 @@ export function HistoriesListPage() {
 
     /** 指定日付の履歴を取り出す */
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
-        const rows:HistoriesCardRow[] = await RenderService.exe<HistoriesCardRow[]>(Histories.selectByDate.name, date)
+        const rows:HistoriesCardRow[] = 
+            await RenderService.exe<HistoriesCardRow[]>(Histories.selectByDate.name, date)
         return rows;
     };
 
