@@ -198,7 +198,6 @@ export function MemberListPage () {
         console.log('formSubmitRegist')
         const fcno = data.fcno;
         const row = await memberListService.getMemberByFcno(fcno);
-        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row == undefined) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -218,7 +217,6 @@ export function MemberListPage () {
         console.log('formSubmitReplace')
         // DBレコード上書きをする
         const fcno = data.fcno;
-        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         const row = await memberListService.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
@@ -235,7 +233,6 @@ export function MemberListPage () {
     const formSubmitDelete = async (data:FormValues) => {
         console.log('formSubmitDelete')
         const fcno = data.fcno;
-        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         const row = await memberListService.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
@@ -246,7 +243,6 @@ export function MemberListPage () {
     }
 
     const membersToTableData = async ():Promise<void> => {
-        //const rows:CardRow[] = await cardsSelectAll();
         const rows = await memberListService.getMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
@@ -309,7 +305,6 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        //await RenderService.exe<number>(Cards.insert.name, newRow)
         await memberListService.addMember(newRow);
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
@@ -324,13 +319,11 @@ export function MemberListPage () {
             idm : '',
         };
         await memberListService.updateMemberByFcno(data.fcno, newRow);
-        //await RenderService.exe<number>(Cards.updatePersonalDataByFcno.name, data.fcno, newRow)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
     // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
-        //await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
         await memberListService.deleteMemberByFcno(data.fcno);
         
     }

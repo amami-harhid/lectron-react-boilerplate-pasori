@@ -127,7 +127,6 @@ export function MemberTrashedListPage () {
 
     /** 論理削除されたメンバー一覧を作成する */
     const membersToTableData = async ():Promise<void> => {
-        //const rows:CardRow[] = await cardsSelectAllSoftDeleted();
         const rows:CardRow[] = await memberTrashedListService.getTrashedMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
@@ -156,7 +155,6 @@ export function MemberTrashedListPage () {
         const data = pageInfo.tempData;
         if(pageInfo.typeRegist==TypeRegist.Recover){
             await memberTrashedListService.setRecorverMemberByFcno(data.fcno);
-            //await RenderService.exe<number>(Cards.recoveryByFcno.name, data.fcno)
             toast.success("復元しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);
@@ -164,8 +162,6 @@ export function MemberTrashedListPage () {
         }else if(pageInfo.typeRegist == TypeRegist.Delete){
             // 物理削除する（履歴も削除）
             await memberTrashedListService.deleteCompletelyByFcno(data.fcno);
-            //await RenderService.exe<number>(Cards.deletePhisycalByFcno.name, data.fcno);
-            //await RenderService.exe<number>(Histories.deleteHistoriesByFcno.name, data.fcno);
             toast.success("抹消しました");
             pageInfo.isConfirmOpen = false;
             redrawPageInfo(pageInfo);

@@ -46,26 +46,15 @@ export function TopPage() {
         setView(_clone);
     }
     const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
-        //const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, idm);
         const row: CardRow = await topPageService.getMemberByIdm(idm);
         return row;
     };
     const setInRoom = async(fcno:string, idm: string) : Promise<void> => {
         // Cards/履歴を更新
         await topPageService.setInRoomByFcno(fcno, idm, true);
-        //await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
-        console.log('setInRoom Cards.updateInRoomByFcno done');
-        // 履歴を更新
-        //const n = await RenderService.exe<number>(Histories.setInRoomByFcnoIdm.name, fcno, idm);
-        //console.log('setInRoom Histories.setInRoomByFcnoIdm done n=',n);
     }
     const setOutRoom = async(fcno:string, idm: string) : Promise<void> => {
         await topPageService.setInRoomByFcno(fcno, idm, false);
-        //await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
-        console.log('setOutRoom Cards.updateInRoomByFcno done');
-        // 履歴を更新
-        //const n = await RenderService.exe<number>(Histories.setOutRoomByFcnoIdm.name, fcno, idm);
-        //console.log('setOutRoom Histories.setInRoomByFcnoIdm done n=', n);
     }
 
     /** カードリリース */
