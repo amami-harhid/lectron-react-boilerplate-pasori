@@ -1,9 +1,16 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import { CHANNEL_REPLY, CHANNEL_REQUEST } from './ipcChannel';
 import { Cards } from '@/db/cards/cards';
 import { Histories } from '@/db/histories/histories';
 import { CardRow } from '@/db/cards/cardRow';
+import { HistoriesRow } from '@/db/histories/historiesRow';
 
-export const service = {
+export const historiesPageService = {
+    /** 日付を指定して全履歴を取得する */
+    getHistoriesByDate: async function(date:Date): Promise<HistoriesRow[]> {
+        window.electron.ipcRenderer.sendMessage(CHANNEL_REQUEST, Histories.selectByDate.name, date);    
+        const val = await window.electron.ipcRenderer.asyncOnce<HistoriesRow[]>(CHANNEL_REPLY);
+        return val;
+    },
     /** IDMが紐づいたメンバーを取得する */
     getMemberByIdm: async function(idm:string): Promise<CardRow> {
         window.electron.ipcRenderer.sendMessage(CHANNEL_REQUEST, Cards.selectRowByIdm.name, idm);    

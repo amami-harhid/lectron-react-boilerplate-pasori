@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 import { toast } from 'sonner';
 
-import * as MemberListService from "@/service/memberList/service";
+import { memberListService } from "@/service/memberListService";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import { Cards } from '@/db/cards/cards';
 import { CardRow } from '@/db/cards/cardRow';
@@ -198,7 +198,7 @@ export function MemberListPage () {
         // DBレコードを追加する
         console.log('formSubmitRegist')
         const fcno = data.fcno;
-        const row = await MemberListService.service.getMemberByFcno(fcno);
+        const row = await memberListService.getMemberByFcno(fcno);
         //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row == undefined) {
             pageInfo.tempData.fcno = fcno;
@@ -220,7 +220,7 @@ export function MemberListPage () {
         // DBレコード上書きをする
         const fcno = data.fcno;
         //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
-        const row = await MemberListService.service.getMemberByFcno(fcno);
+        const row = await memberListService.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -237,7 +237,7 @@ export function MemberListPage () {
         console.log('formSubmitDelete')
         const fcno = data.fcno;
         //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
-        const row = await MemberListService.service.getMemberByFcno(fcno);
+        const row = await memberListService.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.isConfirmOpen = true;
@@ -248,7 +248,7 @@ export function MemberListPage () {
 
     const membersToTableData = async ():Promise<void> => {
         //const rows:CardRow[] = await cardsSelectAll();
-        const rows = await MemberListService.service.getMembers();
+        const rows = await memberListService.getMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
@@ -311,7 +311,7 @@ export function MemberListPage () {
             idm : '',
         };
         //await RenderService.exe<number>(Cards.insert.name, newRow)
-        await MemberListService.service.addMember(newRow);
+        await memberListService.addMember(newRow);
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
@@ -324,7 +324,7 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        await MemberListService.service.updateMemberByFcno(data.fcno, newRow);
+        await memberListService.updateMemberByFcno(data.fcno, newRow);
         //await RenderService.exe<number>(Cards.updatePersonalDataByFcno.name, data.fcno, newRow)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
@@ -332,7 +332,7 @@ export function MemberListPage () {
     // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
         //await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
-        await MemberListService.service.deleteMemberByFcno(data.fcno);
+        await memberListService.deleteMemberByFcno(data.fcno);
         
     }
 

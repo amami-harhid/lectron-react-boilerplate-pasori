@@ -1,9 +1,8 @@
-import { useRef, useState } from "react";
-import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
+import { useState } from "react";
+import { MaterialReactTable } from 'material-react-table';
 import * as DateUtils from '@/utils/dateUtils';
-import { RenderService } from "@/service/render";
+import { historiesPageService } from "@/service/historiesPageService";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import { Histories } from '@/db/histories/histories';
 import { HistoriesCardRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
     no:number,
@@ -66,16 +65,9 @@ export function HistoriesListPage() {
         }
     ];
 
-    /** 指定日付の履歴を取り出す */
-    const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {
-        const rows:HistoriesCardRow[] = 
-            await RenderService.exe<HistoriesCardRow[]>(Histories.selectByDate.name, date)
-        return rows;
-    };
-
     /** 履歴をテーブル化 */
     const historiesToTableData = async (date:Date):Promise<TABLE_ROW[]> => {
-        const rows:HistoriesCardRow[] = await histSelectByDate(date);
+        const rows:HistoriesCardRow[] = await historiesPageService.getHistoriesByDate(date);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;

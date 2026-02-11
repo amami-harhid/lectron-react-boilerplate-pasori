@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 
 import { RenderService } from "@/service/render";
-import * as TopPageService from "@/service/topPage/service";
+import { topPageService } from "@/service/topPageService";
 import * as PasoriCard from "./pasoriCard/pasoriCard";
 import { Cards } from '@/db/cards/cards';
 import { Histories } from '@/db/histories/histories';
@@ -50,12 +50,12 @@ export function TopPage() {
     }
     const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
         //const row: CardRow = await RenderService.exe<CardRow>(Cards.selectRowByIdm.name, idm);
-        const row: CardRow = await TopPageService.service.getMemberByIdm(idm);
+        const row: CardRow = await topPageService.getMemberByIdm(idm);
         return row;
     };
     const setInRoom = async(fcno:string, idm: string) : Promise<void> => {
         // Cards/履歴を更新
-        await TopPageService.service.setInRoomByFcno(fcno, idm, true);
+        await topPageService.setInRoomByFcno(fcno, idm, true);
         //await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
         console.log('setInRoom Cards.updateInRoomByFcno done');
         // 履歴を更新
@@ -63,7 +63,7 @@ export function TopPage() {
         //console.log('setInRoom Histories.setInRoomByFcnoIdm done n=',n);
     }
     const setOutRoom = async(fcno:string, idm: string) : Promise<void> => {
-        await TopPageService.service.setInRoomByFcno(fcno, idm, false);
+        await topPageService.setInRoomByFcno(fcno, idm, false);
         //await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
         console.log('setOutRoom Cards.updateInRoomByFcno done');
         // 履歴を更新
