@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 import { toast } from 'sonner';
 
-import { RenderService } from "@/service/render";
+import * as MemberListService from "@/service/memberList/service";
 import * as PasoriCard from './pasoriCard/pasoriCard';
 import { Cards } from '@/db/cards/cards';
 import { CardRow } from '@/db/cards/cardRow';
@@ -198,7 +198,8 @@ export function MemberListPage () {
         // DBレコードを追加する
         console.log('formSubmitRegist')
         const fcno = data.fcno;
-        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
+        const row = await MemberListService.service.getMemberByFcno(fcno);
+        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
         if(row == undefined) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -218,7 +219,8 @@ export function MemberListPage () {
         console.log('formSubmitReplace')
         // DBレコード上書きをする
         const fcno = data.fcno;
-        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
+        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
+        const row = await MemberListService.service.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -234,7 +236,8 @@ export function MemberListPage () {
     const formSubmitDelete = async (data:FormValues) => {
         console.log('formSubmitDelete')
         const fcno = data.fcno;
-        const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
+        //const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
+        const row = await MemberListService.service.getMemberByFcno(fcno);
         if(row) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.isConfirmOpen = true;
@@ -242,13 +245,10 @@ export function MemberListPage () {
             updatePageInfo(pageInfo);            
         }
     }
-    const cardsSelectAll = async (): Promise<CardRow[]> => {
-        const rows = await RenderService.exe<CardRow[]>(Cards.selectAll.name)
-        return rows;
-    };
 
     const membersToTableData = async ():Promise<void> => {
-        const rows:CardRow[] = await cardsSelectAll();
+        //const rows:CardRow[] = await cardsSelectAll();
+        const rows = await MemberListService.service.getMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
@@ -310,7 +310,8 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        await RenderService.exe<number>(Cards.insert.name, newRow)
+        //await RenderService.exe<number>(Cards.insert.name, newRow)
+        await MemberListService.service.addMember(newRow);
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
@@ -323,13 +324,15 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        await RenderService.exe<number>(Cards.updatePersonalDataByFcno.name, data.fcno, newRow)
+        await MemberListService.service.updateMemberByFcno(data.fcno, newRow);
+        //await RenderService.exe<number>(Cards.updatePersonalDataByFcno.name, data.fcno, newRow)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }
     // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
-        await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
+        //await RenderService.exe<number>(Cards.deleteByFcno.name, data.fcno);
+        await MemberListService.service.deleteMemberByFcno(data.fcno);
         
     }
 
