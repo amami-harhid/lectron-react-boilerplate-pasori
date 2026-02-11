@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '@/db/cards/cards';
+import { Cards } from '@/db/cards/cards';
 import { CardRow } from '@/db/cards/cardRow';
 
 const Display = {
@@ -88,7 +88,7 @@ export function MemberListPage () {
         info.counter += 1;
         updatePageInfo(info);
     }
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>();
+    const { register, handleSubmit, reset, setError, formState: { errors } } = useForm<FormValues>();
     const content = useRef(null);
     const element = content.current
     if(element){
@@ -210,11 +210,12 @@ export function MemberListPage () {
             //reload();
         }else{
             // fcnoが重複
+            setError('fcno', {type:'manual', message:'重複しています'});
         }
 
     }
     const formSubmitReplace = async (data:FormValues) => {
-        console.log('formSubmitRegist')
+        console.log('formSubmitReplace')
         // DBレコード上書きをする
         const fcno = data.fcno;
         const row = await RenderService.exe<CardRow>(Cards.selectRowByFcno.name, fcno)
@@ -309,7 +310,7 @@ export function MemberListPage () {
             mail: data.mail,
             idm : '',
         };
-        await RenderService.exe<number>(Cards.insert.name)
+        await RenderService.exe<number>(Cards.insert.name, newRow)
         pageInfo.isModalOpen = false;
         pageInfo.tableDisplay = Display.block;
     }

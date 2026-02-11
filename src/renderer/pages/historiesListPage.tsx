@@ -3,7 +3,7 @@ import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-rea
 import * as DateUtils from '@/utils/dateUtils';
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Histories from '@/db/histories/histories';
+import { Histories } from '@/db/histories/histories';
 import { HistoriesCardRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
     no:number,
@@ -65,7 +65,6 @@ export function HistoriesListPage() {
             enableSorting: false,
         }
     ];
-
 
     /** 指定日付の履歴を取り出す */
     const histSelectByDate = async (date:Date): Promise<HistoriesCardRow[]> => {

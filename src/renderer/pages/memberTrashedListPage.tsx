@@ -9,7 +9,7 @@ import { toast } from 'sonner';
  
 import { RenderService } from "@/service/render";
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '@/db/cards/cards';
+import { Cards } from '@/db/cards/cards';
 import * as Histories from '@/db/histories/histories';
 import { CardRow } from '@/db/cards/cardRow';
 

@@ -2,10 +2,10 @@ import * as DotEnv from 'dotenv';
 DotEnv.config();
 import { envIs } from '@/main/util';
 import Sqlite from 'sqlite3';
-import * as Cards from '../db/cards/cards';
-import * as Histories from '../db/histories/histories';
+import { DatabaseRef } from './dbReference';
+import { Cards } from '../db/cards/cards';
+import { Histories } from '../db/histories/histories';
 import { CardRow } from '../db/cards/cardRow';
-import { HistoriesRow } from '../db/histories/historiesRow';
 
 //---- DB TABLE INSERT DUMMY DATA
 const cardsDatas:CardRow[] = [
@@ -37,20 +37,20 @@ const cardsDatas:CardRow[] = [
 ] as const;
 
 
-export const createTables = async(db:Sqlite.Database) => {
-
+export const createTables = async(db: Sqlite.Database) => {
+    DatabaseRef.db = db;
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
-        await Cards.dropTable.exec(db);
-        await Histories.dropTable.exec(db);
+        await Cards.dropTable();
+        await Histories.dropTable();
     }
-    await Cards.createTable(db);
-    await Histories.createTable(db);
+    await Cards.createTable();
+    await Histories.createTable();
 
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
         for(const data of cardsDatas) {
-            await Cards.insert.exec(db,data);
+            await Cards.insert(data);
             //await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
             //await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
         }

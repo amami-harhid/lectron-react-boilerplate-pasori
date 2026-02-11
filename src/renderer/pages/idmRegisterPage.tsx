@@ -3,7 +3,7 @@ import Select, {SingleValue, ActionMeta} from "react-select";
 import { RenderService } from "@/service/render";
 import { toast } from 'sonner';
 import * as PasoriCard from './pasoriCard/pasoriCard';
-import * as Cards from '@/db/cards/cards';
+import { Cards } from '@/db/cards/cards';
 import { CardRow } from "@/db/cards/cardRow";
 
 type CardOption = {

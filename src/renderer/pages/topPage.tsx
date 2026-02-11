@@ -2,8 +2,8 @@ import { useRef, useEffect, useState } from "react";
 
 import { RenderService } from "@/service/render";
 import * as PasoriCard from "./pasoriCard/pasoriCard";
-import * as Cards from '@/db/cards/cards';
-import * as Histories from '@/db/histories/histories';
+import { Cards } from '@/db/cards/cards';
+import { Histories } from '@/db/histories/histories';
 import { CardRow } from '@/db/cards/cardRow';
 
 import * as Sounds from "@/renderer/lib/sounds";
@@ -55,14 +55,18 @@ export function TopPage() {
         const in_room = true;
         // Cardsを更新
         await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
+        console.log('setInRoom Cards.updateInRoomByFcno done');
         // 履歴を更新
-        await RenderService.exe<number>(Histories.setInRoomByFcnoIdm.name, fcno, idm);
+        const n = await RenderService.exe<number>(Histories.setInRoomByFcnoIdm.name, fcno, idm);
+        console.log('setInRoom Histories.setInRoomByFcnoIdm done n=',n);
     }
     const setOutRoom = async(fcno:string, idm: string) : Promise<void> => {
         const in_room = false;
         await RenderService.exe<number>(Cards.updateInRoomByFcno.name, fcno, in_room);
+        console.log('setOutRoom Cards.updateInRoomByFcno done');
         // 履歴を更新
-        await RenderService.exe<number>(Histories.setOutRoomByFcnoIdm.name, fcno, idm);
+        const n = await RenderService.exe<number>(Histories.setOutRoomByFcnoIdm.name, fcno, idm);
+        console.log('setOutRoom Histories.setInRoomByFcnoIdm done n=', n);
     }
 
     /** カードリリース */
@@ -74,7 +78,7 @@ export function TopPage() {
     }
     /** カードタッチ */
     const cardTouch = async (idm :string) => {
-        //console.log('カードタッチ idm=', idm);
+        console.log('カードタッチ idm=', idm);
         if(idm.length==0){
             // 安全のために空チェック
             return;
@@ -82,8 +86,10 @@ export function TopPage() {
         // idmが登録されている利用者を取得する
         const row = await cardsSelectCardRow(idm);
         if(row) {
+            console.log('カードタッチ row, idm=',row, idm);
             const fcno = row.fcno;
             if( row.in_room == true ) {
+                console.log('カードタッチ OUT row, idm=',row, idm);
                 // 入室中
                 Sounds.play({name:"CARD_OUT"})
                 await setOutRoom( fcno, idm);
@@ -91,6 +97,7 @@ export function TopPage() {
                 view.name = `(${row.name}さん)`
             }else{
                 // 退室中
+                console.log('カードタッチ IN row, idm=',row, idm);
                 Sounds.play({name:"CARD_IN"})
                 await setInRoom( fcno, idm);
                 view.status = '入室しました';
@@ -101,6 +108,7 @@ export function TopPage() {
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
+        console.log('カードタッチ view.status=',view.status);
         view.modal_display = Display.block;
         setPageView(view);
 

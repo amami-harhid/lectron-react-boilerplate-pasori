@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, envIs } from './util';
-import { ipcMainSqliteBridge } from '@/db/ipcMain';
+import { ipcMainSqliteBridge } from '@/service/ipcMain';
 
 import { ipc_is_production, ipc_assets_path } from './ipc';
 
@@ -32,8 +32,6 @@ reader.ready();
 
 let mainWindow: BrowserWindow | null = null;
 
-// MAIN<-->RENDERERのDB通信
-ipcMainSqliteBridge();
 
 const isDebug = envIs.debug;
 const isProd = envIs.prod;
@@ -108,14 +106,18 @@ const createWindow = async () => {
   });
 
   //---- DB TABLE CREATE IF NOT EXITST
+  console.log('before createTables')
   await createTables(db);
+  console.log('after createTables')
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
+  console.log('before menuBuilder.buildMenu')
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+  console.log('after menuBuilder.buildMenu')
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -155,3 +157,6 @@ app
         logger.error(reason);
     }
   );
+
+// MAIN<-->RENDERERのDB通信
+ipcMainSqliteBridge();

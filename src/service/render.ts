@@ -1,10 +1,4 @@
-import * as IpcServices from '@/channel/ipcService';
-
-type CHANNEL = IpcServices.IpcChannelValOfService;
-/** リクエストチャンネル */
-const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
-/** レスポンスチャンネル */
-const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
+import { CHANNEL_REPLY, CHANNEL_REQUEST } from './ipcChannel';
 
 /** サービスを呼び出しレスポンスを返す */
 const service = async <T>(command:string, ...args:any[]):Promise<T> => {

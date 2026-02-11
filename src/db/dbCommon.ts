@@ -1,8 +1,11 @@
 // Main/Render どちらも import できるはず。
 import sqlite from 'sqlite3';
 import { Logger } from '../log/logger';
+import { DatabaseRef } from './dbReference';
+
 const logger = new Logger();
-const run = (db:sqlite.Database, query:string, params:any[]=[]):Promise<number> => {
+const run = (query:string, params:any[]=[]):Promise<number> => {
+    const db = DatabaseRef.db;
     return new Promise<number>((resolve, reject)=>{
         const _query = `${query}; SELECT changes();`; // 追加変更削除された行数を返す
         const stmt = db.prepare(_query);
@@ -20,7 +23,8 @@ const run = (db:sqlite.Database, query:string, params:any[]=[]):Promise<number> 
     })
 };
 // 対象の行をすべて返す
-const all = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T[]> => {
+const all = <T>(query:string, params:any[]=[]):Promise<T[]> => {
+    const db = DatabaseRef.db;
     return new Promise<T[]>((resolve, reject)=>{
         const stmt = db.prepare(query);
         stmt.all(params,(err:Error, rows:T[])=>{
@@ -34,7 +38,8 @@ const all = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T[]> 
     });
 }
 // 1行だけ返す
-const get = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T> => {
+const get = <T>(query:string, params:any[]=[]):Promise<T> => {
+    const db = DatabaseRef.db;
     return new Promise<T>((resolve, reject)=>{
         const stmt = db.prepare(query);
         stmt.get(params,(err:Error, row:T)=>{
@@ -44,7 +49,7 @@ const get = <T>(db:sqlite.Database, query:string, params:any[]=[]):Promise<T> =>
         });
     });
 }
-type Exec = (db:sqlite.Database, ...args:any[]) => Promise<any>;
+export type Exec = (...args:any[]) => Promise<any>;
 export type Method = {
     name: string,
     exec: Exec,
