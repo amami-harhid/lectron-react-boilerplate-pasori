@@ -1,4 +1,3 @@
-'use client'
 import { useRef, useMemo, useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { useForm } from 'react-hook-form';
@@ -238,7 +237,7 @@ export function MemberListPage () {
             pageInfo.tempData.fcno = fcno;
             pageInfo.isConfirmOpen = true;
             pageInfo.typeRegist = TypeRegist.Delete;
-            updatePageInfo(pageInfo);            
+            updatePageInfo(pageInfo);
         }
     }
 
@@ -254,7 +253,6 @@ export function MemberListPage () {
                 kana: (row.kana)?row.kana:'',
                 mail: (row.mail)?row.mail:'',
             }
-            console.log(newRow)
             _data.push(newRow);
         }
         pageInfo.tableData = _data;
@@ -325,7 +323,7 @@ export function MemberListPage () {
     // 削除する
     const memberDelete = async (data: TABLE_ROW) => {
         await memberListService.deleteMemberByFcno(data.fcno);
-        
+
     }
 
     // カードが離れたときの処理
@@ -333,11 +331,11 @@ export function MemberListPage () {
     // カードタッチしたときの処理
     PasoriCard.onTouch(async ()=>{});
 
-    // redrawPageInfo()が実行されたとき 
+    // redrawPageInfo()が実行されたとき
     // リロードが実行され、メンバー一覧を最新化する仕組み
     useEffect(() => {
         reload();
-    },[pageInfo.counter]); 
+    },[pageInfo.counter]);
 
     return (
         <>
@@ -510,9 +508,9 @@ export function MemberListPage () {
             <h2 style={{margin:0}}>確認</h2>
             <p></p>
             <div className="modal-button-container" style={{margin:5}}>
-                <button className="modal-btn" onClick={confirmNo} 
+                <button className="modal-btn" onClick={confirmNo}
                         >いいえ</button>
-                <button className="modal-alert-btn" onClick={confirmYes} 
+                <button className="modal-alert-btn" onClick={confirmYes}
                         >はい</button>
             </div>
         </Modal>

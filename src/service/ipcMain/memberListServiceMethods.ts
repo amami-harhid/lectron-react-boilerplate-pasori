@@ -17,7 +17,7 @@ const getMemberByFcno = async(fcno:string):Promise<CardRow>=>{
 /** 全メンバーを取得する */
 const getMembers = async():Promise<CardRow[]>=>{
     console.log('methods getMembers');
-    const selectAll = 
+    const selectAll =
         `SELECT * FROM cards WHERE soft_delete = FALSE`;
     const rows = dbAll<CardRow>(selectAll,[]);
     return rows;
@@ -43,7 +43,7 @@ const updateMemberByFcno = async(fcno: string, row: CardRow):Promise<boolean>=>{
     console.log('updateMemberByFcno')
     const rsult = await transactionBase(async ():Promise<boolean>=>{
         const update = `UPDATE cards
-                SET name = ?, kana = ?, mail = ?
+                SET name = ?, kana = ?, mail = ?, date_time = datetime('now', 'localtime')
                 WHERE fcno = ? AND soft_delete = FALSE`;
         const changes = await dbRun(update, [row.name, row.kana, row.mail, fcno]);
         if(changes>0)
@@ -57,10 +57,11 @@ const updateMemberByFcno = async(fcno: string, row: CardRow):Promise<boolean>=>{
 /** FCNO指定でメンバーを論理削除する */
 const deleteMemberByFcno = async(fcno: string):Promise<boolean>=>{
     const rsult = await transactionBase(async ():Promise<boolean>=>{
-        const update = 
-                `UPDATE cards SET soft_delete = TRUE
+        const update =
+                `UPDATE cards SET soft_delete = TRUE, date_time = datetime('now', 'localtime')
                  WHERE fcno = ? AND soft_delete = FALSE`;
         const changes = await dbRun(update, [fcno]);
+        console.log('delete cards changes=',changes);
         if(changes>0)
             return true;
         else

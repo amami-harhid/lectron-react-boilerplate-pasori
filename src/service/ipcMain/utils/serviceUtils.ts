@@ -74,19 +74,22 @@ type AsyncFunction<TArgs extends any[], Tresult> = (...args: TArgs) => Promise<T
 export const transactionBase = async (callBack:AsyncFunction<any,boolean>):Promise<boolean> => {
     try{
         await transaction(Transaction.BEGIN);
-        await new Promise<void>(async (resolve, reject)=>{
+        console.log('Begin');
+        await new Promise<void>(async (resolve)=>{
             try{
                 await callBack();
             }catch(error){
-                reject();
+                //reject();
                 throw error;
             }
             resolve();
         });
     }catch(error){
+        console.log('Rollback');
         transaction(Transaction.ROLLBACK);
         return false;
     }
+    console.log('Commit');
     await transaction(Transaction.COMMIT);
-    return true;    
+    return true;
 }

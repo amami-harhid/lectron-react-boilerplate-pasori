@@ -1,4 +1,3 @@
-'use client'
 import { useRef, useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { MaterialReactTable, type MRT_Row } from 'material-react-table';
@@ -6,7 +5,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 import { toast } from 'sonner';
- 
+
 import { memberTrashedListService } from "@/service/ipcRenderer/memberTrashedListRenderer";
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
@@ -177,7 +176,7 @@ export function MemberTrashedListPage () {
         updatePageInfo(pageInfo);
     }
 
-    /** カードが離れたときの処理 */ 
+    /** カードが離れたときの処理 */
     PasoriCard.onRelease(async()=>{});
     /** カードタッチしたときの処理 */
     PasoriCard.onTouch(async ()=>{});
