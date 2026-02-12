@@ -1,8 +1,7 @@
 import * as IpcServices from '@/channel/ipcService';
-
-type CHANNEL = IpcServices.IpcChannelValOfService;
+type CHANNEL = IpcServices.IpcServiceChannelValOfService;
 /** リクエストチャンネル */
-export const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcChannels.CHANNEL_REQUEST_QUERY;
+export const CHANNEL_REQUEST:CHANNEL = IpcServices.IpcServiceChannels.CHANNEL_REQUEST
 /** レスポンスチャンネル */
-export const CHANNEL_REPLY:CHANNEL = IpcServices.IpcChannels.CHANNEL_REPLY_QUERY;
+export const CHANNEL_REPLY:CHANNEL = IpcServices.IpcServiceChannels.CHANNEL_REPLY;
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Select, {SingleValue, ActionMeta} from "react-select";
-import { idmRegisterService } from "@/service/ipcRenderer/idmRegisterPageService";
+import { idmRegisterService } from '@/service/ipcRenderer/idmRegisterPageRenderer';
 import { toast } from 'sonner';
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from "@/db/cards/cardRow";

@@ -4,13 +4,14 @@ import { Logger } from '../log/logger';
 import { DatabaseRef } from './dbReference';
 
 const logger = new Logger();
-const run = (query:string, params:any[]=[]):Promise<number> => {
+const run = (query:string, cb:CallableFunction, params:any[]=[]):Promise<number> => {
     const db = DatabaseRef.db;
     return new Promise<number>((resolve, reject)=>{
-        const _query = `${query}; SELECT changes();`; // 追加変更削除された行数を返す
+        const _query = `${query}`;
         const stmt = db.prepare(_query);
         stmt.run(params, function(err:Error){
             if (err) {
+                cb(err);
                 logger.error(err);
                 stmt.finalize();
                 reject(err);
@@ -30,6 +31,7 @@ const all = <T>(query:string, params:any[]=[]):Promise<T[]> => {
         stmt.all(params,(err:Error, rows:T[])=>{
             if (err) {
                 logger.error(err);
+                stmt.finalize();
                 throw(err);
             }
             stmt.finalize();
@@ -43,7 +45,10 @@ const get = <T>(query:string, params:any[]=[]):Promise<T> => {
     return new Promise<T>((resolve, reject)=>{
         const stmt = db.prepare(query);
         stmt.get(params,(err:Error, row:T)=>{
-            if (err) reject(err);
+            if (err) {
+                stmt.finalize();
+                reject(err);
+            }
             stmt.finalize();
             resolve(row);
         });
@@ -58,4 +63,10 @@ export const exec = {
     all: all,
     get: get,
     run: run,
+}
+
+export const Transaction = {
+    BEGIN: 'BEGIN TRANSACTION',
+    COMMIT: 'COMMIT',
+    ROLLBACK: 'ROLLBACK',
 }

@@ -41,16 +41,16 @@ export const createTables = async(db: Sqlite.Database) => {
     DatabaseRef.db = db;
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
-        await Cards.dropTable();
-        await Histories.dropTable();
+        await Cards.dropTable(()=>{});
+        await Histories.dropTable(()=>{});
     }
-    await Cards.createTable();
-    await Histories.createTable();
+    await Cards.createTable(()=>{});
+    await Histories.createTable(()=>{});
 
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
         for(const data of cardsDatas) {
-            await Cards.insert(data);
+            await Cards.insert(data,()=>{});
             //await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
             //await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
         }

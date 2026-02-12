@@ -1,12 +1,5 @@
 import logger from 'electron-log';
-//import { is } from '@/main/util';
-
-export interface ILogger {
-    info: CallableFunction;
-    debug: CallableFunction;
-    warn: CallableFunction;
-    error: CallableFunction;
-}
+import { ILogger } from './ILogger';
 
 export class Logger implements ILogger {
 

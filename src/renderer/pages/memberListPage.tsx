@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
 import { toast } from 'sonner';
 
-import { memberListService } from "@/service/ipcRenderer/memberListService";
+import { memberListService } from "@/service/ipcRenderer/memberListRenderer";
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 

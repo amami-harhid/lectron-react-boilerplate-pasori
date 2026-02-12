@@ -1,39 +1,10 @@
 
-import sqlite from 'sqlite3';
 import { CardRow } from "./cardRow";
-import { type Exec, exec } from "../dbCommon";
-
-
-export async function dropTable(db:sqlite.Database, ):Promise<number>{
-        const query = `DROP TABLE IF EXISTS cards`;
-        return exec.run(query);
-}; 
-/*
-export const Cards = [
-    'createTable',
-    'deleteByFcno',
-    'deletePhisycalByFcno',
-    'dropTable',
-    'insert',
-    'recoveryByFcno',
-    'releaseIdmByFcno',
-    'linkIdmByFcno',
-    'selectAll',
-    'selectAllSoftDeleted',
-    'selectRowsEmptyIdm',
-    'selectRowByIdm',
-    'selectRowByFcno',
-    'updatePersonalDataByFcno',
-    'updateInRoomByFcno',
-    
-] as const
-
-type TCards = typeof Cards[number]
-*/
+import { exec } from "../dbCommon";
 
 export const Cards = {
     createTable: 
-        async function():Promise<number>{
+        async function(cb:CallableFunction):Promise<number>{
             const query = 
             `CREATE TABLE IF NOT EXISTS cards (
                 [id] integer primary key autoincrement,
@@ -46,30 +17,30 @@ export const Cards = {
                 [soft_delete] boolean,
                 [date_time] datetime
             )`;
-            return exec.run(query);
+            return exec.run(query, cb);
         },
     deleteByFcno: 
-        function(fcno:string):Promise<number> {
+        function(fcno:string, cb:CallableFunction):Promise<number> {
             const query = `UPDATE cards SET soft_delete = TRUE WHERE fcno = ? AND soft_delete = FALSE`;
-            return exec.run(query, [fcno]);
+            return exec.run(query, cb, [fcno]);
         },
     deletePhisycalByFcno:
-        async function(fcno:string):Promise<number> {
+        async function(fcno:string, cb:CallableFunction):Promise<number> {
             // 論理削除フラグが ON(論理削除)のレコードのみを削除する
             const query = `DELETE FROM cards WHERE fcno = ? AND soft_delete = TRUE`;
-            return exec.run(query, [fcno]);
+            return exec.run(query, cb, [fcno]);
         },
     dropTable:
-        async function dropTable():Promise<number>{
+        async function dropTable(cb:CallableFunction):Promise<number>{
             const query = `DROP TABLE IF EXISTS cards`;
-            return exec.run(query);
+            return exec.run(query, cb);
         },
     insert:
-        async function(data:CardRow): Promise<number>{
+        async function(data:CardRow, cb:CallableFunction): Promise<number>{
             const query = `INSERT INTO cards
                 (fcno, name, kana, mail, in_room, idm, soft_delete, date_time)
                 VALUES (?, ?, ?, ?, ?, ?, FALSE, datetime('now', 'localtime'))`;
-            return exec.run(query,[
+            return exec.run(query, cb, [
                 data.fcno,
                 data.name,
                 data.kana,
@@ -79,25 +50,25 @@ export const Cards = {
             ]);
         },
     recoveryByFcno:
-        async function(fcno:string):Promise<number>{
+        async function(fcno:string, cb:CallableFunction):Promise<number>{
             const query =
                 `UPDATE cards SET soft_delete = FALSE, date_time = datetime('now', 'localtime')
                  WHERE fcno = ? AND soft_delete = TRUE`;
-            return exec.run(query, [fcno]);
+            return exec.run(query, cb, [fcno]);
         },
     releaseIdmByFcno:
-        async function(fcno:string):Promise<number>{
+        async function(fcno:string, cb:CallableFunction):Promise<number>{
             const query =
                 `UPDATE cards SET idm = '', date_time = datetime('now', 'localtime')
                  WHERE fcno=? AND soft_delete = FALSE`;
-            return exec.run(query, [fcno]);
+            return exec.run(query, cb, [fcno]);
         },
     linkIdmByFcno:
-        async function(fcno:string, idm:string):Promise<number>{
+        async function(fcno:string, idm:string, cb:CallableFunction):Promise<number>{
             const query =
                 `UPDATE cards SET idm = ?, date_time = datetime('now', 'localtime')
                  WHERE fcno = ? AND soft_delete = FALSE`;
-            return exec.run(query, [idm, fcno]);
+            return exec.run(query, cb, [idm, fcno]);
         },
     selectAll:
         async function():Promise<CardRow[]>{
@@ -125,20 +96,20 @@ export const Cards = {
             return exec.get<CardRow>(query, [fcno]);
         },
     updatePersonalDataByFcno:
-        async function(fcno:string, data:CardRow):Promise<number>{
+        async function(fcno:string, data:CardRow, cb:CallableFunction):Promise<number>{
             const query = 
                 `UPDATE cards SET name = ?, kana = ?, mail = ?,
                     date_time = datetime('now', 'localtime')
                 WHERE fcno = ? AND soft_delete = FALSE`;
-            return exec.run(query, [data.name, data.kana, data.mail, fcno]);
+            return exec.run(query, cb, [data.name, data.kana, data.mail, fcno]);
         },
     updateInRoomByFcno:
-        async function(fcno:string, in_room:boolean): Promise<number>{
+        async function(fcno:string, in_room:boolean, cb:CallableFunction): Promise<number>{
             const query = `UPDATE cards
                 SET in_room = ?,
                 date_time = datetime('now', 'localtime')
                 WHERE fcno = ? AND soft_delete = FALSE`;
-            return exec.run(query, [in_room, fcno]);
+            return exec.run(query, cb, [in_room, fcno]);
         },
     
 } as const;

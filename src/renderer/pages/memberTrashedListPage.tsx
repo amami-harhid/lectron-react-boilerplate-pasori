@@ -7,7 +7,7 @@ import RecoverIcon from '@mui/icons-material/RestoreFromTrashSharp';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
 import { toast } from 'sonner';
  
-import { memberTrashedListService } from "@/service/ipcRenderer/memberTrashedListService";
+import { memberTrashedListService } from "@/service/ipcRenderer/memberTrashedListRenderer";
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 

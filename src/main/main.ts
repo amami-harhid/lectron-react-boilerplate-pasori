@@ -14,13 +14,15 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, envIs } from './util';
-import { ipcMainSqliteBridge } from '@/service/ipcMain';
+import { ipcMainSqliteBridge } from '@/service/ipcMain/ipcMain';
 
 import { ipc_is_production, ipc_assets_path } from './ipc';
 
 import { Logger } from "@/log/logger";
+import { LoggerRef } from '@/log/loggerReference';
 Logger._debug_mode = envIs.debug; // デバッグモード(true)のときだけ logger.debug() を処理する
 const logger = new Logger();
+LoggerRef.logger = logger;
 
 import { db } from "@/db/db";
 import { createTables } from '@/db/createTables';

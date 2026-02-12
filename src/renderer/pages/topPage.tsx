@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 
-import { topPageService } from '@/service/ipcRenderer/topPageService';
+import { topPageService } from '@/service/ipcRenderer/topPageRenderer';
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { CardRow } from '@/db/cards/cardRow';
 

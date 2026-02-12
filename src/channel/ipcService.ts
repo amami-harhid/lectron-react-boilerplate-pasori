@@ -4,6 +4,15 @@ export const IpcChannels = {
     CHANNEL_IPC_EXAMPLE: 'ipc-example',
 } as const;
 
+export const IpcServiceChannels = {
+    CHANNEL_REQUEST: 'request-service',
+    CHANNEL_REPLY: 'reply-service',
+} as const;
+
 export type IpcChannelKeyOfService = keyof typeof IpcChannels;
 
 export type IpcChannelValOfService = (typeof IpcChannels)[keyof typeof IpcChannels];
+
+export type IpcServiceChannelKeyOfService = keyof typeof IpcServiceChannels;
+
+export type IpcServiceChannelValOfService = (typeof IpcServiceChannels)[keyof typeof IpcServiceChannels];

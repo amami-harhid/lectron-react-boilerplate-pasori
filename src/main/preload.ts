@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import * as IpcServices from '@/channel/ipcService';
 import {CardReaderID, type TCardReaderChannel} from '@/icCard/cardEventID';
 export type Channels = IpcServices.IpcChannelValOfService;
+export type ServiceChannels = IpcServices.IpcServiceChannelValOfService;
 const electronHandler = {
   ipcRenderer: {
     sendMessage(channel: Channels, methodName:string, ...args: unknown[]) {
@@ -30,6 +31,20 @@ const electronHandler = {
         })
       });
 
+    },
+  },
+};
+const electronServiceHandler = {
+  ipcServiceRenderer: {
+    send(channel: ServiceChannels, methodName:string, ...args: unknown[]) {
+      ipcRenderer.send(channel, methodName, ...args);
+    },
+    asyncOnce<T>(channel: ServiceChannels):Promise<T> {
+      return new Promise<T>( (resolve)=>{
+        ipcRenderer.once(channel, (_event, arg:T) => {
+            resolve(arg);
+        })
+      });
     },
   },
 };
@@ -78,6 +93,7 @@ const electronPasoriCard = {
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
+contextBridge.exposeInMainWorld('electronService', electronServiceHandler);
 
 const buildEnv = {
     isProduction : (): Promise<boolean> => {
@@ -122,5 +138,6 @@ contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
+export type ElectronServiceHandler = typeof electronServiceHandler;
 export type ElectronProduct = typeof buildEnv;
 //export type ElectronPasoriDb = typeof electronPasoriDb;

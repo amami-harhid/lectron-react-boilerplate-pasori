@@ -1,5 +1,3 @@
-
-import sqlite from 'sqlite3';
 import { Logger } from '../../log/logger';
 import { HistoriesRow, HistoriesCardRow } from "./historiesRow";
 import { Cards } from '../cards/cards';
@@ -26,12 +24,9 @@ const methodNames = [
 
 type TMethodNames = typeof methodNames[number]
 */
-export const HistoriesDBObj:{[key:string]: sqlite.Database|undefined} = {
-    db: undefined,
-}
 export const Histories = {
     createTable: 
-        async function():Promise<number>{
+        async function(cb:CallableFunction):Promise<number>{
             const query = `
                 CREATE TABLE IF NOT EXISTS histories (
                     [id] integer primary key autoincrement,
@@ -42,30 +37,30 @@ export const Histories = {
                     [date_out] date,
                     [date_time] datetime
                 )`;
-            return exec.run(query);
+            return exec.run(query, cb);
         },
     deleteByIdm:
-        async function(idm:string):Promise<number>{
+        async function(idm:string, cb:CallableFunction):Promise<number>{
             const query = `DELETE FROM histories WHERE idm = ?`;
-            return exec.run(query,[idm]);
+            return exec.run(query,cb,[idm]);
         },
     deleteHistoriesByFcno:
-        async function(fcno:string):Promise<number>{
+        async function(fcno:string, cb:CallableFunction):Promise<number>{
             const query = `DELETE FROM histories WHERE fcno = ?`;
-            return exec.run(query,[fcno]);
+            return exec.run(query,cb,[fcno]);
         },
     dropTable:
-        async function():Promise<number>{
+        async function(cb:CallableFunction):Promise<number>{
             const query = `DROP TABLE IF EXISTS histories`;
-            return exec.run(query);
+            return exec.run(query,cb);
         },
     insert:
-        async function(fcno:string, idm:string):Promise<number>{
+        async function(fcno:string, idm:string, cb:CallableFunction):Promise<number>{
             const query =
                 `INSERT INTO histories
                  (fcno, idm, in_room, date_in, date_out, date_time)
                  VALUES(?, ?, TRUE, date('now', 'localtime'), '', datetime('now', 'localtime'))`;
-            return exec.run(query,[fcno, idm]);
+            return exec.run(query,cb,[fcno, idm]);
         },
     selectAll:
         async function():Promise<HistoriesRow[]>{
@@ -108,18 +103,18 @@ export const Histories = {
         },
     /** 現在日の前日に入室して 退室していないレコードを「退室」にする */
     updateYesterdayToOutroom:
-        async function(): Promise<number>{
+        async function(cb:CallableFunction): Promise<number>{
             const query =
                 `UPDATE histories SET in_room = FALSE, date_out = date(?)
                  WHERE in_room = TRUE AND date_in = date(?)`;
             const toDay = new Date();
             const yesterday_date = DateUtils.getShiftedDate(toDay, -1);
             const yesterday_date_str = DateUtils.dateToSqlite3Date(yesterday_date);
-            return exec.run(query, [yesterday_date_str, yesterday_date_str]);
+            return exec.run(query, cb, [yesterday_date_str, yesterday_date_str]);
         },
     /** 履歴更新( 入室にする ) */
     setInRoomByFcnoIdm:
-        async function(fcno:string, idm:string) : Promise<number>{
+        async function(fcno:string, idm:string, cb:CallableFunction) : Promise<number>{
             console.log('setInRoomByFcnoIdm start')
             const today = new Date();
             const activeCard = await Cards.selectRowByFcno(fcno);
@@ -131,7 +126,7 @@ export const Histories = {
             if(in_room_history == undefined) {
                 console.log('setInRoomByFcnoIdm insert')
                 // 一度も入室していないとき
-                const insertCount = await Histories.insert(fcno, idm);
+                const insertCount = await Histories.insert(fcno, idm, cb);
                 console.log('setInRoomByFcnoIdm insert done')
                 console.log('setInRoomByFcnoIdm fcno, idm, insertCount=', fcno, idm, insertCount);
                 return insertCount;
@@ -143,7 +138,7 @@ export const Histories = {
                      SET in_room = TRUE, date_out = ''
                      WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
                 const todayStr = DateUtils.dateToSqlite3Date(today);
-                const updateCount = exec.run(query, [fcno, idm, todayStr]);
+                const updateCount = exec.run(query, cb, [fcno, idm, todayStr]);
                 console.log('setInRoomByFcnoIdm update done')
                 console.log('setInRoomByFcnoIdm fcno, idm, updateCount=', fcno, idm, updateCount);
                 return updateCount;
@@ -151,7 +146,7 @@ export const Histories = {
         },
     /** 履歴更新( 退室にする ) */
     setOutRoomByFcnoIdm:
-        async function(fcno:string, idm:string) : Promise<number>{
+        async function(fcno:string, idm:string, cb:CallableFunction) : Promise<number>{
             console.log('setOutRoomByFcnoIdm start')
             const today = new Date();
             const activeCard = await Cards.selectRowByFcno(fcno);
@@ -168,7 +163,7 @@ export const Histories = {
                      WHERE fcno = ? AND idm = ? AND date_in = date(?)`;
                 const todayStr = DateUtils.dateToSqlite3Date(today);
                 logger.debug('todayStr=',todayStr)
-                return exec.run(query, [todayStr, fcno, idm, todayStr]);
+                return exec.run(query, cb, [todayStr, fcno, idm, todayStr]);
             }else{
                 return 0;
             }

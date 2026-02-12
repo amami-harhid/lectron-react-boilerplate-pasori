@@ -2,7 +2,8 @@ import {
   ElectronHandler,
   ElectronNavigate,
   ElectronPasoriCard,
-  ElectronProduct
+  ElectronProduct,
+  ElectronServiceHandler,
  } from '@/main/preload';
 
 declare global {
@@ -12,6 +13,7 @@ declare global {
     navigate: ElectronNavigate;
     pasoriCard: ElectronPasoriCard;
     buildEnv: ElectronProduct;
+    electronService: ElectronServiceHandler;
   }
 }
 
