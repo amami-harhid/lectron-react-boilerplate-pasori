@@ -94,6 +94,7 @@
     "electron-updater": "^6.3.9",
     "material-react-table": "^3.2.1",
     "nfc-pcsc": "^0.8.1",
+    "nodemailer": "^8.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
