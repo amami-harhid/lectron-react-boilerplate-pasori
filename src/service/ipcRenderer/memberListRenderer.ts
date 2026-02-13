@@ -17,21 +17,21 @@ export const memberListService = {
         return rows;
     },
     /** メンバーを追加する */
-    addMember: async function(row: MemberRow): Promise<number> {
+    addMember: async function(row: MemberRow): Promise<boolean> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.addMember.name, row);    
-        const val = await ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
         return val;
     },
     /** FCNOを指定してメンバーを更新する */
-    updateMemberByFcno: async function(fcno: string, row: MemberRow): Promise<number> {
+    updateMemberByFcno: async function(fcno: string, row: MemberRow): Promise<boolean> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.updateMemberByFcno.name, fcno, row);    
-        const val = await ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
         return val;
     },
     /** FCNOを指定してメンバーを論理削除する */
-    deleteMemberByFcno: async function(fcno: string): Promise<number> {
+    deleteMemberByFcno: async function(fcno: string): Promise<boolean> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.deleteMemberByFcno.name, fcno);    
-        const val = await ipcRenderer.asyncOnce<number>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
         return val;
     },
 };

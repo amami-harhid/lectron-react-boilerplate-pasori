@@ -3,12 +3,11 @@ DotEnv.config();
 import { envIs } from '@/main/util';
 import Sqlite from 'sqlite3';
 import { DatabaseRef } from './dbReference';
-import { Cards } from '../db/cards/cards';
 import { Members } from './members/members';
 import { Idms } from './idms/idms';
 import { Histories } from '../db/histories/histories';
 import { MemberRow } from './members/memberRow';
-import { dbRun, dbAll, dbGet, transactionBase } from '@/service/ipcMain/utils/serviceUtils';
+import { dbRun } from '@/service/ipcMain/utils/serviceUtils';
 //---- DB TABLE INSERT DUMMY DATA
 const memberDatas:MemberRow[] = [
     {
@@ -57,8 +56,8 @@ export const createTables = async(db: Sqlite.Database) => {
 const memberInsert = async (data:MemberRow) => {
     const query = 
             `INSERT INTO members 
-             (fcno,name,kana,mail,oft_delete,date_time) 
-             values(?,?,?,?, FALSE, datetime('now', 'localtime')))`;
+             (fcno, name, kana, mail, soft_delete, date_time) 
+             VALUES(?,?,?,?, FALSE, datetime('now', 'localtime'))`;
     await dbRun(query, 
             [data.fcno,
              data.name,

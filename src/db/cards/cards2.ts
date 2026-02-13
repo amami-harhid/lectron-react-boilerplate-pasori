@@ -1,5 +1,5 @@
 
-import { CardRow } from "./cardRow";
+import { CardRow } from "./cardRow2";
 import { exec } from "../dbCommon";
 
 export const Cards = {

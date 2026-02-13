@@ -7,8 +7,9 @@ import DeleteIcon from '@mui/icons-material/DeleteForever';
 import { toast } from 'sonner';
 
 import { memberTrashedListService } from "@/service/ipcRenderer/memberTrashedListRenderer";
+import { MemberRow } from "@/db/members/memberRow";
+
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
-import { CardRow } from '@/db/cards/cardRow';
 
 type TABLE_ROW = {
     no:number,
@@ -126,7 +127,7 @@ export function MemberTrashedListPage () {
 
     /** 論理削除されたメンバー一覧を作成する */
     const membersToTableData = async ():Promise<void> => {
-        const rows:CardRow[] = await memberTrashedListService.getTrashedMembers();
+        const rows:MemberRow[] = await memberTrashedListService.getTrashedMembers();
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
