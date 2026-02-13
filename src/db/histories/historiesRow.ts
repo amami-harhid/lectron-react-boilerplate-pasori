@@ -10,6 +10,7 @@ export type HistoriesMemberRow = {
     id?: number;
     fcno: string;
     date: string;
+    in_room: boolean;
     name?: string;
     kana?: string;
     mail?: string;
@@ -21,9 +22,9 @@ export type HistoriesMemberIdmRow = {
     idm: string;
     fcno: string;
     date: string;
+    in_room: boolean;
     name: string;
     kana: string;
     mail: string;
-    in_room: boolean;
     date_time?: string;
 }

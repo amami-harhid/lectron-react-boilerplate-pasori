@@ -3,7 +3,7 @@ import { MaterialReactTable } from 'material-react-table';
 import * as DateUtils from '@/utils/dateUtils';
 import { historiesPageService } from "@/service/ipcRenderer/historiesListPageRenderer";
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
-import { HistoriesCardRow } from '@/db/histories/historiesRow';
+import { HistoriesMemberRow } from '@/db/histories/historiesRow';
 type TABLE_ROW = {
     no:number,
     fcno:string,
@@ -67,7 +67,7 @@ export function HistoriesListPage() {
 
     /** 履歴をテーブル化 */
     const historiesToTableData = async (date:Date):Promise<TABLE_ROW[]> => {
-        const rows:HistoriesCardRow[] = await historiesPageService.getHistoriesByDate(date);
+        const rows:HistoriesMemberRow[] = await historiesPageService.getHistoriesByDate(date);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
@@ -76,7 +76,7 @@ export function HistoriesListPage() {
                 fcno: row.fcno,
                 name: (row.name)?row.name:'',
                 kana: (row.kana)?row.kana:'',
-                in: (row.date_out)? '退室':'入室'
+                in: (row.in_room)? '退室':'入室'
             }
             _data.push(newRow);
         }

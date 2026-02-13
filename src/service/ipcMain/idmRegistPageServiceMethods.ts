@@ -59,30 +59,27 @@ const releaseIdmToMemberByFcno = async(fcno:string):Promise<boolean>=>{
 /** FCNOを指定してメンバーを取得する */
 const getMemberByFcno = async(fcno:string):Promise<MemberIdmRow>=>{
     const query = 
-        `SELECT M.*, I.idm FROM members AS M
-         LEFT OUTER JOIN idms AS I
-         WHERE M.fcno = I.fcno
-         AND M.fcno = ? AND M.soft_delete = FALSE`;
+        `SELECT M.*, IFNULL(I.idm,'') AS idm FROM members AS M
+         LEFT OUTER JOIN idms AS I ON M.fcno = I.fcno
+         WHERE M.fcno = ? AND M.soft_delete = FALSE`;
     const row = await dbGet<MemberIdmRow>(query, [fcno]);
     return row;
 }
 /** IDMを指定してメンバーを取得する */
 const getMemberByIdm = async(idm:string):Promise<MemberIdmRow>=>{
     const query = 
-        `SELECT * FROM members AS M
-         LEFT OUTER JOIN idms AS I
-         WHERE M.fcno = I.fcno 
-         AND idm = ? AND M.soft_delete = FALSE`;
+        `SELECT M.*, IFNULL(I.idm, '') AS idm FROM members AS M
+         LEFT OUTER JOIN idms AS I ON M.fcno = I.fcno AND I.idm = ?
+         WHERE M.soft_delete = FALSE`;
     const row = await dbGet<MemberIdmRow>(query, [idm]);
     return row;
 }
 /** Idmが紐づいていないメンバーを取得する */
 const getMemberIdmIsEmpty = async(idm:string):Promise<MemberIdmRow[]>=>{
     const query = 
-        `SELECT * FROM members AS M
-         LEFT OUTER JOIN idms AS I
-         WHERE M.fcno = I.fcno
-         AND (I.idm = '' OR I.idm = NULL) AND M.soft_delete = FALSE`;
+        `SELECT M.*, IFNULL(I.idm,'') AS idm FROM members AS M
+         LEFT OUTER JOIN idms AS I ON M.fcno = I.fcno AND IFNULL(I.idm, '') = ''
+         WHERE M.soft_delete = FALSE`;
     const rows = await dbAll<MemberIdmRow>(query, [idm]);
     return rows;
 }
