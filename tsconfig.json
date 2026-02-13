@@ -16,7 +16,7 @@
     "paths": {
       "sqlite3": ["./.erb/node_modules/sqlite3"],
       "@/*": ["./src/*"],
-      "@sounds": ["./assets/sounds"],
+      "@sounds": ["./assets/sounds"]
     }
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]

@@ -2,7 +2,8 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { useForm } from 'react-hook-form';
 import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { Box, Icon, IconButton, Tooltip } from '@mui/material';
+import CardIcon from "@/icons/Card";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
@@ -367,18 +368,25 @@ export function MemberListPage () {
                     )}
                     positionActionsColumn="last"
                     renderRowActions={({ row }) => (
+                        <>
                         <Box sx={{ display: 'flex', gap: '0.2rem' }}>
-                            <Tooltip title="編集">
+                            <Tooltip title="カード" arrow placement="top">
+                                <IconButton>
+                                    <CardIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="編集" arrow placement="top">
                                 <IconButton onClick={() => handleEdit(row)}>
                                     <EditIcon />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="削除">
+                            <Tooltip title="削除" arrow placement="top">
                                 <IconButton color="error" onClick={() => handleDelete(row)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
                         </Box>
+                        </>
                     )}
                 />
             </div>
