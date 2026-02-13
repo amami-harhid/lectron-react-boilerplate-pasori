@@ -3,7 +3,7 @@ const ipcMain = electron.ipcMain;
 import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
-import type { CardRow } from '@/db/cards/cardRow';
+import type { MemberRow } from '@/db/members/memberRow';
 import * as IpcServices from '@/channel/ipcService';
 
 import { memberListPageServiceMethods } from './memberListServiceMethods';
@@ -16,7 +16,7 @@ export function ipcMainMemberListPage() {
         // IDMが紐づいたメンバーを取得する
         if( command == methods.getMemberByFcno.name ){
             const fcno:string = args[0];
-            const row: CardRow = await methods.getMemberByFcno(fcno);
+            const row: MemberRow = await methods.getMemberByFcno(fcno);
             event.reply(replyChannel, row);
             return;            
         }
@@ -31,7 +31,7 @@ export function ipcMainMemberListPage() {
         }
         /** メンバーを追加する */
         else if(command == methods.addMember.name){
-            const row:CardRow = args[0];
+            const row:MemberRow = args[0];
             const rslt = await methods.addMember(row);
             event.reply(replyChannel, rslt);
             return;
@@ -39,7 +39,7 @@ export function ipcMainMemberListPage() {
         /** メンバー情報を変更する */
         else if(command == methods.updateMemberByFcno.name){
             const fcno:string = args[0];
-            const row:CardRow = args[1];
+            const row:MemberRow = args[1];
             const rslt = await methods.updateMemberByFcno(fcno, row);
             event.reply(replyChannel, rslt);
             return;

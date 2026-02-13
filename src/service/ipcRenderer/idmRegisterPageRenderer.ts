@@ -1,6 +1,6 @@
 import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
-import { Cards } from '@/db/cards/cards';
-import { CardRow } from '@/db/cards/cardRow';
+import type { MemberRow } from '@/db/members/memberRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 import { idmRegisterServiceMethods } from '../ipcMain/idmRegistPageServiceMethods';
 const methods = idmRegisterServiceMethods;
 
@@ -21,22 +21,22 @@ export const idmRegisterService = {
     },
 
     /** FCNOを指定してメンバーを取得する */
-    getMemberByFcno: async function(fcno:string): Promise<CardRow> {
+    getMemberByFcno: async function(fcno:string): Promise<MemberIdmRow> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByFcno.name, fcno);    
-        const val = await ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<MemberIdmRow>(CHANNEL_REPLY);
         return val;
     },
 
     /** Idmが紐づいているメンバーを取得する */
-    getMemberByIdm: async function(idm:string): Promise<CardRow> {
+    getMemberByIdm: async function(idm:string): Promise<MemberIdmRow> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByIdm.name, idm);    
-        const val = await ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<MemberIdmRow>(CHANNEL_REPLY);
         return val;
     },
     /** Idmが紐づいていないメンバーを取得する */
-    getMemberIdmIsEmpty: async function(): Promise<CardRow[]> {
+    getMemberIdmIsEmpty: async function(): Promise<MemberIdmRow[]> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberIdmIsEmpty.name);    
-        const val = await ipcRenderer.asyncOnce<CardRow[]>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<MemberIdmRow[]>(CHANNEL_REPLY);
         return val;
     },
 };

@@ -1,7 +1,5 @@
 import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
-import { Cards } from '@/db/cards/cards';
-import { Histories } from '@/db/histories/histories';
-import { CardRow } from '@/db/cards/cardRow';
+import { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
 
 import { topPageServiceMethods } from '../ipcMain/topPageServiceMethods';
 const methods = topPageServiceMethods;
@@ -9,9 +7,9 @@ const ipcRenderer = window.electronService.ipcServiceRenderer;
 
 export const topPageService = {
     /** IDMが紐づいたメンバーを取得する */
-    getMemberByIdm: async function(idm:string): Promise<CardRow> {
+    getMemberByIdm: async function(idm:string): Promise<HistoriesMemberIdmRow> {
         ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByIdm.name, idm);    
-        const val = await ipcRenderer.asyncOnce<CardRow>(CHANNEL_REPLY);
+        const val = await ipcRenderer.asyncOnce<HistoriesMemberIdmRow>(CHANNEL_REPLY);
         return val;
     },
     /** 入室にする(退室にする) */

@@ -1,34 +1,32 @@
-import { LoggerRef } from '@/log/loggerReference';
-const logger = LoggerRef.logger;
-
-import type { CardRow } from '@/db/cards/cardRow';
+import type { MemberRow } from '@/db/members/memberRow';
 
 import { dbRun, dbAll, dbGet, transactionBase } from './utils/serviceUtils';
 
 /** FCNO指定でメンバーを取得する */
-const getMemberByFcno = async(fcno:string):Promise<CardRow>=>{
-    console.log('getMemberByFcno');
-    const query = `SELECT * FROM cards WHERE fcno = ? AND soft_delete = FALSE`;
-    const row = await dbGet<CardRow>(query, [fcno]);
-    console.log('getMemberByFcno executed.');
+const getMemberByFcno = async(fcno:string):Promise<MemberRow>=>{
+    const query = 
+        `SELECT * FROM members 
+         WHERE fcno = ? AND soft_delete = FALSE`;
+    const row = await dbGet<MemberRow>(query, [fcno]);
     return row;
 }
 
 /** 全メンバーを取得する */
-const getMembers = async():Promise<CardRow[]>=>{
-    console.log('methods getMembers');
+const getMembers = async():Promise<MemberRow[]>=>{
     const selectAll =
-        `SELECT * FROM cards WHERE soft_delete = FALSE`;
-    const rows = dbAll<CardRow>(selectAll,[]);
+        `SELECT * FROM members 
+         WHERE soft_delete = FALSE
+         ORDER BY kana ASC`;
+    const rows = dbAll<MemberRow>(selectAll,[]);
     return rows;
 }
 
 /** メンバーを追加する */
-const addMember = async(row: CardRow):Promise<boolean>=>{
+const addMember = async(row: MemberRow):Promise<boolean>=>{
     const rsult = await transactionBase(async ():Promise<boolean>=>{
-        const insert = `INSERT INTO cards
-                (fcno, name, kana, mail, in_room, idm, soft_delete, date_time)
-                VALUES (?, ?, ?, ?, FALSE, '', FALSE, datetime('now', 'localtime'))`;
+        const insert = `INSERT INTO members
+                (fcno, name, kana, mail, soft_delete, date_time)
+                VALUES (?, ?, ?, ?, FALSE, datetime('now', 'localtime'))`;
         const changes = await dbRun(insert, [row.fcno, row.name, row.kana, row.mail]);
         if(changes>0)
             return true;
@@ -39,10 +37,9 @@ const addMember = async(row: CardRow):Promise<boolean>=>{
 }
 
 /** FCNO指定でメンバー情報を更新する */
-const updateMemberByFcno = async(fcno: string, row: CardRow):Promise<boolean>=>{
-    console.log('updateMemberByFcno')
+const updateMemberByFcno = async(fcno: string, row: MemberRow):Promise<boolean>=>{
     const rsult = await transactionBase(async ():Promise<boolean>=>{
-        const update = `UPDATE cards
+        const update = `UPDATE members
                 SET name = ?, kana = ?, mail = ?, date_time = datetime('now', 'localtime')
                 WHERE fcno = ? AND soft_delete = FALSE`;
         const changes = await dbRun(update, [row.name, row.kana, row.mail, fcno]);
@@ -58,7 +55,7 @@ const updateMemberByFcno = async(fcno: string, row: CardRow):Promise<boolean>=>{
 const deleteMemberByFcno = async(fcno: string):Promise<boolean>=>{
     const rsult = await transactionBase(async ():Promise<boolean>=>{
         const update =
-                `UPDATE cards SET soft_delete = TRUE, date_time = datetime('now', 'localtime')
+                `UPDATE members SET soft_delete = TRUE, date_time = datetime('now', 'localtime')
                  WHERE fcno = ? AND soft_delete = FALSE`;
         const changes = await dbRun(update, [fcno]);
         console.log('delete cards changes=',changes);

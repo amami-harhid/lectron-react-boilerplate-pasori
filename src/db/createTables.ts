@@ -4,33 +4,29 @@ import { envIs } from '@/main/util';
 import Sqlite from 'sqlite3';
 import { DatabaseRef } from './dbReference';
 import { Cards } from '../db/cards/cards';
+import { Members } from './members/members';
+import { Idms } from './idms/idms';
 import { Histories } from '../db/histories/histories';
-import { CardRow } from '../db/cards/cardRow';
-
+import { MemberRow } from './members/memberRow';
+import { dbRun, dbAll, dbGet, transactionBase } from '@/service/ipcMain/utils/serviceUtils';
 //---- DB TABLE INSERT DUMMY DATA
-const cardsDatas:CardRow[] = [
+const memberDatas:MemberRow[] = [
     {
       fcno: '0001',
-      idm: '',
       name: 'ひながた みなみ',
       kana: 'ヒナガタ ミナミ',
-      in_room: false,
       mail: 'minami-xxx@test.com',
     },
     {
       fcno: '0002',
-      idm: '',
       name: 'ジェームス 鴇田',
       kana: 'トキタ ジェームス',
-      in_room: false,
       mail: 'jms-xxxx@test.com',
     },
     {
       fcno: '0003',
-      idm: '',
       name: 'ジェームス 鴇田2',
       kana: 'トキタ ジェームス2',
-      in_room: false,
       mail: 'jms-xxxx2@test.com',
     }
 
@@ -41,19 +37,32 @@ export const createTables = async(db: Sqlite.Database) => {
     DatabaseRef.db = db;
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
-        await Cards.dropTable(()=>{});
+        await Members.dropTable(()=>{});
+        await Idms.dropTable(()=>{});
         await Histories.dropTable(()=>{});
     }
-    await Cards.createTable(()=>{});
+    await Members.createTable(()=>{});
+    await Idms.createTable(()=>{});
     await Histories.createTable(()=>{});
 
     if( envIs.development ){
         console.log('DEBUG DATA SHIKOMI!')
-        for(const data of cardsDatas) {
-            await Cards.insert(data,()=>{});
-            //await Histories.hist_setInRoomByFcnoIdm(db, data.fcno, data.idm);
-            //await Cards.cards_updateInRoomByFcno(db, data.fcno, true);
+        for(const data of memberDatas) {
+            await memberInsert(data);
         }
     }
 
+}
+
+const memberInsert = async (data:MemberRow) => {
+    const query = 
+            `INSERT INTO members 
+             (fcno,name,kana,mail,oft_delete,date_time) 
+             values(?,?,?,?, FALSE, datetime('now', 'localtime')))`;
+    await dbRun(query, 
+            [data.fcno,
+             data.name,
+             data.kana,
+             data.mail
+            ]);
 }

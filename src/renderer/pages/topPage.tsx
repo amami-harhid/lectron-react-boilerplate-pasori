@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 
 import { topPageService } from '@/service/ipcRenderer/topPageRenderer';
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
-import { CardRow } from '@/db/cards/cardRow';
+import { HistoriesMemberIdmRow } from "@/db/histories/historiesRow";
 
 import * as Sounds from "@/renderer/lib/sounds";
 
@@ -45,8 +45,8 @@ export function TopPage() {
         const _clone = structuredClone(_view);
         setView(_clone);
     }
-    const cardsSelectCardRow = async (idm:string): Promise<CardRow | undefined> => {
-        const row: CardRow = await topPageService.getMemberByIdm(idm);
+    const cardsSelectCardRow = async (idm:string): Promise<HistoriesMemberIdmRow | undefined> => {
+        const row: HistoriesMemberIdmRow = await topPageService.getMemberByIdm(idm);
         return row;
     };
     const setInRoom = async(fcno:string, idm: string) : Promise<void> => {

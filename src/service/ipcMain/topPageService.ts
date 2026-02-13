@@ -3,7 +3,7 @@ const ipcMain = electron.ipcMain;
 import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
-import type { CardRow } from '@/db/cards/cardRow';
+import type { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
 
 import * as IpcServices from '@/channel/ipcService';
 
@@ -16,7 +16,7 @@ export function ipcMainTopPage() {
         // IDMが紐づいたメンバーを取得する
         if( command == methods.getMemberByIdm.name ){
             const idm:string = args[0];
-            const row: CardRow = await methods.getMemberByIdm(idm);
+            const row: HistoriesMemberIdmRow = await methods.getMemberByIdm(idm);
             event.reply(replyChannel, row);
             return;            
         }

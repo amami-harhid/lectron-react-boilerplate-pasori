@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 import { memberListService } from "@/service/ipcRenderer/memberListRenderer";
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
-import { CardRow } from '@/db/cards/cardRow';
+import { MemberRow } from "@/db/members/memberRow";
 
 const Display = {
     block: 'block',
@@ -297,12 +297,11 @@ export function MemberListPage () {
     }
     // 追加する
     const memberRegist = async (data: TABLE_ROW) => {
-        const newRow:CardRow = {
+        const newRow:MemberRow = {
             fcno: data.fcno,
             name: data.name,
             kana: data.kana,
             mail: data.mail,
-            idm : '',
         };
         await memberListService.addMember(newRow);
         pageInfo.isModalOpen = false;
@@ -310,12 +309,11 @@ export function MemberListPage () {
     }
     // 上書きする
     const memberReplace = async (data: TABLE_ROW) => {
-        const newRow:CardRow = {
+        const newRow:MemberRow = {
             fcno: data.fcno,
             name: data.name,
             kana: data.kana,
             mail: data.mail,
-            idm : '',
         };
         await memberListService.updateMemberByFcno(data.fcno, newRow);
         pageInfo.isModalOpen = false;

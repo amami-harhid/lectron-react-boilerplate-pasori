@@ -3,7 +3,7 @@ const ipcMain = electron.ipcMain;
 import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
-import type { CardRow } from '@/db/cards/cardRow';
+import type { HistoriesMemberRow } from '@/db/histories/historiesRow';
 
 import * as IpcServices from '@/channel/ipcService';
 
@@ -16,7 +16,7 @@ export function ipcMainHistoriesListPagePage() {
         // IDMが紐づいたメンバーを取得する
         if( command == methods.getHistoriesByDate.name ){
             const date:Date = args[0];
-            const rows: CardRow[] = await methods.getHistoriesByDate(date);
+            const rows: HistoriesMemberRow[] = await methods.getHistoriesByDate(date);
             event.reply(replyChannel, rows);
             return;            
         }

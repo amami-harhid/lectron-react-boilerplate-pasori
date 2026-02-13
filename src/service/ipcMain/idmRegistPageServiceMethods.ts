@@ -1,34 +1,55 @@
-import { LoggerRef } from '@/log/loggerReference';
-const logger = LoggerRef.logger;
-
-import sqlite from 'sqlite3';
-import { DatabaseRef } from '@/db/dbReference';
-import { Transaction } from '@/db/dbCommon';
-import type { CardRow } from '@/db/cards/cardRow';
-
-import * as DateUtils from '../../utils/dateUtils';
-import * as IpcServices from '@/channel/ipcService';
+import type { MemberRow } from '@/db/members/memberRow';
+import type { IdmRow } from '@/db/idms/idmRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 
 import { dbRun, dbAll, dbGet, transactionBase } from './utils/serviceUtils';
-import { resolve } from 'path';
-import { rejects } from 'assert';
 
 /** FCNO指定でIDMを紐づける */
 const registIdmToMemberByFcno = async(fcno:string,idm:string):Promise<boolean>=>{
-    const query = 
-        `UPDATE cards SET idm = ?, date_time = datetime('now', 'localtime')
-         WHERE fcno = ? AND soft_delete = FALSE`;
-    const changes = await dbRun(query, [fcno, idm]);
-    if(changes>0)
-        return true;
-    else
+    const rsult = await transactionBase(async ()=>{
+        // FCNO指定でメンバーが存在し、FCNO指定＋IDM指定で idmsがあるとき
+        const selectMemberQuery = 
+            `SELECT * FROM members WHERE fcno = ? AND soft_delete = FALSE`;
+        const memberRow = await dbGet<MemberRow>(selectMemberQuery, [fcno]);
+        if(memberRow){
+            const selectIdmQuery =
+                `SELECT * FROM idms WHERE fcno = ?`;
+            const idmRow = await dbGet<IdmRow>(selectIdmQuery, [fcno]);
+            if(idmRow) {
+                if( idmRow.idm == ''){
+                    // （存在するが）紐づいていない
+                    const updateIdmQuery = 
+                        `UPDATE idms SET idm = ?, date_time = datetime('now', 'localtime')
+                        WHERE fcno = ?`;
+                    const changes = await dbRun(updateIdmQuery, [idm, fcno]);
+                    if( changes > 0) {
+                        return true;
+                    }
+                }else{
+                    //（変更不可）既に紐づいている
+                }
+            }else{
+                // （存在しない）紐づいていない
+                const insertIdmQuery =
+                    `INSERT INTO idms
+                     (fcno, idm, date_time)
+                     VALUES(?, ?, datetime('now', 'localtime'))`;
+                const changes = await dbRun(insertIdmQuery, [fcno, idm]);
+                if(changes>0){
+                    return true;
+                }
+            }
+        }
         return false;
+    });
+    return rsult;
 }
+
 /** FCNO指定でIDM紐づけを解除する */
 const releaseIdmToMemberByFcno = async(fcno:string):Promise<boolean>=>{
     const query = 
-        `UPDATE cards SET idm = '', date_time = datetime('now', 'localtime')
-         WHERE fcno = ? AND soft_delete = FALSE`;
+        `UPDATE idms SET idm = '', date_time = datetime('now', 'localtime')
+         WHERE fcno = ?`;
     const changes = await dbRun(query, [fcno]);
     if(changes>0)
         return true;
@@ -36,21 +57,33 @@ const releaseIdmToMemberByFcno = async(fcno:string):Promise<boolean>=>{
         return false;
 }
 /** FCNOを指定してメンバーを取得する */
-const getMemberByFcno = async(fcno:string):Promise<CardRow>=>{
-    const query = `SELECT * FROM cards WHERE fcno = ? AND soft_delete = FALSE`;
-    const row = await dbGet<CardRow>(query, [fcno]);
+const getMemberByFcno = async(fcno:string):Promise<MemberIdmRow>=>{
+    const query = 
+        `SELECT M.*, I.idm FROM members AS M
+         LEFT OUTER JOIN idms AS I
+         WHERE M.fcno = I.fcno
+         AND M.fcno = ? AND M.soft_delete = FALSE`;
+    const row = await dbGet<MemberIdmRow>(query, [fcno]);
     return row;
 }
 /** IDMを指定してメンバーを取得する */
-const getMemberByIdm = async(idm:string):Promise<CardRow>=>{
-    const query = `SELECT * FROM cards WHERE idm = ? AND soft_delete = FALSE`;
-    const row = await dbGet<CardRow>(query, [idm]);
+const getMemberByIdm = async(idm:string):Promise<MemberIdmRow>=>{
+    const query = 
+        `SELECT * FROM members AS M
+         LEFT OUTER JOIN idms AS I
+         WHERE M.fcno = I.fcno 
+         AND idm = ? AND M.soft_delete = FALSE`;
+    const row = await dbGet<MemberIdmRow>(query, [idm]);
     return row;
 }
 /** Idmが紐づいていないメンバーを取得する */
-const getMemberIdmIsEmpty = async(idm:string):Promise<CardRow[]>=>{
-    const query = `SELECT * FROM cards WHERE idm = '' AND soft_delete = FALSE`;
-    const rows = await dbAll<CardRow>(query, []);
+const getMemberIdmIsEmpty = async(idm:string):Promise<MemberIdmRow[]>=>{
+    const query = 
+        `SELECT * FROM members AS M
+         LEFT OUTER JOIN idms AS I
+         WHERE M.fcno = I.fcno
+         AND (I.idm = '' OR I.idm = NULL) AND M.soft_delete = FALSE`;
+    const rows = await dbAll<MemberIdmRow>(query, [idm]);
     return rows;
 }
 

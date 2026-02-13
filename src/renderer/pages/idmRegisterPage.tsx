@@ -3,7 +3,7 @@ import Select, {SingleValue, ActionMeta} from "react-select";
 import { idmRegisterService } from '@/service/ipcRenderer/idmRegisterPageRenderer';
 import { toast } from 'sonner';
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
-import { CardRow } from "@/db/cards/cardRow";
+import { MemberIdmRow } from "@/db/members/memberIdmRow";
 
 type CardOption = {
   value: string,
@@ -134,7 +134,7 @@ export function IdmRegisterPage() {
             view.selectOn = Display.none;
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
-                const row: CardRow = await idmRegisterService.getMemberByFcno(fcno);
+                const row: MemberIdmRow = await idmRegisterService.getMemberByFcno(fcno);
                 if(row){
                     view.selectOn = Display.block;
                     view.idm = view.idm;
@@ -176,7 +176,7 @@ export function IdmRegisterPage() {
 
     /** 選択リストを作る */
     const redrawSelect = async (ipc_idm:string) => {
-        const idmRow: CardRow = await idmRegisterService.getMemberByIdm(ipc_idm);
+        const idmRow: MemberIdmRow = await idmRegisterService.getMemberByIdm(ipc_idm);
         if(idmRow) {
             // タッチしたIDMが登録済のとき
             view.card_fcno = idmRow.fcno;
@@ -192,7 +192,7 @@ export function IdmRegisterPage() {
         }else{
             // タッチしたIDMが未登録のとき
             // idm未登録のCardsを取り出す
-            const rows: CardRow[] = await idmRegisterService.getMemberIdmIsEmpty();
+            const rows: MemberIdmRow[] = await idmRegisterService.getMemberIdmIsEmpty();
             const options:CardOption[] = [];
             for(const _row of rows) {
                 const option:CardOption = {
