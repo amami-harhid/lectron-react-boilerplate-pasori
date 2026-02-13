@@ -3,6 +3,7 @@ import { ipcMainMemberListPage } from "./memberListService";
 import { ipcMainMemberTrashedListPage } from './memberTrashedListService';
 import { ipcMainIdmRegistPage } from './idmRegistPageService';
 import { ipcMainHistoriesListPagePage } from './historiesPageService';
+import { ipcMail } from './mailService';
 // RENDERER --> MAIN -->RENDERERのDB通信
 export function ipcMainSqliteBridge() {
     ipcMainTopPage();
@@ -10,5 +11,7 @@ export function ipcMainSqliteBridge() {
     ipcMainHistoriesListPagePage();
     ipcMainIdmRegistPage();
     ipcMainMemberTrashedListPage();
+    ipcMail();
 };
+
 

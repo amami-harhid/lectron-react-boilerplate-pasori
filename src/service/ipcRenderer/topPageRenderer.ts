@@ -1,14 +1,15 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import { CHANNEL_REPLY, CHANNEL_REQUEST,
+        CHANNEL_MAIL_REQUEST, CHANNEL_MAIL_REPLY } from '../ipcChannel';
 import { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
 
 import { topPageServiceMethods } from '../ipcMain/topPageServiceMethods';
 const methods = topPageServiceMethods;
 const ipcRenderer = window.electronService.ipcServiceRenderer;
-
+const ipcMailRenderer = window.electronMailService.ipcMailServiceRenderer;
 export const topPageService = {
     /** IDMが紐づいたメンバーを取得する */
     getMemberByIdm: async function(idm:string): Promise<HistoriesMemberIdmRow> {
-        ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByIdm.name, idm);    
+        ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByIdm.name, idm);
         const val = await ipcRenderer.asyncOnce<HistoriesMemberIdmRow>(CHANNEL_REPLY);
         return val;
     },
@@ -18,4 +19,10 @@ export const topPageService = {
         const count = await ipcRenderer.asyncOnce<boolean>(CHANNEL_REPLY);
         return count;
     },
+    sendMail: async function(mail_to:string, in_out:boolean, name:string): Promise<boolean> {
+        ipcMailRenderer.send(CHANNEL_MAIL_REQUEST, mail_to, in_out, name);
+        const result = await ipcMailRenderer.asyncOnce(CHANNEL_MAIL_REPLY);
+        return result;
+    }
+
 };

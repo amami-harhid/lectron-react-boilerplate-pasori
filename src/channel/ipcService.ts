@@ -9,6 +9,11 @@ export const IpcServiceChannels = {
     CHANNEL_REPLY: 'reply-service',
 } as const;
 
+export const IpcMailServiceChannels = {
+    CHANNEL_MAIL_REQUEST: 'request-mail-service',
+    CHANNEL_MAIL_REPLY: 'reply-mail-service',
+} as const;
+
 export type IpcChannelKeyOfService = keyof typeof IpcChannels;
 
 export type IpcChannelValOfService = (typeof IpcChannels)[keyof typeof IpcChannels];
@@ -16,3 +21,7 @@ export type IpcChannelValOfService = (typeof IpcChannels)[keyof typeof IpcChanne
 export type IpcServiceChannelKeyOfService = keyof typeof IpcServiceChannels;
 
 export type IpcServiceChannelValOfService = (typeof IpcServiceChannels)[keyof typeof IpcServiceChannels];
+
+export type IpcMailServiceChannelsKeyOfService = keyof typeof IpcMailServiceChannels;
+
+export type IpcMailServiceChannelsValOfService = (typeof IpcMailServiceChannels)[keyof typeof IpcMailServiceChannels];

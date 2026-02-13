@@ -1,13 +1,12 @@
-import electron from 'electron'
 import nodemailer from 'nodemailer';
-import { ApConfig } from '@/conf/conf.js';
+import { ApConfig } from '@/conf/conf';
 import { Logger } from '@/log/logger';
 const logger = new Logger();
 
 const SMTP_SERVER = (ApConfig.has("SMTP_SERVER"))?
         ApConfig.get("SMTP_SERVER"):"";
 const SMTP_PORT = (ApConfig.has("SMTP_PORT"))?
-        ApConfig.get("SMTP_PORT"):456;  
+        ApConfig.get("SMTP_PORT"):456;
 // trueの場合はSSL/TLSを使用
 const SMPT_SECURE = (ApConfig.has("SMPT_SECURE"))?
         ApConfig.get("SMPT_SECURE"):true;
@@ -25,25 +24,25 @@ const SMTP_ACCOUNT_PASSWORD = (ApConfig.has("SMTP_ACCOUNT_PASSWORD"))?
 const MAIL_FROM = '"Pasori System" <pasori@mirai-logic.com>'
 // 件名
 const MAIL_SUBJECT = {
-    IN: (ApConfig.has("MAIL_SUBJECT_IN"))? 
+    IN: (ApConfig.has("MAIL_SUBJECT_IN"))?
         ApConfig.get("MAIL_SUBJECT_IN"):"入室連絡(Pasori)",
-    OUT: (ApConfig.has("MAIL_SUBJECT_OUT"))? 
+    OUT: (ApConfig.has("MAIL_SUBJECT_OUT"))?
         ApConfig.get("MAIL_SUBJECT_OUT"):"退室連絡(Pasori)",
 }
 // 本文
 const MAIL_TEXT = {
-    IN: (ApConfig.has("MAIL_TEXT_IN"))? 
+    IN: (ApConfig.has("MAIL_TEXT_IN"))?
         ApConfig.get("MAIL_TEXT_IN"):"入室",
-    OUT: (ApConfig.has("MAIL_TEXT_OUT"))? 
+    OUT: (ApConfig.has("MAIL_TEXT_OUT"))?
         ApConfig.get("MAIL_TEXT_OUT"):"退室",
 }
 
-const SEND_MAILER = async ( eve: Electron.IpcMainEvent,
-    mail_to:string, mail_subject:string, text:string, name:string ) =>{
+const SEND_MAILER =
+    async ( mail_to:string, mail_subject:string, text:string, name:string ):Promise<boolean> =>{
     // SMTPサーバーの設定
     let transporter = nodemailer.createTransport({
-        host: SMTP_SERVER, 
-        port: SMTP_PORT, 
+        host: SMTP_SERVER,
+        port: SMTP_PORT,
         secure: SMPT_SECURE,
         auth: {
             user: SMTP_ACCOUNT_USER, // メールアドレス
@@ -64,7 +63,9 @@ const SEND_MAILER = async ( eve: Electron.IpcMainEvent,
         logger.debug("メールが送信されました:", mailOptions)
     } catch (error) {
         logger.error("エラーが発生しました:", error)
+        return false;
     }
+    return true;
 }
 
 

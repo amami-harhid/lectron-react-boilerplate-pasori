@@ -3,6 +3,7 @@ import * as IpcServices from '@/channel/ipcService';
 import {CardReaderID, type TCardReaderChannel} from '@/icCard/cardEventID';
 export type Channels = IpcServices.IpcChannelValOfService;
 export type ServiceChannels = IpcServices.IpcServiceChannelValOfService;
+export type ServiceMailChannels = IpcServices.IpcMailServiceChannelsValOfService;
 const electronHandler = {
   ipcRenderer: {
     sendMessage(channel: Channels, methodName:string, ...args: unknown[]) {
@@ -88,12 +89,28 @@ const electronPasoriCard = {
   onCardStop: async () => {
     await ipcRenderer.invoke( CardReaderID.CARD_STOP);
   },
+};
 
+/** メーラーサービス */
+const electronMailServiceHandler = {
+  ipcMailServiceRenderer: {
+    send(channel: ServiceMailChannels, mail_to:string, in_out:boolean, name:string) {
+      ipcRenderer.send(channel, mail_to, in_out, name);
+    },
+    asyncOnce(channel: ServiceMailChannels):Promise<boolean> {
+      return new Promise<boolean>( (resolve)=>{
+        ipcRenderer.once(channel, (_event, result:boolean) => {
+            resolve(result);
+        })
+      });
+    },
+  },
 };
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 contextBridge.exposeInMainWorld('electronService', electronServiceHandler);
+contextBridge.exposeInMainWorld('electronMailerService', electronMailServiceHandler)
 
 const buildEnv = {
     isProduction : (): Promise<boolean> => {
@@ -118,26 +135,12 @@ const buildEnv = {
 
 contextBridge.exposeInMainWorld('buildEnv', buildEnv);
 
-/*
-export type DbChannels = 'cards' | 'histories';
-const electronPasoriDb = {
-    cardRequest(channel: DbChannels, ...args: unknown[]) {
-      ipcRenderer.send(channel, ...args);
-    },
-    cardAllOnce(channel: DbChannels, func: (rows: CardRow[]) => void) {
-      ipcRenderer.once(channel, (_event:IpcRendererEvent, rows:CardRow[]) => func(rows));
-    },
-    cardGetOnce(channel: DbChannels, func: (row:CardRow) => void) {
-      ipcRenderer.once(channel, (_event:IpcRendererEvent, row) => func(row));
-    },
-}
-contextBridge.exposeInMainWorld('pasoriDb', electronPasoriDb);
-*/
 
 
 export type ElectronHandler = typeof electronHandler;
 export type ElectronNavigate = typeof electronNavigate;
 export type ElectronPasoriCard = typeof electronPasoriCard;
 export type ElectronServiceHandler = typeof electronServiceHandler;
+export type ElectronMailServiceHandler = typeof electronMailServiceHandler;
 export type ElectronProduct = typeof buildEnv;
 //export type ElectronPasoriDb = typeof electronPasoriDb;

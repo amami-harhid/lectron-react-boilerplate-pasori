@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-
+import { toast } from 'sonner';
 import { topPageService } from '@/service/ipcRenderer/topPageRenderer';
 import * as PasoriCard from '@/renderer/pages/pasoriCard/pasoriCard';
 import { HistoriesMemberIdmRow } from "@/db/histories/historiesRow";
@@ -59,14 +59,12 @@ export function TopPage() {
 
     /** カードリリース */
     const cardRelease = () => {
-        //console.log('カードリリース')
         view.status = '';
         view.modal_display = Display.none;
         setPageView(view);
     }
     /** カードタッチ */
     const cardTouch = async (idm :string) => {
-        console.log('カードタッチ idm=', idm);
         if(idm.length==0){
             // 安全のために空チェック
             return;
@@ -74,29 +72,43 @@ export function TopPage() {
         // idmが登録されている利用者を取得する
         const row = await cardsSelectCardRow(idm);
         if(row) {
-            console.log('カードタッチ row, idm=',row, idm);
+            //console.log('カードタッチ row, idm=',row, idm);
             const fcno = row.fcno;
             if( row.in_room == true ) {
-                console.log('カードタッチ OUT row, idm=',row, idm);
+                //console.log('カードタッチ OUT row, idm=',row, idm);
                 // 入室中
                 Sounds.play({name:"CARD_OUT"})
                 await setOutRoom( fcno, idm);
+                if(row.mail != ''){
+                    // 退室通知メール
+                    const mailResult = await topPageService.sendMail(row.mail, false, row.name);
+                    if(mailResult==false){
+                      toast.warning('メール送信失敗');
+                    }
+                }
                 view.status = '退室しました';
-                view.name = `(${row.name}さん)`
+                view.name = `(${row.name}さん)`;
             }else{
                 // 退室中
-                console.log('カードタッチ IN row, idm=',row, idm);
-                Sounds.play({name:"CARD_IN"})
+                //console.log('カードタッチ IN row, idm=',row, idm);
+                Sounds.play({name:"CARD_IN"});
                 await setInRoom( fcno, idm);
+                if(row.mail != ''){
+                    // 入室通知メール
+                    const mailResult = await topPageService.sendMail(row.mail, true, row.name);
+                    if(mailResult==false){
+                      toast.warning('メール送信失敗');
+                    }
+                }
                 view.status = '入室しました';
-                view.name = `(${row.name}さん)`
+                view.name = `(${row.name}さん)`;
             }
         }else{
             Sounds.play({name:"CARD_NG"})
             view.status = `未登録カード(${idm})`;
             view.name = ``
         }
-        console.log('カードタッチ view.status=',view.status);
+        //console.log('カードタッチ view.status=',view.status);
         view.modal_display = Display.block;
         setPageView(view);
 

@@ -4,6 +4,7 @@ import {
   ElectronPasoriCard,
   ElectronProduct,
   ElectronServiceHandler,
+  ElectronMailServiceHandler,
  } from '@/main/preload';
 
 declare global {
@@ -14,6 +15,7 @@ declare global {
     pasoriCard: ElectronPasoriCard;
     buildEnv: ElectronProduct;
     electronService: ElectronServiceHandler;
+    electronMailService: ElectronMailServiceHandler,
   }
 }
 

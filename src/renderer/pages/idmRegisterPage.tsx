@@ -293,8 +293,8 @@ export function IdmRegisterPage() {
             <div>
                 <p>{view.confirm_message}</p>
                 <div style={{width:'80%', marginLeft:'10%', display: "flex", justifyContent: "space-between"}}>
-                    <button onClick={confirm_yes_button}>はい</button>
                     <button onClick={confirm_no_button}>いいえ</button>
+                    <button onClick={confirm_yes_button}>はい</button>
                 </div>
                 <p></p>
             </div>
