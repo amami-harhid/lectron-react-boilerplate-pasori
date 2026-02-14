@@ -292,9 +292,6 @@ export function MemberCardListPage () {
                 <button className="modal-btn" onClick={()=>handleRegistCancel()}>
                     中止
                 </button>
-                <button className="modal-alert-btn" onClick={()=>pasoriCardListenStart()}>
-                    読込開始
-                </button>
             </div>
         </Modal>
         {/* カード情報登録解除 */}
