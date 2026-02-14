@@ -1,11 +1,12 @@
 import type { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 
 import * as DateUtils from '../../utils/dateUtils';
 
 import { dbRun, dbGet, transactionBase } from './utils/serviceUtils';
 
 /** IDMが紐づいているメンバーを取得する */
-export const getMemberByIdm = async (idm: string):Promise<HistoriesMemberIdmRow> => {
+const getMemberByIdm = async (idm: string):Promise<HistoriesMemberIdmRow> => {
     const query = 
         `SELECT M.*, IFNULL(I.idm, '') AS idm, IFNULL(H.in_room, FALSE) AS in_room
          FROM members AS M
@@ -21,7 +22,7 @@ export const getMemberByIdm = async (idm: string):Promise<HistoriesMemberIdmRow>
 }
 
 /** 入室にする・退室にする */
-export const setInRoomByFcno = async (fcno:string, idm:string, in_room:boolean):Promise<boolean>=>{
+const setInRoomByFcno = async (fcno:string, idm:string, in_room:boolean):Promise<boolean>=>{
     console.log('Method setInRoomByFcno parms=', fcno, idm, in_room)
     const memberIdm = await getMemberByIdm(idm);
     console.log('memberIdm=', memberIdm);

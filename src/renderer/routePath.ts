@@ -5,6 +5,7 @@ export const routePath = {
     HistoriesListPage: '/historieslistpage',
     IdmRegister: '/idmregisterpage',
     MemberListPage: '/memberlistpage',
+    MemberCardListPage: '/membercardlistpage',
     MemberTrashedListPage: '/membertrashedlistpage',
 } as const;
 

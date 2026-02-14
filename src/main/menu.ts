@@ -19,6 +19,7 @@ const CARD_MANAGE = '#CardManage';
 const GENERAL = '#Genaral';
 const GENERAL_STOP = '#Genaral_STOP';
 const MEMBERS = '#MEMBERS';
+const MEMBERCARDS = '#MEMBERCARDS';
 const DEV_TOOL = "#DEV_TOOL";
 const APP_VERSION = "#APP_VERSION";
 const APP_VERSION_VIEW = "#APP_VERSION_VIEW";
@@ -94,6 +95,14 @@ export default class MenuBuilder {
             enabled: true,
             click() {
               toMember();
+            },
+          },
+          {
+            label: 'カード一覧',
+            id: MEMBERCARDS,
+            enabled: true,
+            click() {
+              toMemberCard();
             },
           },
           {
@@ -211,6 +220,7 @@ const toHome = ()=>{
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.Home);
 }
@@ -220,6 +230,7 @@ const toManager = ()=>{
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.IdmRegister);
 }
@@ -228,6 +239,7 @@ const toGeneral = () => {
     setEnableToMenuItem(GENERAL_STOP, true);
     setEnableToMenuItem(CARD_MANAGE, false);
     setEnableToMenuItem(MEMBERS, false);
+    setEnableToMenuItem(MEMBERCARDS, false);
     setEnableToMenuItem(HISTORIES, false);
     sendMessage("navigate", routePath.Top);
 }
@@ -236,6 +248,7 @@ const toGeneralStop = () => {
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.Stop);
 }
@@ -244,8 +257,18 @@ const toMember = () => {
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, false);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.MemberListPage)
+}
+const toMemberCard = () => {
+    setEnableToMenuItem(GENERAL, true);
+    setEnableToMenuItem(GENERAL_STOP, false);
+    setEnableToMenuItem(CARD_MANAGE, true);
+    setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, false);
+    setEnableToMenuItem(HISTORIES, true);
+    sendMessage("navigate", routePath.MemberCardListPage)
 }
 const openDevTool = () => {
     const browser = BrowserWindow.getFocusedWindow();
@@ -258,6 +281,7 @@ const viewHistories = () => {
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.HistoriesListPage);
 }
@@ -266,6 +290,7 @@ const viewMemberTrashedList = () => {
     setEnableToMenuItem(GENERAL_STOP, false);
     setEnableToMenuItem(CARD_MANAGE, true);
     setEnableToMenuItem(MEMBERS, true);
+    setEnableToMenuItem(MEMBERCARDS, true);
     setEnableToMenuItem(HISTORIES, true);
     sendMessage("navigate", routePath.MemberTrashedListPage);
 }

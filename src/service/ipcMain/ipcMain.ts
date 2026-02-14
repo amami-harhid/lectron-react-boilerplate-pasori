@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import * as IpcServices from '@/channel/ipcService';
 import { ipcMainTopPage } from '../ipcMain/topPageService';
 import { ipcMainMemberListPage } from "./memberListService";
+import { ipcMainMemberCardListPage } from './memberCardListService';
 import { ipcMainMemberTrashedListPage } from './memberTrashedListService';
 import { ipcMainIdmRegistPage } from './idmRegistPageService';
 import { ipcMainHistoriesListPagePage } from './historiesPageService';
@@ -14,6 +15,7 @@ const replyChannel = IpcServices.IpcServiceChannels.CHANNEL_REPLY;
 export function ipcMainSqliteBridge() {
     ipcMainTopPage();
     ipcMainMemberListPage();
+    ipcMainMemberCardListPage();
     ipcMainHistoriesListPagePage();
     ipcMainIdmRegistPage();
     ipcMainMemberTrashedListPage();

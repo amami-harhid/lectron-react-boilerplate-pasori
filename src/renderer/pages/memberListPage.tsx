@@ -3,7 +3,6 @@ import Modal from 'react-modal';
 import { useForm } from 'react-hook-form';
 import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
 import { Box, Icon, IconButton, Tooltip } from '@mui/material';
-import CardIcon from "@/icons/Card";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/PersonAdd';
@@ -197,7 +196,7 @@ export function MemberListPage () {
         // DBレコードを追加する
         console.log('formSubmitRegist')
         const fcno = data.fcno;
-        const row = await memberListService.getMemberByFcno(fcno);
+        const row = await memberListService.getMemberIdmByFcno(fcno);
         if(row == undefined) {
             pageInfo.tempData.fcno = fcno;
             pageInfo.tempData.name = data.name;
@@ -368,11 +367,6 @@ export function MemberListPage () {
                     renderRowActions={({ row }) => (
                         <>
                         <Box sx={{ display: 'flex', gap: '0.2rem' }}>
-                            <Tooltip title="カード" arrow placement="top">
-                                <IconButton>
-                                    <CardIcon />
-                                </IconButton>
-                            </Tooltip>
                             <Tooltip title="編集" arrow placement="top">
                                 <IconButton onClick={() => handleEdit(row)}>
                                     <EditIcon />

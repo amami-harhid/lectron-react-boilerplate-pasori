@@ -4,6 +4,7 @@ import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
 import type { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 
 import * as IpcServices from '@/channel/ipcService';
 

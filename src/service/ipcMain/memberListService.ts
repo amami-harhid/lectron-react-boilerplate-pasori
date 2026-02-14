@@ -4,6 +4,7 @@ import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
 import type { MemberRow } from '@/db/members/memberRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 import * as IpcServices from '@/channel/ipcService';
 
 import { memberListPageServiceMethods } from './memberListServiceMethods';
@@ -24,12 +25,16 @@ export function ipcMainMemberListPage() {
             event.reply(replyChannel, row);
             return;            
         }
+        // IDMが紐づいたメンバーを取得する
+        else if( command == methods.getMemberIdmByFcno.name ){
+            const fcno:string = args[0];
+            const row: MemberIdmRow = await methods.getMemberIdmByFcno(fcno);
+            event.reply(replyChannel, row);
+            return row;            
+        }
         /** 全メンバーを取得する */
         else if(command == methods.getMembers.name){
-            console.log('ipcMain.on command=',command);
-
             const rows = await methods.getMembers();
-            console.log('rows=',rows);
             event.reply(replyChannel, rows);
             return;
         }

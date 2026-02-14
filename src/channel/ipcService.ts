@@ -11,6 +11,8 @@ export const IpcServiceChannels = {
     TOPPAGE_CHANNEL_REPLY: 'toppage-reply-service',
     MEMBERLIST_CHANNEL_REQUEST: 'memberlistpage-request-service',
     MEMBERLIST_CHANNEL_REPLY: 'memberlistpage-reply-service',
+    MEMBERCARDLIST_CHANNEL_REQUEST: 'membercardlistpage-request-service',
+    MEMBERCARDLIST_CHANNEL_REPLY: 'membercardlistpage-reply-service',
     HISTORIES_CHANNEL_REQUEST: 'historiespage-request-service',
     HISTORIES_CHANNEL_REPLY: 'historiespage-reply-service',
     IDMREGIST_CHANNEL_REQUEST: 'idmRegistpage-request-service',

@@ -1,4 +1,5 @@
 import type { MemberRow } from '@/db/members/memberRow';
+import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 
 import { dbRun, dbAll, dbGet, transactionBase } from './utils/serviceUtils';
 
@@ -11,13 +12,26 @@ const getMemberByFcno = async(fcno:string):Promise<MemberRow>=>{
     return row;
 }
 
+/** FCNOでIDM情報を含めたメンバー情報を取得する */
+const getMemberIdmByFcno = async (fcno: string):Promise<MemberIdmRow> => {
+    const query = 
+        `SELECT M.*, IFNULL(I.idm, '') AS idm
+         FROM members AS M
+         LEFT OUTER JOIN idms AS I ON M.fcno = I.fcno
+         WHERE M.fcno = ? AND M.soft_delete = FALSE`;
+    
+    const row = await dbGet<MemberIdmRow>(query, [fcno]);
+    return row;
+}
+
 /** 全メンバーを取得する */
-const getMembers = async():Promise<MemberRow[]>=>{
+const getMembers = async():Promise<MemberIdmRow[]>=>{
     const selectAll =
-        `SELECT * FROM members 
-         WHERE soft_delete = FALSE
-         ORDER BY kana ASC`;
-    const rows = dbAll<MemberRow>(selectAll,[]);
+        `SELECT M.*, IFNULL(I.idm,'') AS idm FROM members AS M
+         LEFT OUTER JOIN idms AS I ON M.fcno = I.fcno
+         WHERE M.soft_delete = FALSE
+         ORDER BY M.kana ASC`;
+    const rows = dbAll<MemberIdmRow>(selectAll,[]);
     return rows;
 }
 
@@ -69,6 +83,7 @@ const deleteMemberByFcno = async(fcno: string):Promise<boolean>=>{
 
 export const memberListPageServiceMethods = {
     getMemberByFcno: getMemberByFcno,
+    getMemberIdmByFcno: getMemberIdmByFcno,
     getMembers: getMembers,
     addMember: addMember,
     updateMemberByFcno: updateMemberByFcno,
