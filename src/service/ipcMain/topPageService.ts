@@ -1,7 +1,7 @@
 import electron from 'electron';
 const ipcMain = electron.ipcMain;
-import { LoggerRef } from '@/log/loggerReference';
-const logger = LoggerRef.logger;
+//import { LoggerRef } from '@/log/loggerReference';
+//const logger = LoggerRef.logger;
 
 import type { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
 import type { MemberIdmRow } from '@/db/members/memberIdmRow';
@@ -19,7 +19,7 @@ export function ipcMainTopPage(){
             const idm:string = args[0];
             const row: HistoriesMemberIdmRow = await methods.getMemberByIdm(idm);
             event.reply(replyChannel, row);
-            return row;            
+            return;
         }
         /** 入室にする(退室にする) */
         else if(command == methods.setInRoomByFcno.name){
@@ -27,10 +27,11 @@ export function ipcMainTopPage(){
             const idm:string = args[1];
             const in_room:boolean = args[2];
             const result = await methods.setInRoomByFcno(fcno, idm, in_room);
-            return result;
+            event.reply(replyChannel, result);
+            return;
         }
         return false;
         //logger.error(`comman is not match =(${command})`)
- 
+
     });
 }

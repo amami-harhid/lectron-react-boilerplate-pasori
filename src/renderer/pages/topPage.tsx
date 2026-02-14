@@ -51,10 +51,14 @@ export function TopPage() {
     };
     const setInRoom = async(fcno:string, idm: string) : Promise<void> => {
         // Cards/履歴を更新
+        console.log('setInRoom fcno=',fcno,',idm=',idm);
         await topPageService.setInRoomByFcno(fcno, idm, true);
+        console.log('setInRoom fcno Done');
     }
     const setOutRoom = async(fcno:string, idm: string) : Promise<void> => {
+        console.log('setOutRoom fcno=',fcno,',idm=',idm);
         await topPageService.setInRoomByFcno(fcno, idm, false);
+        console.log('setOutRoom fcno Done');
     }
 
     /** カードリリース */

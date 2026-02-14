@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { MaterialReactTable } from 'material-react-table';
 import * as DateUtils from '@/utils/dateUtils';
 import { historiesPageService } from "@/service/ipcRenderer/historiesListPageRenderer";
@@ -18,8 +18,9 @@ type PAGEINFO = {
 
 /** 履歴一覧ページ */
 export function HistoriesListPage() {
-
-    const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:'', tableData:[]});
+    const toDay = new Date();
+    const toDayStr = DateUtils.dateToSqlite3Date(toDay);
+    const [pageInfo, setPageInfo] = useState<PAGEINFO>({date:toDayStr, tableData:[]});
 
     // Define columns
     const columns = [
@@ -80,20 +81,18 @@ export function HistoriesListPage() {
                 fcno: row.fcno,
                 name: (row.name)?row.name:'',
                 kana: (row.kana)?row.kana:'',
-                in: (row.in_room)? '退室':'入室'
+                in: (row.in_room)? '入室':'退室'
             }
             _data.push(newRow);
         }
         return _data;
     }
-    /** 日付選択値が変更されたとき */ 
+    /** 日付選択値が変更されたとき */
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>)=>{
         const date = event.target.valueAsDate;
         if(date){
-            const _rows = await historiesToTableData(date);
-            const date_str = DateUtils.dateToSqlite3Date(date);
             // ここでレンダリングされる（テーブルへのデータ反映）
-            pageRender(date_str, _rows);
+            pageRender(date);
         }else{
             // ここでレンダリングされる（テーブル初期化）
             pageRender();
@@ -101,16 +100,22 @@ export function HistoriesListPage() {
 
     }
     /** ページレンダリング */
-    const pageRender = (_data:string='', _tableData:TABLE_ROW[]=[]) => {
-        setPageInfo( {date:_data, tableData:_tableData} )
+    const pageRender = async (date:Date=toDay) => {
+        const date_str = DateUtils.dateToSqlite3Date(date);
+        const rows = await historiesToTableData(date);
+        setPageInfo( {date:date_str, tableData: rows} );
     }
 
     /** 初期化 */
     const pageInit = () => {
-      // ページレンダリングされる
-      pageRender();
+        // ページレンダリングされる
+        pageRender();
     }
-    
+
+    useEffect(()=>{
+        pageRender();
+    },[]);
+
     PasoriCard.onRelease(async ()=>{});
     PasoriCard.onTouch(async ()=>{});
 

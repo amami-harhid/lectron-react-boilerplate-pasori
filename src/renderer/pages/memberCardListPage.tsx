@@ -3,9 +3,6 @@ import Modal from 'react-modal';
 import { MaterialReactTable, type MRT_Row, type MRT_RowData } from 'material-react-table';
 import { Box, Icon, IconButton, Tooltip } from '@mui/material';
 import CardIcon from '@/icons/Card';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/PersonAdd';
 import { toast } from 'sonner';
 
 import { memberCardListService } from "@/service/ipcRenderer/memberCardListRenderer";
@@ -138,11 +135,26 @@ export function MemberCardListPage () {
             pageInfo.tempData.idm = idm;
             console.log('カードタッチした idm=',idm);
             const fcno = pageInfo.tempData.fcno;
-            console.log('memberCardListService.setIdmByFcno fcno,idm=',fcno,idm);
-            await memberCardListService.setIdmByFcno(fcno, idm);
-            console.log('memberCardListService.setIdmByFcno Done');
-            pageInfo.textCardRegistModal = 'カード登録しました';
-            toast.success('カード登録しました');
+            const idmRow = await memberCardListService.getIdm(idm);
+            if(idmRow) {
+                if(idmRow.fcno != fcno) {
+                    // すでに利用されているカード
+                    pageInfo.textCardRegistModal = 'カードは他で使用済';
+                    toast.warning('カード使用済');
+                }else{
+                    pageInfo.textCardRegistModal = 'カードは自分で使用済';
+                    toast.warning('カード使用済');
+                }
+            }else{
+                // IDMは未登録
+                const result = await memberCardListService.setIdmByFcno(fcno, idm);
+                if(result){
+                    pageInfo.textCardRegistModal = 'カード登録しました';
+                    toast.success('カード登録しました');
+                }else{
+                    toast.error('カード登録失敗');
+                }
+            }
             redrawPageInfo(pageInfo);
         });
     }
@@ -216,10 +228,10 @@ export function MemberCardListPage () {
 
     // redrawPageInfo()が実行されたとき
     // リロードが実行され、メンバー一覧を最新化する仕組み
-    useEffect(() => {        
+    useEffect(() => {
         reload();
     },[pageInfo.counter]);
-    console.log('before return')
+
     return (
         <>
         <div ref={content} className="modal_manager" >
@@ -239,21 +251,21 @@ export function MemberCardListPage () {
                     renderRowActions={({ row }) => (
                         <Box sx={{ display: 'flex', gap: '0.2rem' }}>
                             <Tooltip title="登録" arrow placement="top">
-                                <IconButton color="primary" onClick={() => handleRegist(row)} 
+                                <IconButton color="primary" onClick={() => handleRegist(row)}
                                         disabled={row.original.idm != ''}
                                     >
                                     <CardIcon />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="解除" arrow placement="top">
-                                <IconButton color="error" onClick={() => handleRemove(row)} 
+                                <IconButton className="customRedIcon" color="error" onClick={() => handleRemove(row)}
                                         disabled={row.original.idm == ''}
                                     >
                                     <CardIcon />
                                 </IconButton>
                             </Tooltip>
                         </Box>
-                        
+
                     )}
                 />
             </div>
@@ -268,7 +280,7 @@ export function MemberCardListPage () {
             style={{
                 content: {
                     width: "50%",
-                    height: "70%",
+                    height: "40%",
                     top: '50%',
                     left: '50%',
                     right: 'auto',

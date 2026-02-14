@@ -200,3 +200,7 @@ h1 {
 .modal-alert-btn:hover {
     background-color: #b00000;
 }
+
+.customRedIcon {
+  color: red; /* あるいは、任意の色コード */
+}
