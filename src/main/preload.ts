@@ -110,7 +110,7 @@ contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('navigate', electronNavigate);
 contextBridge.exposeInMainWorld('pasoriCard', electronPasoriCard);
 contextBridge.exposeInMainWorld('electronService', electronServiceHandler);
-contextBridge.exposeInMainWorld('electronMailerService', electronMailServiceHandler)
+contextBridge.exposeInMainWorld('electronMailService', electronMailServiceHandler)
 
 const buildEnv = {
     isProduction : (): Promise<boolean> => {

@@ -62,71 +62,65 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-  if (isDebug) {
-    await installExtensions();
-  }
-
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
-  const assetsPath = getAssetPath();
-  logger.info('Asset path=', getAssetPath());
-  ipc_assets_path(assetsPath);
-
-  mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
-    webPreferences: {
-      webSecurity: true, // ローカルリソースロード不可
-      preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
-    },
-  });
-
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
-  mainWindow.setAlwaysOnTop(true, 'screen-saver'); // 常時トップ表示
-  mainWindow.moveTop();
-
-  mainWindow.on('ready-to-show', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
+    if (isDebug) {
+        await installExtensions();
     }
 
-  });
+    const RESOURCES_PATH = app.isPackaged
+      ? path.join(process.resourcesPath, 'assets')
+      : path.join(__dirname, '../../assets');
 
-  //---- DB TABLE CREATE IF NOT EXITST
-  console.log('before createTables')
-  await createTables(db);
-  console.log('after createTables')
+    const getAssetPath = (...paths: string[]): string => {
+        return path.join(RESOURCES_PATH, ...paths);
+    };
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+    const assetsPath = getAssetPath();
+    ipc_assets_path(assetsPath);
 
-  console.log('before menuBuilder.buildMenu')
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-  console.log('after menuBuilder.buildMenu')
+    mainWindow = new BrowserWindow({
+      show: false,
+      width: 1024,
+      height: 728,
+      icon: getAssetPath('icon.png'),
+      webPreferences: {
+        webSecurity: true, // ローカルリソースロード不可
+        preload: app.isPackaged
+          ? path.join(__dirname, 'preload.js')
+          : path.join(__dirname, '../../.erb/dll/preload.js'),
+        },
+    });
 
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
+    mainWindow.loadURL(resolveHtmlPath('index.html'));
+    mainWindow.setAlwaysOnTop(true, 'screen-saver'); // 常時トップ表示
+    mainWindow.moveTop();
 
+    mainWindow.on('ready-to-show', () => {
+        if (!mainWindow) {
+            throw new Error('"mainWindow" is not defined');
+        }
+        if (process.env.START_MINIMIZED) {
+            mainWindow.minimize();
+        } else {
+            mainWindow.show();
+        }
+
+    });
+
+    //---- DB TABLE CREATE IF NOT EXITST
+    await createTables(db);
+
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+    });
+
+    const menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu();
+
+    // Open urls in the user's browser
+    mainWindow.webContents.setWindowOpenHandler((edata) => {
+        shell.openExternal(edata.url);
+        return { action: 'deny' };
+    });
 };
 
 /**
@@ -134,12 +128,12 @@ const createWindow = async () => {
  */
 
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    db.close();
-    app.quit();
-  }
+    // Respect the OSX convention of having the application in memory even
+    // after all windows have been closed
+    if (process.platform !== 'darwin') {
+        db.close();
+        app.quit();
+    }
 });
 
 app
@@ -155,10 +149,14 @@ app
   })
   .catch(
     (reason: any) => {
-        logger.error('uncaught exception occured?????')
         logger.error(reason);
     }
   );
 
 // MAIN<-->RENDERERのDB通信
 ipcMainSqliteBridge();
+
+// 異常終了を検知する
+process.on('uncaughtException', function (error) {
+    logger.error(error);
+});

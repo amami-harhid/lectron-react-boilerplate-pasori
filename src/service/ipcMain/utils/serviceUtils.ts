@@ -33,7 +33,6 @@ export const dbAll = async <T>(query:string, params:any[]=[]):Promise<T[]>=>{
                 throw error;
             }
             stmt.finalize();
-            console.log(rows)
             resolve(rows);
         })
     });
@@ -48,7 +47,6 @@ export const dbGet = async <T>(query:string, params:any[]): Promise<T> =>{
         console.log('query',query);
         stmt.get(params, (error:Error, row:T)=>{
             if(error){
-                console.log(error);
                 logger.error(error);
                 stmt.finalize();
                 throw error;
@@ -79,17 +77,15 @@ export const transactionBase = async (callBack:AsyncFunction<any,boolean>):Promi
             try{
                 await callBack();
             }catch(error){
-                //reject();
+                logger.error(error);
                 throw error;
             }
             resolve();
         });
     }catch(error){
-        console.log('Rollback');
         transaction(Transaction.ROLLBACK);
         return false;
     }
-    console.log('Commit');
     await transaction(Transaction.COMMIT);
     return true;
 }

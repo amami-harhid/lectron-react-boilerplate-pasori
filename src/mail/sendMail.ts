@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { ApConfig } from '@/conf/conf';
+import { ApConfig } from '@/conf/confUtil';
 import { Logger } from '@/log/logger';
 const logger = new Logger();
 
@@ -39,6 +39,9 @@ const MAIL_TEXT = {
 
 const SEND_MAILER =
     async ( mail_to:string, mail_subject:string, text:string, name:string ):Promise<boolean> =>{
+    if(SMTP_SERVER == ''){
+        return false;
+    }
     // SMTPサーバーの設定
     let transporter = nodemailer.createTransport({
         host: SMTP_SERVER,

@@ -1,7 +1,7 @@
 {
   "name": "electron-react-boilerplate-pasori",
   "description": "Simple IC-Card application",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "keywords": [
     "electron",
     "boilerplate",

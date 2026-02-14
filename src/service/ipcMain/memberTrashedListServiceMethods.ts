@@ -1,6 +1,7 @@
 import type { MemberRow } from '@/db/members/memberRow';
-
 import { dbRun, dbAll, transactionBase } from './utils/serviceUtils';
+import { LoggerRef } from '@/log/loggerReference';
+const logger = LoggerRef.logger;
 
 /** 論理削除されたメンバーを取得する */
 const getTrashedMembers = async (): Promise<MemberRow[]> => {
@@ -26,14 +27,23 @@ const setRecorverMemberByFcno = async (fcno:string): Promise<boolean> => {
 /** 論理削除されたメンバーと紐づく履歴を完全削除する */
 const deleteCompletelyByFcno = async (fcno:string): Promise<boolean> => {
     const rsult = await transactionBase(async ()=>{
-        const deleteMemberQuery =
-          `DELETE FROM histories WHERE fcno = ?;
-           DELETE FROM idms WHERE fcno = ?; 
-           DELETE FROM members WHERE fcno = ? AND soft_delete = TRUE;`;
-        const changes = await dbRun(deleteMemberQuery, [fcno, fcno, fcno]);
-        if(changes > 0) {
-            return true;
-        }else{
+        const deleteQuery = [
+          `DELETE FROM histories WHERE fcno = ?`,
+          `DELETE FROM idms WHERE fcno = ?`,
+          `DELETE FROM members WHERE fcno = ? AND soft_delete = TRUE`
+        ]
+        try{
+            let count = 0;
+            for(const query of deleteQuery){
+                const changes = await dbRun(query, [fcno]);
+                count += changes;
+            }
+            if(count>0){
+                return true;
+            }
+            return false;
+        }catch(error){
+            logger.error(error);
             return false;
         }
     });
