@@ -1,8 +1,11 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import * as IpcServices from '@/channel/ipcService';
 import { MemberRow } from '@/db/members/memberRow';
 import { memberTrashedListServiceMethods } from '../ipcMain/memberTrashedListServiceMethods';
 const methods = memberTrashedListServiceMethods;
 const ipcRenderer = window.electronService.ipcServiceRenderer;
+
+const CHANNEL_REQUEST = IpcServices.IpcServiceChannels.MEMBERTRUSHED_CHANNEL_REQUEST;
+const CHANNEL_REPLY = IpcServices.IpcServiceChannels.MEMBERTRUSHED_CHANNEL_REPLY;
 
 export const memberTrashedListService = {
     /** 論理削除されたメンバーを取り出す */

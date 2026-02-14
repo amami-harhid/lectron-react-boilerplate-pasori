@@ -43,6 +43,7 @@ const electronServiceHandler = {
     asyncOnce<T>(channel: ServiceChannels):Promise<T> {
       return new Promise<T>( (resolve)=>{
         ipcRenderer.once(channel, (_event, arg:T) => {
+            console.log('main asyncOnce arg=', arg);
             resolve(arg);
         })
       });

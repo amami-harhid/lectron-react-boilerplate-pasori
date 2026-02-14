@@ -1,8 +1,11 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import * as IpcServices from '@/channel/ipcService';
 import { HistoriesMemberRow } from '@/db/histories/historiesRow';
 import { historiesPageServiceMethods } from '../ipcMain/historiesPageServiceMethods';
 const methods = historiesPageServiceMethods;
 const ipcRenderer = window.electronService.ipcServiceRenderer;
+
+const CHANNEL_REQUEST = IpcServices.IpcServiceChannels.HISTORIES_CHANNEL_REQUEST;
+const CHANNEL_REPLY = IpcServices.IpcServiceChannels.HISTORIES_CHANNEL_REPLY;
 
 export const historiesPageService = {
     /** 日付を指定して全履歴を取得する */

@@ -70,6 +70,10 @@ export function HistoriesListPage() {
         const rows:HistoriesMemberRow[] = await historiesPageService.getHistoriesByDate(date);
         const _data:TABLE_ROW[] = [];
         for(const row of rows){
+            if(row.date == ''){
+                // Historiesテーブルがないとき
+                continue;
+            }
             const newId = _data.length > 0 ? _data[_data.length - 1].no + 1 : 1;
             const newRow:TABLE_ROW = {
                 no: newId,

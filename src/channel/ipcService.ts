@@ -7,6 +7,16 @@ export const IpcChannels = {
 export const IpcServiceChannels = {
     CHANNEL_REQUEST: 'request-service',
     CHANNEL_REPLY: 'reply-service',
+    TOPPAGE_CHANNEL_REQUEST: 'toppage-request-service',
+    TOPPAGE_CHANNEL_REPLY: 'toppage-reply-service',
+    MEMBERLIST_CHANNEL_REQUEST: 'memberlistpage-request-service',
+    MEMBERLIST_CHANNEL_REPLY: 'memberlistpage-reply-service',
+    HISTORIES_CHANNEL_REQUEST: 'historiespage-request-service',
+    HISTORIES_CHANNEL_REPLY: 'historiespage-reply-service',
+    IDMREGIST_CHANNEL_REQUEST: 'idmRegistpage-request-service',
+    IDMREGIST_CHANNEL_REPLY: 'idmRegistpage-reply-service',
+    MEMBERTRUSHED_CHANNEL_REQUEST: 'memberTrushedpage-request-service',
+    MEMBERTRUSHED_CHANNEL_REPLY: 'memberTrushedpage-reply-service',
 } as const;
 
 export const IpcMailServiceChannels = {
@@ -14,14 +24,13 @@ export const IpcMailServiceChannels = {
     CHANNEL_MAIL_REPLY: 'reply-mail-service',
 } as const;
 
-export type IpcChannelKeyOfService = keyof typeof IpcChannels;
+//export type IpcChannelKeyOfService = keyof typeof IpcChannels;
 
 export type IpcChannelValOfService = (typeof IpcChannels)[keyof typeof IpcChannels];
 
-export type IpcServiceChannelKeyOfService = keyof typeof IpcServiceChannels;
-
+//export type IpcServiceChannelKeyOfService = keyof typeof IpcServiceChannels;
 export type IpcServiceChannelValOfService = (typeof IpcServiceChannels)[keyof typeof IpcServiceChannels];
 
-export type IpcMailServiceChannelsKeyOfService = keyof typeof IpcMailServiceChannels;
+//export type IpcMailServiceChannelsKeyOfService = keyof typeof IpcMailServiceChannels;
 
 export type IpcMailServiceChannelsValOfService = (typeof IpcMailServiceChannels)[keyof typeof IpcMailServiceChannels];

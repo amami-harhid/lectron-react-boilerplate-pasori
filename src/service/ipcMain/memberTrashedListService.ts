@@ -3,21 +3,22 @@ const ipcMain = electron.ipcMain;
 import { LoggerRef } from '@/log/loggerReference';
 const logger = LoggerRef.logger;
 
-import type { CardRow } from '@/db/cards/cardRow';
+import type { MemberRow } from '@/db/members/memberRow';
 import * as IpcServices from '@/channel/ipcService';
 
 import { memberTrashedListServiceMethods } from './memberTrashedListServiceMethods';
 const methods = memberTrashedListServiceMethods;
 
+const channel = IpcServices.IpcServiceChannels.MEMBERTRUSHED_CHANNEL_REQUEST;
+const replyChannel = IpcServices.IpcServiceChannels.MEMBERTRUSHED_CHANNEL_REPLY;
+
 export function ipcMainMemberTrashedListPage() {
-    const channel = IpcServices.IpcServiceChannels.CHANNEL_REQUEST;
-    const replyChannel = IpcServices.IpcServiceChannels.CHANNEL_REPLY;
     ipcMain.on(channel, async(event:Electron.IpcMainEvent, command:string, ...args:any[])=>{
         console.log('ipcMain.on memberTrashedListPage')
         // 論理削除されたメンバーを取得する
         if( command == methods.getTrashedMembers.name ){
             console.log('----getTrashedMembers----')
-            const rows: CardRow[] = await methods.getTrashedMembers();
+            const rows: MemberRow[] = await methods.getTrashedMembers();
             console.log(rows);
             event.reply(replyChannel, rows);
             return;

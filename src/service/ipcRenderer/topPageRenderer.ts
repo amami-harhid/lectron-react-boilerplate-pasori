@@ -1,11 +1,17 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST,
-        CHANNEL_MAIL_REQUEST, CHANNEL_MAIL_REPLY } from '../ipcChannel';
+import * as IpcServices from '@/channel/ipcService';
 import { HistoriesMemberIdmRow } from '@/db/histories/historiesRow';
 
 import { topPageServiceMethods } from '../ipcMain/topPageServiceMethods';
 const methods = topPageServiceMethods;
 const ipcRenderer = window.electronService.ipcServiceRenderer;
 const ipcMailRenderer = window.electronMailService.ipcMailServiceRenderer;
+
+const CHANNEL_REQUEST = IpcServices.IpcServiceChannels.TOPPAGE_CHANNEL_REQUEST;
+const CHANNEL_REPLY = IpcServices.IpcServiceChannels.TOPPAGE_CHANNEL_REPLY;
+
+const CHANNEL_MAIL_REQUEST = IpcServices.IpcMailServiceChannels.CHANNEL_MAIL_REQUEST;
+const CHANNEL_MAIL_REPLY = IpcServices.IpcMailServiceChannels.CHANNEL_MAIL_REPLY;
+
 export const topPageService = {
     /** IDMが紐づいたメンバーを取得する */
     getMemberByIdm: async function(idm:string): Promise<HistoriesMemberIdmRow> {

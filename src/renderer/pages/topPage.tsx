@@ -79,12 +79,15 @@ export function TopPage() {
                 // 入室中
                 Sounds.play({name:"CARD_OUT"})
                 await setOutRoom( fcno, idm);
+                console.log('----- setOutRoom Done')
                 if(row.mail != ''){
                     // 退室通知メール
+                    /*
                     const mailResult = await topPageService.sendMail(row.mail, false, row.name);
                     if(mailResult==false){
                       toast.warning('メール送信失敗');
                     }
+                    */
                 }
                 view.status = '退室しました';
                 view.name = `(${row.name}さん)`;
@@ -93,12 +96,15 @@ export function TopPage() {
                 //console.log('カードタッチ IN row, idm=',row, idm);
                 Sounds.play({name:"CARD_IN"});
                 await setInRoom( fcno, idm);
+                console.log('----- setInRoom Done')
                 if(row.mail != ''){
                     // 入室通知メール
+                    /*
                     const mailResult = await topPageService.sendMail(row.mail, true, row.name);
                     if(mailResult==false){
                       toast.warning('メール送信失敗');
                     }
+                    */
                 }
                 view.status = '入室しました';
                 view.name = `(${row.name}さん)`;

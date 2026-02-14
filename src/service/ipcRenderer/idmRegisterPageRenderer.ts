@@ -1,9 +1,12 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import * as IpcServices from '@/channel/ipcService';
 import type { MemberIdmRow } from '@/db/members/memberIdmRow';
 import { idmRegisterServiceMethods } from '../ipcMain/idmRegistPageServiceMethods';
 const methods = idmRegisterServiceMethods;
 
 const ipcRenderer = window.electronService.ipcServiceRenderer;
+
+const CHANNEL_REQUEST = IpcServices.IpcServiceChannels.IDMREGIST_CHANNEL_REQUEST;
+const CHANNEL_REPLY = IpcServices.IpcServiceChannels.IDMREGIST_CHANNEL_REPLY;
 
 export const idmRegisterService = {
     /** FCNOを指定してIDMを登録する */
@@ -21,9 +24,12 @@ export const idmRegisterService = {
 
     /** FCNOを指定してメンバーを取得する */
     getMemberByFcno: async function(fcno:string): Promise<MemberIdmRow> {
+        console.log('ServiceRenderer getMemberByFcno fcno=',fcno);
         ipcRenderer.send(CHANNEL_REQUEST, methods.getMemberByFcno.name, fcno);    
-        const val = await ipcRenderer.asyncOnce<MemberIdmRow>(CHANNEL_REPLY);
-        return val;
+        const val = await ipcRenderer.asyncOnce(CHANNEL_REPLY);
+        console.log('ServiceRenderer val=',val);
+        const _val:MemberIdmRow = val as MemberIdmRow;
+        return _val;
     },
 
     /** Idmが紐づいているメンバーを取得する */

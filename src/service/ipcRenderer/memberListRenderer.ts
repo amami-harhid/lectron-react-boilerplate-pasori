@@ -1,8 +1,11 @@
-import { CHANNEL_REPLY, CHANNEL_REQUEST } from '../ipcChannel';
+import * as IpcServices from '@/channel/ipcService';
 import { MemberRow } from '@/db/members/memberRow';
 import { memberListPageServiceMethods } from '../ipcMain/memberListServiceMethods';
 const methods = memberListPageServiceMethods;
 const ipcRenderer = window.electronService.ipcServiceRenderer;
+
+const CHANNEL_REQUEST = IpcServices.IpcServiceChannels.MEMBERLIST_CHANNEL_REQUEST;
+const CHANNEL_REPLY = IpcServices.IpcServiceChannels.MEMBERLIST_CHANNEL_REPLY;
 
 export const memberListService = {
     /** FCNOを指定してメンバーを取り出す */

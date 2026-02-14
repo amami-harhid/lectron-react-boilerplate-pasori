@@ -8,15 +8,19 @@ import * as IpcServices from '@/channel/ipcService';
 
 import { memberListPageServiceMethods } from './memberListServiceMethods';
 const methods = memberListPageServiceMethods;
+
+const channel = IpcServices.IpcServiceChannels.MEMBERLIST_CHANNEL_REQUEST;
+const replyChannel = IpcServices.IpcServiceChannels.MEMBERLIST_CHANNEL_REPLY;
+
 export function ipcMainMemberListPage() {
-    const channel = IpcServices.IpcServiceChannels.CHANNEL_REQUEST;
-    const replyChannel = IpcServices.IpcServiceChannels.CHANNEL_REPLY;
     ipcMain.on(channel, async(event:Electron.IpcMainEvent, command:string, ...args:any[])=>{
         console.log('ipcMain.on memberListPage')
         // IDMが紐づいたメンバーを取得する
         if( command == methods.getMemberByFcno.name ){
             const fcno:string = args[0];
+            console.log('membersList command=',command)
             const row: MemberRow = await methods.getMemberByFcno(fcno);
+            console.log('memberList row=',row);
             event.reply(replyChannel, row);
             return;            
         }

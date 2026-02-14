@@ -135,6 +135,7 @@ export function IdmRegisterPage() {
             if(fcno != view.card_fcno) {
                 // fcno を指定して cardを読み込む
                 const row: MemberIdmRow = await idmRegisterService.getMemberByFcno(fcno);
+                console.log('selectCardChange row=',row);
                 if(row){
                     view.selectOn = Display.block;
                     view.idm = view.idm;
@@ -177,7 +178,8 @@ export function IdmRegisterPage() {
     /** 選択リストを作る */
     const redrawSelect = async (ipc_idm:string) => {
         const idmRow: MemberIdmRow = await idmRegisterService.getMemberByIdm(ipc_idm);
-        if(idmRow) {
+        console.log(idmRow)
+        if(idmRow && idmRow.idm != '') {
             // タッチしたIDMが登録済のとき
             view.card_fcno = idmRow.fcno;
             view.card_name = (idmRow.name)?idmRow.name:'';
